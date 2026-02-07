@@ -268,145 +268,145 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo-container">
-            <img src="logo.png" alt="Iron Peak Logo" class="logo-img">
-            <div class="logo-text">Iron Peak</div>
+<div class="header">
+    <div class="logo-container">
+        <img src="logo.png" alt="Iron Peak Logo" class="logo-img">
+        <div class="logo-text">Iron Peak</div>
+    </div>
+    <div class="user-info">
+        <span class="user-email" id="user-email">Loading...</span>
+        <button class="btn btn-secondary" id="logout-btn">Logout</button>
+    </div>
+</div>
+
+<div class="container">
+    <div id="loading" class="loading">⛰️ Loading your dashboard...</div>
+
+    <div id="dashboard-content" class="hidden">
+        <div class="welcome-card">
+            <div class="mountain-icon">🏔️</div>
+            <h1>Welcome to Iron Peak, <span id="username">Athlete</span>! 💪</h1>
+            <p>Ready to conquer your fitness goals and reach new heights?</p>
         </div>
-        <div class="user-info">
-            <span class="user-email" id="user-email">Loading...</span>
-            <button class="btn btn-secondary" id="logout-btn">Logout</button>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">🏃</div>
+                <h3>Workouts This Week</h3>
+                <div class="value">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🔥</div>
+                <h3>Current Streak</h3>
+                <div class="value">0 days</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">💎</div>
+                <h3>Total Workouts</h3>
+                <div class="value">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🏆</div>
+                <h3>Personal Records</h3>
+                <div class="value">0</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h2>⚡ Quick Actions</h2>
+            <div class="action-grid">
+                <a href="peak-stride.html" class="action-btn">
+                    <div class="icon">🏋️</div>
+                    <div class="label">Peak Stride Training</div>
+                </a>
+                <a href="#" class="action-btn">
+                    <div class="icon">📊</div>
+                    <div class="label">View Progress</div>
+                </a>
+                <a href="#" class="action-btn">
+                    <div class="icon">📝</div>
+                    <div class="label">Training Plans</div>
+                </a>
+                <a href="#" class="action-btn">
+                    <div class="icon">⚙️</div>
+                    <div class="label">Settings</div>
+                </a>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="container">
-        <div id="loading" class="loading">⛰️ Loading your dashboard...</div>
-        
-        <div id="dashboard-content" class="hidden">
-            <div class="welcome-card">
-                <div class="mountain-icon">🏔️</div>
-                <h1>Welcome to Iron Peak, <span id="username">Athlete</span>! 💪</h1>
-                <p>Ready to conquer your fitness goals and reach new heights?</p>
-            </div>
+<footer>
+    © 2026 Iron Peak. All rights reserved. | 🏔️ Reach Your Peak
+</footer>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="icon">🏃</div>
-                    <h3>Workouts This Week</h3>
-                    <div class="value">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon">🔥</div>
-                    <h3>Current Streak</h3>
-                    <div class="value">0 days</div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon">💎</div>
-                    <h3>Total Workouts</h3>
-                    <div class="value">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon">🏆</div>
-                    <h3>Personal Records</h3>
-                    <div class="value">0</div>
-                </div>
-            </div>
+<!-- Load Supabase JS Library -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<!-- Load Supabase Config -->
+<script src="supabase-config.js"></script>
 
-            <div class="quick-actions">
-                <h2>⚡ Quick Actions</h2>
-                <div class="action-grid">
-                    <a href="peak-stride.html" class="action-btn">
-                        <div class="icon">🏋️</div>
-                        <div class="label">Peak Stride Training</div>
-                    </a>
-                    <a href="#" class="action-btn">
-                        <div class="icon">📊</div>
-                        <div class="label">View Progress</div>
-                    </a>
-                    <a href="#" class="action-btn">
-                        <div class="icon">📝</div>
-                        <div class="label">Training Plans</div>
-                    </a>
-                    <a href="#" class="action-btn">
-                        <div class="icon">⚙️</div>
-                        <div class="label">Settings</div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+<script>
+    const loadingDiv = document.getElementById('loading');
+    const dashboardContent = document.getElementById('dashboard-content');
+    const userEmailSpan = document.getElementById('user-email');
+    const usernameSpan = document.getElementById('username');
+    const logoutBtn = document.getElementById('logout-btn');
 
-    <footer>
-        © 2026 Iron Peak. All rights reserved. | 🏔️ Reach Your Peak
-    </footer>
+    // Check authentication status
+    async function checkAuth() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
 
-    <!-- Load Supabase JS Library -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <!-- Load Supabase Config -->
-    <script src="supabase-config.js"></script>
-
-    <script>
-        const loadingDiv = document.getElementById('loading');
-        const dashboardContent = document.getElementById('dashboard-content');
-        const userEmailSpan = document.getElementById('user-email');
-        const usernameSpan = document.getElementById('username');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        // Check authentication status
-        async function checkAuth() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            
-            if (!session) {
-                // Not logged in, redirect to login
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // User is logged in
-            const user = session.user;
-            userEmailSpan.textContent = user.email;
-            
-            // Try to get username from user metadata
-            if (user.user_metadata && user.user_metadata.username) {
-                usernameSpan.textContent = user.user_metadata.username;
-            } else {
-                // Fallback to email username
-                usernameSpan.textContent = user.email.split('@')[0];
-            }
-
-            // Show dashboard
-            loadingDiv.classList.add('hidden');
-            dashboardContent.classList.remove('hidden');
-
-            // Load user stats (you can implement this later with your database)
-            // await loadUserStats(user.id);
+        if (!session) {
+            // Not logged in, redirect to login
+            window.location.href = 'login.html';
+            return;
         }
 
-        // Logout function
-        logoutBtn.addEventListener('click', async () => {
-            logoutBtn.disabled = true;
-            logoutBtn.textContent = 'Logging out...';
-            
-            const { error } = await supabaseClient.auth.signOut();
-            
-            if (error) {
-                alert('Error logging out: ' + error.message);
-                logoutBtn.disabled = false;
-                logoutBtn.textContent = 'Logout';
-            } else {
-                window.location.href = 'index.html';
-            }
-        });
+        // User is logged in
+        const user = session.user;
+        userEmailSpan.textContent = user.email;
 
-        // Listen for auth changes
-        supabaseClient.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_OUT') {
-                window.location.href = 'index.html';
-            }
-        });
+        // Try to get username from user metadata
+        if (user.user_metadata && user.user_metadata.username) {
+            usernameSpan.textContent = user.user_metadata.username;
+        } else {
+            // Fallback to email username
+            usernameSpan.textContent = user.email.split('@')[0];
+        }
 
-        // Initialize
-        checkAuth();
-    </script>
+        // Show dashboard
+        loadingDiv.classList.add('hidden');
+        dashboardContent.classList.remove('hidden');
+
+        // Load user stats (you can implement this later with your database)
+        // await loadUserStats(user.id);
+    }
+
+    // Logout function
+    logoutBtn.addEventListener('click', async () => {
+        logoutBtn.disabled = true;
+        logoutBtn.textContent = 'Logging out...';
+
+        const { error } = await supabaseClient.auth.signOut();
+
+        if (error) {
+            alert('Error logging out: ' + error.message);
+            logoutBtn.disabled = false;
+            logoutBtn.textContent = 'Logout';
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
+
+    // Listen for auth changes
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT') {
+            window.location.href = 'index.html';
+        }
+    });
+
+    // Initialize
+    checkAuth();
+</script>
 </body>
 </html>
