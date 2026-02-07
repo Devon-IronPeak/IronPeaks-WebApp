@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Iron Peak</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
             margin: 0;
             padding: 0;
             min-height: 100vh;
@@ -15,123 +23,235 @@
             justify-content: center;
             align-items: center;
             color: white;
+            position: relative;
+        }
+
+        /* Mountain background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml,<svg width="1200" height="600" xmlns="http://www.w3.org/2000/svg"><path d="M 0,300 L 200,100 L 400,180 L 600,50 L 800,150 L 1000,80 L 1200,200 L 1200,600 L 0,600 Z" fill="%23ffffff" fill-opacity="0.03"/><path d="M 0,350 L 150,200 L 350,250 L 550,150 L 750,220 L 950,140 L 1200,280 L 1200,600 L 0,600 Z" fill="%23ffffff" fill-opacity="0.05"/></svg>');
+            background-size: cover;
+            background-position: bottom;
+            opacity: 0.6;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .login-container {
             background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+            margin-bottom: 1rem;
+        }
+
+        .mountain-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
         }
 
         h2 {
             text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .back-link {
+            text-align: center;
             margin-bottom: 1.5rem;
-            font-size: 2rem;
+        }
+
+        .back-link a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .back-link a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
         }
 
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
             font-size: 1rem;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             color: white;
             box-sizing: border-box;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
         }
 
         input[type="email"]::placeholder,
         input[type="password"]::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.6);
         }
 
         input[type="email"]:focus,
         input[type="password"]:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             font-size: 1.1rem;
+            font-weight: 700;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 1rem;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .btn-primary {
-            background: #ff6b6b;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
             color: white;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
         }
 
-        .btn-primary:hover {
-            background: #ff5252;
-            transform: translateY(-2px);
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #ff5252 0%, #ff3838 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
         }
 
         .btn-primary:disabled {
             background: #999;
             cursor: not-allowed;
             transform: none;
+            opacity: 0.7;
         }
 
         .signup-link {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .signup-link p {
+            margin: 0;
+            font-size: 0.95rem;
         }
 
         .signup-link a {
-            color: #ff6b6b;
+            color: #ffd700;
             text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
         }
 
         .signup-link a:hover {
-            text-decoration: underline;
+            color: #ffed4e;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
 
         .error {
-            background: rgba(255, 0, 0, 0.2);
+            background: rgba(255, 68, 68, 0.3);
             color: #ffcccb;
-            padding: 0.5rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
             display: none;
-        }
-
-        .back-link {
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .back-link a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
+            border: 1px solid rgba(255, 68, 68, 0.5);
             font-size: 0.9rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .logo {
+                width: 80px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="login-container">
     <div class="back-link">
-        <a href="index.html">&larr; Back to Home</a>
+        <a href="index.html">← Back to Home</a>
+    </div>
+
+    <div class="logo-container">
+        <img src="../resources/logo.png" alt="Iron Peak Logo" class="logo">
+        <span class="mountain-icon">🏔️</span>
     </div>
 
     <h2>Login to Iron Peak</h2>
@@ -140,16 +260,16 @@
 
     <form id="login-form">
         <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <label for="email">📧 Email</label>
+            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
         </div>
 
         <div class="form-group">
-            <label for="password">Password:</label>
+            <label for="password">🔒 Password</label>
             <input type="password" id="password" name="password" placeholder="Enter your password" required>
         </div>
 
-        <button type="submit" class="btn btn-primary" id="login-btn">Login</button>
+        <button type="submit" class="btn btn-primary" id="login-btn">🚀 Login</button>
     </form>
 
     <div class="signup-link">
@@ -175,7 +295,7 @@
 
         errorDiv.style.display = 'none';
         loginBtn.disabled = true;
-        loginBtn.textContent = 'Logging in...';
+        loginBtn.textContent = '⏳ Logging in...';
 
         try {
             // Sign in with Supabase
@@ -185,19 +305,22 @@
             });
 
             if (error) {
-                errorDiv.textContent = error.message;
+                errorDiv.textContent = '❌ ' + error.message;
                 errorDiv.style.display = 'block';
                 loginBtn.disabled = false;
-                loginBtn.textContent = 'Login';
+                loginBtn.textContent = '🚀 Login';
             } else {
                 // Success! Redirect to dashboard
-                window.location.href = 'dashboard.html';
+                loginBtn.textContent = '✅ Success! Redirecting...';
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 500);
             }
         } catch (error) {
-            errorDiv.textContent = 'An unexpected error occurred. Please try again.';
+            errorDiv.textContent = '❌ An unexpected error occurred. Please try again.';
             errorDiv.style.display = 'block';
             loginBtn.disabled = false;
-            loginBtn.textContent = 'Login';
+            loginBtn.textContent = '🚀 Login';
         }
     });
 
