@@ -1229,6 +1229,61 @@
                 font-size: 0.8rem;
             }
         }
+        /* Today Highlight */
+        .today-highlight {
+            border: 3px solid #2196F3 !important;
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(33, 150, 243, 0.05) 100%) !important;
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.3) !important;
+            position: relative;
+            overflow: visible !important;
+        }
+        
+        .today-highlight::before {
+            content: '📍';
+            position: absolute;
+            top: 50%;
+            left: -15px;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .today-highlight::after {
+            content: 'TODAY';
+            position: absolute;
+            bottom: -8px;
+            right: 15px;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+                transform: translateY(-50%) scale(1);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(33, 150, 243, 0.6);
+                transform: translateY(-50%) scale(1.1);
+            }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1319,7 +1374,7 @@
                     </div>
                     <div class="days-grid">
                         <!-- Monday - Rest -->
-                        <div class="day-row rest-day" data-day-id="w1d1">
+                        <div class="day-row rest-day" data-date="2026-01-26" data-day-id="w1d1">
                             <div class="day-name">MON</div>
                             <div class="day-date">Jan 26</div>
                             <div class="checkbox-label">
@@ -1342,7 +1397,7 @@
                         <div class="note-display" data-note-display="w1d1"></div>
 
                         <!-- Tuesday - Easy + Bike -->
-                        <div class="day-row" data-day-id="w1d2">
+                        <div class="day-row" data-date="2026-01-27" data-day-id="w1d2">
                             <div class="day-name">TUE</div>
                             <div class="day-date">Jan 27</div>
                             <div class="checkbox-label">
@@ -1365,7 +1420,7 @@
                         <div class="note-display" data-note-display="w1d2"></div>
 
                         <!-- Wednesday - Easy -->
-                        <div class="day-row" data-day-id="w1d3">
+                        <div class="day-row" data-date="2026-01-28" data-day-id="w1d3">
                             <div class="day-name">WED</div>
                             <div class="day-date">Jan 28</div>
                             <div class="checkbox-label">
@@ -1388,7 +1443,7 @@
                         <div class="note-display" data-note-display="w1d3"></div>
 
                         <!-- Thursday - Steady -->
-                        <div class="day-row workout-day" data-day-id="w1d4">
+                        <div class="day-row workout-day" data-date="2026-01-29" data-day-id="w1d4">
                             <div class="day-name">THU</div>
                             <div class="day-date">Jan 29</div>
                             <div class="checkbox-label">
@@ -1411,7 +1466,7 @@
                         <div class="note-display" data-note-display="w1d4"></div>
 
                         <!-- Friday - Easy -->
-                        <div class="day-row" data-day-id="w1d5">
+                        <div class="day-row" data-date="2026-01-30" data-day-id="w1d5">
                             <div class="day-name">FRI</div>
                             <div class="day-date">Jan 30</div>
                             <div class="checkbox-label">
@@ -1434,7 +1489,7 @@
                         <div class="note-display" data-note-display="w1d5"></div>
 
                         <!-- Saturday - Rest -->
-                        <div class="day-row rest-day" data-day-id="w1d6">
+                        <div class="day-row rest-day" data-date="2026-01-31" data-day-id="w1d6">
                             <div class="day-name">SAT</div>
                             <div class="day-date">Jan 31</div>
                             <div class="checkbox-label">
@@ -1457,7 +1512,7 @@
                         <div class="note-display" data-note-display="w1d6"></div>
 
                         <!-- Sunday - Long Run -->
-                        <div class="day-row long-run" data-day-id="w1d7">
+                        <div class="day-row long-run" data-date="2026-02-01" data-day-id="w1d7">
                             <div class="day-name">SUN</div>
                             <div class="day-date">Feb 1</div>
                             <div class="checkbox-label">
@@ -1495,12 +1550,12 @@
                         <div class="week-compliance"></div>
                     </div>
                     <div class="week-total">49 km</div>
-                    <div class="toggle-icon">▼</div>
+                    <span class="collapse-indicator">▼</span>
                 </div>
                 <div class="week-content">
                     <div class="days-grid">
                         <!-- Monday -->
-                        <div class="day-row" data-day-id="w2d1">
+                        <div class="day-row" data-date="2026-02-02" data-day-id="w2d1">
                             <div class="day-name">MON</div>
                             <div class="day-date">Feb 2</div>
                             <div class="checkbox-label">
@@ -1523,7 +1578,7 @@
                         <div class="note-display" data-note-display="w2d1"></div>
 
                         <!-- Tuesday -->
-                        <div class="day-row" data-day-id="w2d2">
+                        <div class="day-row" data-date="2026-02-03" data-day-id="w2d2">
                             <div class="day-name">TUE</div>
                             <div class="day-date">Feb 3</div>
                             <div class="checkbox-label">
@@ -1546,7 +1601,7 @@
                         <div class="note-display" data-note-display="w2d2"></div>
 
                         <!-- Wednesday -->
-                        <div class="day-row" data-day-id="w2d3">
+                        <div class="day-row" data-date="2026-02-04" data-day-id="w2d3">
                             <div class="day-name">WED</div>
                             <div class="day-date">Feb 4</div>
                             <div class="checkbox-label">
@@ -1569,7 +1624,7 @@
                         <div class="note-display" data-note-display="w2d3"></div>
 
                         <!-- Thursday -->
-                        <div class="day-row workout-day" data-day-id="w2d4">
+                        <div class="day-row workout-day" data-date="2026-02-05" data-day-id="w2d4">
                             <div class="day-name">THU</div>
                             <div class="day-date">Feb 5</div>
                             <div class="checkbox-label">
@@ -1592,7 +1647,7 @@
                         <div class="note-display" data-note-display="w2d4"></div>
 
                         <!-- Friday -->
-                        <div class="day-row" data-day-id="w2d5">
+                        <div class="day-row" data-date="2026-02-06" data-day-id="w2d5">
                             <div class="day-name">FRI</div>
                             <div class="day-date">Feb 6</div>
                             <div class="checkbox-label">
@@ -1615,7 +1670,7 @@
                         <div class="note-display" data-note-display="w2d5"></div>
 
                         <!-- Saturday -->
-                        <div class="day-row" data-day-id="w2d6">
+                        <div class="day-row" data-date="2026-02-07" data-day-id="w2d6">
                             <div class="day-name">SAT</div>
                             <div class="day-date">Feb 7</div>
                             <div class="checkbox-label">
@@ -1638,7 +1693,7 @@
                         <div class="note-display" data-note-display="w2d6"></div>
 
                         <!-- Sunday -->
-                        <div class="day-row long-run" data-day-id="w2d7">
+                        <div class="day-row long-run" data-date="2026-02-08" data-day-id="w2d7">
                             <div class="day-name">SUN</div>
                             <div class="day-date">Feb 8</div>
                             <div class="checkbox-label">
@@ -1677,12 +1732,12 @@
                         <div class="week-compliance"></div>
                     </div>
                     <div class="week-total">53 km</div>
-                    <div class="toggle-icon">▼</div>
+                    <span class="collapse-indicator">▼</span>
                 </div>
                 <div class="week-content">
                     <div class="days-grid">
                         <!-- Monday -->
-                        <div class="day-row" data-day-id="w3d1">
+                        <div class="day-row" data-date="2026-02-09" data-day-id="w3d1">
                             <div class="day-name">MON</div>
                             <div class="day-date">Feb 9</div>
                             <div class="checkbox-label">
@@ -1705,7 +1760,7 @@
                         <div class="note-display" data-note-display="w3d1"></div>
 
                         <!-- Tuesday -->
-                        <div class="day-row" data-day-id="w3d2">
+                        <div class="day-row" data-date="2026-02-10" data-day-id="w3d2">
                             <div class="day-name">TUE</div>
                             <div class="day-date">Feb 10</div>
                             <div class="checkbox-label">
@@ -1728,7 +1783,7 @@
                         <div class="note-display" data-note-display="w3d2"></div>
 
                         <!-- Wednesday -->
-                        <div class="day-row" data-day-id="w3d3">
+                        <div class="day-row" data-date="2026-02-11" data-day-id="w3d3">
                             <div class="day-name">WED</div>
                             <div class="day-date">Feb 11</div>
                             <div class="checkbox-label">
@@ -1751,7 +1806,7 @@
                         <div class="note-display" data-note-display="w3d3"></div>
 
                         <!-- Thursday -->
-                        <div class="day-row workout-day key-workout" data-day-id="w3d4">
+                        <div class="day-row workout-day key-workout" data-date="2026-02-12" data-day-id="w3d4">
                             <div class="day-name">THU</div>
                             <div class="day-date">Feb 12</div>
                             <div class="checkbox-label">
@@ -1774,7 +1829,7 @@
                         <div class="note-display" data-note-display="w3d4"></div>
 
                         <!-- Friday -->
-                        <div class="day-row" data-day-id="w3d5">
+                        <div class="day-row" data-date="2026-02-13" data-day-id="w3d5">
                             <div class="day-name">FRI</div>
                             <div class="day-date">Feb 13</div>
                             <div class="checkbox-label">
@@ -1797,7 +1852,7 @@
                         <div class="note-display" data-note-display="w3d5"></div>
 
                         <!-- Saturday -->
-                        <div class="day-row" data-day-id="w3d6">
+                        <div class="day-row" data-date="2026-02-14" data-day-id="w3d6">
                             <div class="day-name">SAT</div>
                             <div class="day-date">Feb 14</div>
                             <div class="checkbox-label">
@@ -1820,7 +1875,7 @@
                         <div class="note-display" data-note-display="w3d6"></div>
 
                         <!-- Sunday -->
-                        <div class="day-row long-run" data-day-id="w3d7">
+                        <div class="day-row long-run" data-date="2026-02-15" data-day-id="w3d7">
                             <div class="day-name">SUN</div>
                             <div class="day-date">Feb 15</div>
                             <div class="checkbox-label">
@@ -1859,12 +1914,12 @@
                         <div class="week-compliance"></div>
                     </div>
                     <div class="week-total">55 km</div>
-                    <div class="toggle-icon">▼</div>
+                    <span class="collapse-indicator">▼</span>
                 </div>
                 <div class="week-content">
                     <div class="days-grid">
                         <!-- Monday -->
-                        <div class="day-row" data-day-id="w4d1">
+                        <div class="day-row" data-date="2026-02-16" data-day-id="w4d1">
                             <div class="day-name">MON</div>
                             <div class="day-date">Feb 16</div>
                             <div class="checkbox-label">
@@ -1887,7 +1942,7 @@
                         <div class="note-display" data-note-display="w4d1"></div>
 
                         <!-- Tuesday -->
-                        <div class="day-row" data-day-id="w4d2">
+                        <div class="day-row" data-date="2026-02-17" data-day-id="w4d2">
                             <div class="day-name">TUE</div>
                             <div class="day-date">Feb 17</div>
                             <div class="checkbox-label">
@@ -1910,7 +1965,7 @@
                         <div class="note-display" data-note-display="w4d2"></div>
 
                         <!-- Wednesday -->
-                        <div class="day-row" data-day-id="w4d3">
+                        <div class="day-row" data-date="2026-02-18" data-day-id="w4d3">
                             <div class="day-name">WED</div>
                             <div class="day-date">Feb 18</div>
                             <div class="checkbox-label">
@@ -1933,7 +1988,7 @@
                         <div class="note-display" data-note-display="w4d3"></div>
 
                         <!-- Thursday -->
-                        <div class="day-row workout-day" data-day-id="w4d4">
+                        <div class="day-row workout-day" data-date="2026-02-19" data-day-id="w4d4">
                             <div class="day-name">THU</div>
                             <div class="day-date">Feb 19</div>
                             <div class="checkbox-label">
@@ -1956,7 +2011,7 @@
                         <div class="note-display" data-note-display="w4d4"></div>
 
                         <!-- Friday -->
-                        <div class="day-row" data-day-id="w4d5">
+                        <div class="day-row" data-date="2026-02-20" data-day-id="w4d5">
                             <div class="day-name">FRI</div>
                             <div class="day-date">Feb 20</div>
                             <div class="checkbox-label">
@@ -1979,7 +2034,7 @@
                         <div class="note-display" data-note-display="w4d5"></div>
 
                         <!-- Saturday -->
-                        <div class="day-row" data-day-id="w4d6">
+                        <div class="day-row" data-date="2026-02-21" data-day-id="w4d6">
                             <div class="day-name">SAT</div>
                             <div class="day-date">Feb 21</div>
                             <div class="checkbox-label">
@@ -2002,7 +2057,7 @@
                         <div class="note-display" data-note-display="w4d6"></div>
 
                         <!-- Sunday -->
-                        <div class="day-row long-run" data-day-id="w4d7">
+                        <div class="day-row long-run" data-date="2026-02-22" data-day-id="w4d7">
                             <div class="day-name">SUN</div>
                             <div class="day-date">Feb 22</div>
                             <div class="checkbox-label">
@@ -2053,15 +2108,15 @@
                             <div class="week-compliance"></div>
                         </div>
                         <div class="week-total">52 km</div>
-                        <div class="toggle-icon">▼</div>
+                        <span class="collapse-indicator">▼</span>
                     </div>
                     <div class="week-content">
                         <div class="days-grid">
                             <!-- Days continue with same pattern... I'll create them all -->
                             <!-- Monday -->
-                            <div class="day-row" data-day-id="w5d1">
-                                <div class="day-name">MON</div>
-                                <div class="day-date">Feb 23</div>
+                            <div class="day-row" data-date="2026-02-23" data-day-id="w5d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">Feb 23</div>
                                 <div class="checkbox-label">
                                     <input type="checkbox" class="checkbox" data-id="w5d1">
                                     Done
@@ -2082,9 +2137,9 @@
                             <div class="note-display" data-note-display="w5d1"></div>
 
                             <!-- Tuesday -->
-                            <div class="day-row" data-day-id="w5d2">
-                                <div class="day-name">TUE</div>
-                                <div class="day-date">Feb 24</div>
+                            <div class="day-row" data-date="2026-02-24" data-day-id="w5d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">Feb 24</div>
                                 <div class="checkbox-label">
                                     <input type="checkbox" class="checkbox" data-id="w5d2">
                                     Done
@@ -2105,9 +2160,9 @@
                             <div class="note-display" data-note-display="w5d2"></div>
 
                             <!-- Wednesday -->
-                            <div class="day-row" data-day-id="w5d3">
-                                <div class="day-name">WED</div>
-                                <div class="day-date">Feb 25</div>
+                            <div class="day-row" data-date="2026-02-25" data-day-id="w5d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">Feb 25</div>
                                 <div class="checkbox-label">
                                     <input type="checkbox" class="checkbox" data-id="w5d3">
                                     Done
@@ -2128,9 +2183,9 @@
                             <div class="note-display" data-note-display="w5d3"></div>
 
                             <!-- Thursday - KEY WORKOUT -->
-                            <div class="day-row workout-day key-workout" data-day-id="w5d4">
-                                <div class="day-name">THU</div>
-                                <div class="day-date">Feb 26</div>
+                            <div class="day-row workout-day key-workout" data-date="2026-02-26" data-day-id="w5d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">Feb 26</div>
                                 <div class="checkbox-label">
                                     <input type="checkbox" class="checkbox" data-id="w5d4">
                                     Done
@@ -2151,9 +2206,9 @@
                             <div class="note-display" data-note-display="w5d4"></div>
 
                             <!-- Friday -->
-                            <div class="day-row" data-day-id="w5d5">
-                                <div class="day-name">FRI</div>
-                                <div class="day-date">Feb 27</div>
+                            <div class="day-row" data-date="2026-02-27" data-day-id="w5d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">Feb 27</div>
                                 <div class="checkbox-label">
                                     <input type="checkbox" class="checkbox" data-id="w5d5">
                                     Done
@@ -2174,9 +2229,9 @@
                             <div class="note-display" data-note-display="w5d5"></div>
 
                             <!-- Saturday -->
-                            <div class="day-row" data-day-id="w5d6">
-                                <div class="day-name">SAT</div>
-                                <div class="day-date">Feb 28</div>
+                            <div class="day-row" data-date="2026-02-28" data-day-id="w5d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">Feb 28</div>
                                 <div class="checkbox-label">
                                     <input type="checkbox" class="checkbox" data-id="w5d6">
                                     Done
@@ -2197,9 +2252,9 @@
                             <div class="note-display" data-note-display="w5d6"></div>
 
                             <!-- Sunday -->
-                            <div class="day-row long-run" data-day-id="w5d7">
-                                <div class="day-name">SUN</div>
-                                <div class="day-date">Mar 1</div>
+                            <div class="day-row long-run" data-date="2026-03-01" data-day-id="w5d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">Mar 1</div>
                                 <div class="checkbox-label">
                                     <input type="checkbox" class="checkbox" data-id="w5d7">
                                     Done
@@ -2234,12 +2289,13 @@
                         <div class="week-compliance"></div>
                     </div>
                     <div class="week-total">50-52 km</div>
-                    <div class="toggle-icon">▼</div>
+                    <span class="collapse-indicator">▼</span>
                 </div>
                 <div class="week-content">
                     <div class="days-grid">
-                        <div class="day-row" data-day-id="w6d1">
-                            <div class="day-name">MON</div><div class="day-date">Mar 2</div>
+                        <div class="day-row" data-date="2026-03-02" data-day-id="w6d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">Mar 2</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w6d1">Done</div>
                             <div class="workout-name" data-id="w6d1">Rest 💤 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w6d1">✗</div>Miss</div>
@@ -2249,8 +2305,9 @@
                         <div class="notes-section" data-id="w6d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w6d1"></div>
                         <div class="note-display" data-note-display="w6d1"></div>
 
-                        <div class="day-row" data-day-id="w6d2">
-                            <div class="day-name">TUE</div><div class="day-date">Mar 3</div>
+                        <div class="day-row" data-date="2026-03-03" data-day-id="w6d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">Mar 3</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w6d2">Done</div>
                             <div class="workout-name" data-id="w6d2">Easy + Bike 🚴 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w6d2">✗</div>Miss</div>
@@ -2260,8 +2317,9 @@
                         <div class="notes-section" data-id="w6d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w6d2"></div>
                         <div class="note-display" data-note-display="w6d2"></div>
 
-                        <div class="day-row" data-day-id="w6d3">
-                            <div class="day-name">WED</div><div class="day-date">Mar 4</div>
+                        <div class="day-row" data-date="2026-03-04" data-day-id="w6d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">Mar 4</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w6d3">Done</div>
                             <div class="workout-name" data-id="w6d3">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w6d3">✗</div>Miss</div>
@@ -2271,8 +2329,9 @@
                         <div class="notes-section" data-id="w6d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w6d3"></div>
                         <div class="note-display" data-note-display="w6d3"></div>
 
-                        <div class="day-row workout-day key-workout" data-day-id="w6d4">
-                            <div class="day-name">THU</div><div class="day-date">Mar 5</div>
+                        <div class="day-row workout-day key-workout" data-date="2026-03-05" data-day-id="w6d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">Mar 5</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w6d4">Done</div>
                             <div class="workout-name" data-id="w6d4">Threshold Combo: 2km WU, 20min @ Threshold, 5min jog, 5min @ MP, CD 🔥 🗝️ <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w6d4">✗</div>Miss</div>
@@ -2282,8 +2341,9 @@
                         <div class="notes-section" data-id="w6d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w6d4"></div>
                         <div class="note-display" data-note-display="w6d4"></div>
 
-                        <div class="day-row" data-day-id="w6d5">
-                            <div class="day-name">FRI</div><div class="day-date">Mar 6</div>
+                        <div class="day-row" data-date="2026-03-06" data-day-id="w6d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">Mar 6</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w6d5">Done</div>
                             <div class="workout-name" data-id="w6d5">Easy 🌿 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w6d5">✗</div>Miss</div>
@@ -2293,8 +2353,9 @@
                         <div class="notes-section" data-id="w6d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w6d5"></div>
                         <div class="note-display" data-note-display="w6d5"></div>
 
-                        <div class="day-row" data-day-id="w6d6">
-                            <div class="day-name">SAT</div><div class="day-date">Mar 7</div>
+                        <div class="day-row" data-date="2026-03-07" data-day-id="w6d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">Mar 7</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w6d6">Done</div>
                             <div class="workout-name" data-id="w6d6">Rest 💤 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w6d6">✗</div>Miss</div>
@@ -2304,8 +2365,9 @@
                         <div class="notes-section" data-id="w6d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w6d6"></div>
                         <div class="note-display" data-note-display="w6d6"></div>
 
-                        <div class="day-row" data-day-id="w6d7">
-                            <div class="day-name">SUN</div><div class="day-date">Mar 8</div>
+                        <div class="day-row" data-date="2026-03-08" data-day-id="w6d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">Mar 8</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w6d7">Done</div>
                             <div class="workout-name" data-id="w6d7">26km PROGRESSION: ~10km easy, ~8-10km steady, 6-8km @ MP 🔥 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w6d7">✗</div>Miss</div>
@@ -2330,12 +2392,13 @@
                         <div class="week-compliance"></div>
                     </div>
                     <div class="week-total">58-59 km</div>
-                    <div class="toggle-icon">▼</div>
+                    <span class="collapse-indicator">▼</span>
                 </div>
                 <div class="week-content">
                     <div class="days-grid">
-                        <div class="day-row" data-day-id="w7d1">
-                            <div class="day-name">MON</div><div class="day-date">Mar 9</div>
+                        <div class="day-row" data-date="2026-03-09" data-day-id="w7d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">Mar 9</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w7d1">Done</div>
                             <div class="workout-name" data-id="w7d1">Rest 💤 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w7d1">✗</div>Miss</div>
@@ -2345,8 +2408,9 @@
                         <div class="notes-section" data-id="w7d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w7d1"></div>
                         <div class="note-display" data-note-display="w7d1"></div>
 
-                        <div class="day-row" data-day-id="w7d2">
-                            <div class="day-name">TUE</div><div class="day-date">Mar 10</div>
+                        <div class="day-row" data-date="2026-03-10" data-day-id="w7d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">Mar 10</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w7d2">Done</div>
                             <div class="workout-name" data-id="w7d2">Easy + Bike 🚴 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w7d2">✗</div>Miss</div>
@@ -2356,8 +2420,9 @@
                         <div class="notes-section" data-id="w7d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w7d2"></div>
                         <div class="note-display" data-note-display="w7d2"></div>
 
-                        <div class="day-row" data-day-id="w7d3">
-                            <div class="day-name">WED</div><div class="day-date">Mar 11</div>
+                        <div class="day-row" data-date="2026-03-11" data-day-id="w7d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">Mar 11</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w7d3">Done</div>
                             <div class="workout-name" data-id="w7d3">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w7d3">✗</div>Miss</div>
@@ -2367,8 +2432,9 @@
                         <div class="notes-section" data-id="w7d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w7d3"></div>
                         <div class="note-display" data-note-display="w7d3"></div>
 
-                        <div class="day-row workout-day key-workout" data-day-id="w7d4">
-                            <div class="day-name">THU</div><div class="day-date">Mar 12</div>
+                        <div class="day-row workout-day key-workout" data-date="2026-03-12" data-day-id="w7d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">Mar 12</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w7d4">Done</div>
                             <div class="workout-name" data-id="w7d4">Speed: 2km WU, 6-8 × 800m @ HM, 400m jog 🔥 🗝️ <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w7d4">✗</div>Miss</div>
@@ -2378,8 +2444,9 @@
                         <div class="notes-section" data-id="w7d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w7d4"></div>
                         <div class="note-display" data-note-display="w7d4"></div>
 
-                        <div class="day-row" data-day-id="w7d5">
-                            <div class="day-name">FRI</div><div class="day-date">Mar 13</div>
+                        <div class="day-row" data-date="2026-03-13" data-day-id="w7d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">Mar 13</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w7d5">Done</div>
                             <div class="workout-name" data-id="w7d5">Easy 🌿 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w7d5">✗</div>Miss</div>
@@ -2389,8 +2456,9 @@
                         <div class="notes-section" data-id="w7d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w7d5"></div>
                         <div class="note-display" data-note-display="w7d5"></div>
 
-                        <div class="day-row" data-day-id="w7d6">
-                            <div class="day-name">SAT</div><div class="day-date">Mar 14</div>
+                        <div class="day-row" data-date="2026-03-14" data-day-id="w7d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">Mar 14</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w7d6">Done</div>
                             <div class="workout-name" data-id="w7d6">Rest 💤 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w7d6">✗</div>Miss</div>
@@ -2400,8 +2468,9 @@
                         <div class="notes-section" data-id="w7d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w7d6"></div>
                         <div class="note-display" data-note-display="w7d6"></div>
 
-                        <div class="day-row long-run" data-day-id="w7d7">
-                            <div class="day-name">SUN</div><div class="day-date">Mar 15</div>
+                        <div class="day-row long-run" data-date="2026-03-15" data-day-id="w7d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">Mar 15</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w7d7">Done</div>
                             <div class="workout-name" data-id="w7d7">Long Easy 🏃 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w7d7">✗</div>Miss</div>
@@ -2426,12 +2495,13 @@
                         <div class="week-compliance"></div>
                     </div>
                     <div class="week-total">58 km</div>
-                    <div class="toggle-icon">▼</div>
+                    <span class="collapse-indicator">▼</span>
                 </div>
                 <div class="week-content">
                     <div class="days-grid">
-                        <div class="day-row" data-day-id="w8d1">
-                            <div class="day-name">MON</div><div class="day-date">Mar 16</div>
+                        <div class="day-row" data-date="2026-03-16" data-day-id="w8d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">Mar 16</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d1">Done</div>
                             <div class="workout-name" data-id="w8d1">Rest 💤 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d1">✗</div>Miss</div>
@@ -2441,8 +2511,9 @@
                         <div class="notes-section" data-id="w8d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d1"></div>
                         <div class="note-display" data-note-display="w8d1"></div>
 
-                        <div class="day-row" data-day-id="w8d2">
-                            <div class="day-name">TUE</div><div class="day-date">Mar 17</div>
+                        <div class="day-row" data-date="2026-03-17" data-day-id="w8d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">Mar 17</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d2">Done</div>
                             <div class="workout-name" data-id="w8d2">Easy + Strides 🏃‍♂️ <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d2">✗</div>Miss</div>
@@ -2452,8 +2523,9 @@
                         <div class="notes-section" data-id="w8d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d2"></div>
                         <div class="note-display" data-note-display="w8d2"></div>
 
-                        <div class="day-row" data-day-id="w8d3">
-                            <div class="day-name">WED</div><div class="day-date">Mar 18</div>
+                        <div class="day-row" data-date="2026-03-18" data-day-id="w8d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">Mar 18</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d3">Done</div>
                             <div class="workout-name" data-id="w8d3">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d3">✗</div>Miss</div>
@@ -2463,8 +2535,9 @@
                         <div class="notes-section" data-id="w8d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d3"></div>
                         <div class="note-display" data-note-display="w8d3"></div>
 
-                        <div class="day-row workout-day key-workout" data-day-id="w8d4">
-                            <div class="day-name">THU</div><div class="day-date">Mar 19</div>
+                        <div class="day-row workout-day key-workout" data-date="2026-03-19" data-day-id="w8d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">Mar 19</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d4">Done</div>
                             <div class="workout-name" data-id="w8d4">Intervals (VO2max) 🔥 🗝️ <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d4">✗</div>Miss</div>
@@ -2474,8 +2547,9 @@
                         <div class="notes-section" data-id="w8d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d4"></div>
                         <div class="note-display" data-note-display="w8d4"></div>
 
-                        <div class="day-row" data-day-id="w8d5">
-                            <div class="day-name">FRI</div><div class="day-date">Mar 20</div>
+                        <div class="day-row" data-date="2026-03-20" data-day-id="w8d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">Mar 20</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d5">Done</div>
                             <div class="workout-name" data-id="w8d5">Easy 🌿 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d5">✗</div>Miss</div>
@@ -2485,8 +2559,9 @@
                         <div class="notes-section" data-id="w8d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d5"></div>
                         <div class="note-display" data-note-display="w8d5"></div>
 
-                        <div class="day-row" data-day-id="w8d6">
-                            <div class="day-name">SAT</div><div class="day-date">Mar 21</div>
+                        <div class="day-row" data-date="2026-03-21" data-day-id="w8d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">Mar 21</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d6">Done</div>
                             <div class="workout-name" data-id="w8d6">Rest 💤 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d6">✗</div>Miss</div>
@@ -2496,8 +2571,9 @@
                         <div class="notes-section" data-id="w8d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d6"></div>
                         <div class="note-display" data-note-display="w8d6"></div>
 
-                        <div class="day-row long-run" data-day-id="w8d7">
-                            <div class="day-name">SUN</div><div class="day-date">Mar 22</div>
+                        <div class="day-row long-run" data-date="2026-03-22" data-day-id="w8d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">Mar 22</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d7">Done</div>
                             <div class="workout-name" data-id="w8d7">Long Easy 🏃 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d7">✗</div>Miss</div>
@@ -2534,12 +2610,13 @@
                             <div class="week-compliance"></div>
                         </div>
                         <div class="week-total">56 km</div>
-                        <div class="toggle-icon">▼</div>
+                        <span class="collapse-indicator">▼</span>
                     </div>
                     <div class="week-content">
                         <div class="days-grid">
-                            <div class="day-row" data-day-id="w10d1">
-                                <div class="day-name">MON</div><div class="day-date">Mar 30</div>
+                            <div class="day-row" data-date="2026-03-30" data-day-id="w10d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">Mar 30</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w10d1">Done</div>
                                 <div class="workout-name" data-id="w10d1">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w10d1">✗</div>Miss</div>
@@ -2549,8 +2626,9 @@
                             <div class="notes-section" data-id="w10d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w10d1"></div>
                             <div class="note-display" data-note-display="w10d1"></div>
 
-                            <div class="day-row" data-day-id="w10d2">
-                                <div class="day-name">TUE</div><div class="day-date">Mar 31</div>
+                            <div class="day-row" data-date="2026-03-31" data-day-id="w10d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">Mar 31</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w10d2">Done</div>
                                 <div class="workout-name" data-id="w10d2">Easy + Bike 🚴 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w10d2">✗</div>Miss</div>
@@ -2560,8 +2638,9 @@
                             <div class="notes-section" data-id="w10d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w10d2"></div>
                             <div class="note-display" data-note-display="w10d2"></div>
 
-                            <div class="day-row" data-day-id="w10d3">
-                                <div class="day-name">WED</div><div class="day-date">Apr 1</div>
+                            <div class="day-row" data-date="2026-04-01" data-day-id="w10d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">Apr 1</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w10d3">Done</div>
                                 <div class="workout-name" data-id="w10d3">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w10d3">✗</div>Miss</div>
@@ -2571,8 +2650,9 @@
                             <div class="notes-section" data-id="w10d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w10d3"></div>
                             <div class="note-display" data-note-display="w10d3"></div>
 
-                            <div class="day-row key-workout" data-day-id="w10d4">
-                                <div class="day-name">THU</div><div class="day-date">Apr 2</div>
+                            <div class="day-row key-workout" data-date="2026-04-02" data-day-id="w10d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">Apr 2</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w10d4">Done</div>
                                 <div class="workout-name" data-id="w10d4">10km Continuous @ MP 🎯 🗝️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w10d4">✗</div>Miss</div>
@@ -2582,8 +2662,9 @@
                             <div class="notes-section" data-id="w10d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w10d4"></div>
                             <div class="note-display" data-note-display="w10d4"></div>
 
-                            <div class="day-row" data-day-id="w10d5">
-                                <div class="day-name">FRI</div><div class="day-date">Apr 3</div>
+                            <div class="day-row" data-date="2026-04-03" data-day-id="w10d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">Apr 3</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w10d5">Done</div>
                                 <div class="workout-name" data-id="w10d5">Easy 🌿 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w10d5">✗</div>Miss</div>
@@ -2593,8 +2674,9 @@
                             <div class="notes-section" data-id="w10d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w10d5"></div>
                             <div class="note-display" data-note-display="w10d5"></div>
 
-                            <div class="day-row" data-day-id="w10d6">
-                                <div class="day-name">SAT</div><div class="day-date">Apr 4</div>
+                            <div class="day-row" data-date="2026-04-04" data-day-id="w10d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">Apr 4</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w10d6">Done</div>
                                 <div class="workout-name" data-id="w10d6">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w10d6">✗</div>Miss</div>
@@ -2604,8 +2686,9 @@
                             <div class="notes-section" data-id="w10d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w10d6"></div>
                             <div class="note-display" data-note-display="w10d6"></div>
 
-                            <div class="day-row" data-day-id="w10d7">
-                                <div class="day-name">SUN</div><div class="day-date">Apr 5</div>
+                            <div class="day-row" data-date="2026-04-05" data-day-id="w10d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">Apr 5</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w10d7">Done</div>
                                 <div class="workout-name" data-id="w10d7">28km (Last 6-8km @ MP) 🔥 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w10d7">✗</div>Miss</div>
@@ -2631,12 +2714,13 @@
                             <div class="week-compliance"></div>
                         </div>
                         <div class="week-total">60-62 km</div>
-                        <div class="toggle-icon">▼</div>
+                        <span class="collapse-indicator">▼</span>
                     </div>
                     <div class="week-content">
                         <div class="days-grid">
-                            <div class="day-row" data-day-id="w11d1">
-                                <div class="day-name">MON</div><div class="day-date">Apr 6</div>
+                            <div class="day-row" data-date="2026-04-06" data-day-id="w11d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">Apr 6</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w11d1">Done</div>
                                 <div class="workout-name" data-id="w11d1">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w11d1">✗</div>Miss</div>
@@ -2646,8 +2730,9 @@
                             <div class="notes-section" data-id="w11d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w11d1"></div>
                             <div class="note-display" data-note-display="w11d1"></div>
 
-                            <div class="day-row" data-day-id="w11d2">
-                                <div class="day-name">TUE</div><div class="day-date">Apr 7</div>
+                            <div class="day-row" data-date="2026-04-07" data-day-id="w11d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">Apr 7</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w11d2">Done</div>
                                 <div class="workout-name" data-id="w11d2">Easy + Bike 🚴 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w11d2">✗</div>Miss</div>
@@ -2657,8 +2742,9 @@
                             <div class="notes-section" data-id="w11d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w11d2"></div>
                             <div class="note-display" data-note-display="w11d2"></div>
 
-                            <div class="day-row" data-day-id="w11d3">
-                                <div class="day-name">WED</div><div class="day-date">Apr 8</div>
+                            <div class="day-row" data-date="2026-04-08" data-day-id="w11d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">Apr 8</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w11d3">Done</div>
                                 <div class="workout-name" data-id="w11d3">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w11d3">✗</div>Miss</div>
@@ -2668,8 +2754,9 @@
                             <div class="notes-section" data-id="w11d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w11d3"></div>
                             <div class="note-display" data-note-display="w11d3"></div>
 
-                            <div class="day-row key-workout" data-day-id="w11d4">
-                                <div class="day-name">THU</div><div class="day-date">Apr 9</div>
+                            <div class="day-row key-workout" data-date="2026-04-09" data-day-id="w11d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">Apr 9</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w11d4">Done</div>
                                 <div class="workout-name" data-id="w11d4">12km Total (6-8km @ MP) 🎯 🗝️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w11d4">✗</div>Miss</div>
@@ -2679,8 +2766,9 @@
                             <div class="notes-section" data-id="w11d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w11d4"></div>
                             <div class="note-display" data-note-display="w11d4"></div>
 
-                            <div class="day-row" data-day-id="w11d5">
-                                <div class="day-name">FRI</div><div class="day-date">Apr 10</div>
+                            <div class="day-row" data-date="2026-04-10" data-day-id="w11d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">Apr 10</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w11d5">Done</div>
                                 <div class="workout-name" data-id="w11d5">Easy 🌿 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w11d5">✗</div>Miss</div>
@@ -2690,8 +2778,9 @@
                             <div class="notes-section" data-id="w11d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w11d5"></div>
                             <div class="note-display" data-note-display="w11d5"></div>
 
-                            <div class="day-row" data-day-id="w11d6">
-                                <div class="day-name">SAT</div><div class="day-date">Apr 11</div>
+                            <div class="day-row" data-date="2026-04-11" data-day-id="w11d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">Apr 11</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w11d6">Done</div>
                                 <div class="workout-name" data-id="w11d6">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w11d6">✗</div>Miss</div>
@@ -2701,8 +2790,9 @@
                             <div class="notes-section" data-id="w11d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w11d6"></div>
                             <div class="note-display" data-note-display="w11d6"></div>
 
-                            <div class="day-row long-run" data-day-id="w11d7">
-                                <div class="day-name">SUN</div><div class="day-date">Apr 12</div>
+                            <div class="day-row long-run" data-date="2026-04-12" data-day-id="w11d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">Apr 12</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w11d7">Done</div>
                                 <div class="workout-name" data-id="w11d7">30-32km PROGRESSION PEAK: ~12-14km easy, ~8-10km steady, 8-10km build to MP 🔥🔥 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w11d7">✗</div>Miss</div>
@@ -2728,12 +2818,13 @@
                             <div class="week-compliance"></div>
                         </div>
                         <div class="week-total">54-58 km</div>
-                        <div class="toggle-icon">▼</div>
+                        <span class="collapse-indicator">▼</span>
                     </div>
                     <div class="week-content">
                         <div class="days-grid">
-                            <div class="day-row" data-day-id="w12d1">
-                                <div class="day-name">MON</div><div class="day-date">Apr 13</div>
+                            <div class="day-row" data-date="2026-04-13" data-day-id="w12d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">Apr 13</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w12d1">Done</div>
                                 <div class="workout-name" data-id="w12d1">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w12d1">✗</div>Miss</div>
@@ -2743,8 +2834,9 @@
                             <div class="notes-section" data-id="w12d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w12d1"></div>
                             <div class="note-display" data-note-display="w12d1"></div>
 
-                            <div class="day-row" data-day-id="w12d2">
-                                <div class="day-name">TUE</div><div class="day-date">Apr 14</div>
+                            <div class="day-row" data-date="2026-04-14" data-day-id="w12d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">Apr 14</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w12d2">Done</div>
                                 <div class="workout-name" data-id="w12d2">Easy + Bike 🚴 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w12d2">✗</div>Miss</div>
@@ -2754,8 +2846,9 @@
                             <div class="notes-section" data-id="w12d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w12d2"></div>
                             <div class="note-display" data-note-display="w12d2"></div>
 
-                            <div class="day-row" data-day-id="w12d3">
-                                <div class="day-name">WED</div><div class="day-date">Apr 15</div>
+                            <div class="day-row" data-date="2026-04-15" data-day-id="w12d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">Apr 15</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w12d3">Done</div>
                                 <div class="workout-name" data-id="w12d3">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w12d3">✗</div>Miss</div>
@@ -2765,8 +2858,9 @@
                             <div class="notes-section" data-id="w12d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w12d3"></div>
                             <div class="note-display" data-note-display="w12d3"></div>
 
-                            <div class="day-row key-workout" data-day-id="w12d4">
-                                <div class="day-name">THU</div><div class="day-date">Apr 16</div>
+                            <div class="day-row key-workout" data-date="2026-04-16" data-day-id="w12d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">Apr 16</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w12d4">Done</div>
                                 <div class="workout-name" data-id="w12d4">Threshold Combo: 2km WU, 20min @ Threshold, 5min jog, 5min @ MP, 3-4km CD 🔥 🗝️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w12d4">✗</div>Miss</div>
@@ -2776,8 +2870,9 @@
                             <div class="notes-section" data-id="w12d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w12d4"></div>
                             <div class="note-display" data-note-display="w12d4"></div>
 
-                            <div class="day-row" data-day-id="w12d5">
-                                <div class="day-name">FRI</div><div class="day-date">Apr 17</div>
+                            <div class="day-row" data-date="2026-04-17" data-day-id="w12d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">Apr 17</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w12d5">Done</div>
                                 <div class="workout-name" data-id="w12d5">Easy 🌿 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w12d5">✗</div>Miss</div>
@@ -2787,8 +2882,9 @@
                             <div class="notes-section" data-id="w12d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w12d5"></div>
                             <div class="note-display" data-note-display="w12d5"></div>
 
-                            <div class="day-row" data-day-id="w12d6">
-                                <div class="day-name">SAT</div><div class="day-date">Apr 18</div>
+                            <div class="day-row" data-date="2026-04-18" data-day-id="w12d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">Apr 18</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w12d6">Done</div>
                                 <div class="workout-name" data-id="w12d6">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w12d6">✗</div>Miss</div>
@@ -2798,8 +2894,9 @@
                             <div class="notes-section" data-id="w12d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w12d6"></div>
                             <div class="note-display" data-note-display="w12d6"></div>
 
-                            <div class="day-row long-run" data-day-id="w12d7">
-                                <div class="day-name">SUN</div><div class="day-date">Apr 19</div>
+                            <div class="day-row long-run" data-date="2026-04-19" data-day-id="w12d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">Apr 19</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w12d7">Done</div>
                                 <div class="workout-name" data-id="w12d7">Long Easy (No MP) 🏃 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w12d7">✗</div>Miss</div>
@@ -2825,12 +2922,13 @@
                             <div class="week-compliance"></div>
                         </div>
                         <div class="week-total">60 km</div>
-                        <div class="toggle-icon">▼</div>
+                        <span class="collapse-indicator">▼</span>
                     </div>
                     <div class="week-content">
                         <div class="days-grid">
-                            <div class="day-row" data-day-id="w13d1">
-                                <div class="day-name">MON</div><div class="day-date">Apr 20</div>
+                            <div class="day-row" data-date="2026-04-20" data-day-id="w13d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">Apr 20</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w13d1">Done</div>
                                 <div class="workout-name" data-id="w13d1">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w13d1">✗</div>Miss</div>
@@ -2840,8 +2938,9 @@
                             <div class="notes-section" data-id="w13d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w13d1"></div>
                             <div class="note-display" data-note-display="w13d1"></div>
 
-                            <div class="day-row" data-day-id="w13d2">
-                                <div class="day-name">TUE</div><div class="day-date">Apr 21</div>
+                            <div class="day-row" data-date="2026-04-21" data-day-id="w13d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">Apr 21</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w13d2">Done</div>
                                 <div class="workout-name" data-id="w13d2">Easy + Bike 🚴 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w13d2">✗</div>Miss</div>
@@ -2851,8 +2950,9 @@
                             <div class="notes-section" data-id="w13d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w13d2"></div>
                             <div class="note-display" data-note-display="w13d2"></div>
 
-                            <div class="day-row" data-day-id="w13d3">
-                                <div class="day-name">WED</div><div class="day-date">Apr 22</div>
+                            <div class="day-row" data-date="2026-04-22" data-day-id="w13d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">Apr 22</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w13d3">Done</div>
                                 <div class="workout-name" data-id="w13d3">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w13d3">✗</div>Miss</div>
@@ -2862,8 +2962,9 @@
                             <div class="notes-section" data-id="w13d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w13d3"></div>
                             <div class="note-display" data-note-display="w13d3"></div>
 
-                            <div class="day-row" data-day-id="w13d4">
-                                <div class="day-name">THU</div><div class="day-date">Apr 23</div>
+                            <div class="day-row" data-date="2026-04-23" data-day-id="w13d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">Apr 23</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w13d4">Done</div>
                                 <div class="workout-name" data-id="w13d4">2 × 8km @ MP 🎯 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w13d4">✗</div>Miss</div>
@@ -2873,8 +2974,9 @@
                             <div class="notes-section" data-id="w13d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w13d4"></div>
                             <div class="note-display" data-note-display="w13d4"></div>
 
-                            <div class="day-row" data-day-id="w13d5">
-                                <div class="day-name">FRI</div><div class="day-date">Apr 24</div>
+                            <div class="day-row" data-date="2026-04-24" data-day-id="w13d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">Apr 24</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w13d5">Done</div>
                                 <div class="workout-name" data-id="w13d5">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w13d5">✗</div>Miss</div>
@@ -2884,8 +2986,9 @@
                             <div class="notes-section" data-id="w13d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w13d5"></div>
                             <div class="note-display" data-note-display="w13d5"></div>
 
-                            <div class="day-row" data-day-id="w13d6">
-                                <div class="day-name">SAT</div><div class="day-date">Apr 25</div>
+                            <div class="day-row" data-date="2026-04-25" data-day-id="w13d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">Apr 25</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w13d6">Done</div>
                                 <div class="workout-name" data-id="w13d6">Half Marathon (Controlled Effort) 🏁 🗝️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w13d6">✗</div>Miss</div>
@@ -2895,8 +2998,9 @@
                             <div class="notes-section" data-id="w13d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w13d6"></div>
                             <div class="note-display" data-note-display="w13d6"></div>
 
-                            <div class="day-row rest-day" data-day-id="w13d7">
-                                <div class="day-name">SUN</div><div class="day-date">Apr 26</div>
+                            <div class="day-row rest-day" data-date="2026-04-26" data-day-id="w13d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">Apr 26</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w13d7">Done</div>
                                 <div class="workout-name" data-id="w13d7">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w13d7">✗</div>Miss</div>
@@ -2935,12 +3039,13 @@
                             <div class="week-compliance"></div>
                         </div>
                         <div class="week-total">43-50 km</div>
-                        <div class="toggle-icon">▼</div>
+                        <span class="collapse-indicator">▼</span>
                     </div>
                     <div class="week-content">
                         <div class="days-grid">
-                            <div class="day-row" data-day-id="w14d1">
-                                <div class="day-name">MON</div><div class="day-date">Apr 27</div>
+                            <div class="day-row" data-date="2026-04-27" data-day-id="w14d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">Apr 27</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w14d1">Done</div>
                                 <div class="workout-name" data-id="w14d1">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w14d1">✗</div>Miss</div>
@@ -2950,8 +3055,9 @@
                             <div class="notes-section" data-id="w14d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w14d1"></div>
                             <div class="note-display" data-note-display="w14d1"></div>
 
-                            <div class="day-row" data-day-id="w14d2">
-                                <div class="day-name">TUE</div><div class="day-date">Apr 28</div>
+                            <div class="day-row" data-date="2026-04-28" data-day-id="w14d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">Apr 28</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w14d2">Done</div>
                                 <div class="workout-name" data-id="w14d2">Easy + Strides ⚡ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w14d2">✗</div>Miss</div>
@@ -2961,8 +3067,9 @@
                             <div class="notes-section" data-id="w14d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w14d2"></div>
                             <div class="note-display" data-note-display="w14d2"></div>
 
-                            <div class="day-row" data-day-id="w14d3">
-                                <div class="day-name">WED</div><div class="day-date">Apr 29</div>
+                            <div class="day-row" data-date="2026-04-29" data-day-id="w14d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">Apr 29</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w14d3">Done</div>
                                 <div class="workout-name" data-id="w14d3">10km (Last 5km @ MP) 🎯 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w14d3">✗</div>Miss</div>
@@ -2972,8 +3079,9 @@
                             <div class="notes-section" data-id="w14d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w14d3"></div>
                             <div class="note-display" data-note-display="w14d3"></div>
 
-                            <div class="day-row" data-day-id="w14d4">
-                                <div class="day-name">THU</div><div class="day-date">Apr 30</div>
+                            <div class="day-row" data-date="2026-04-30" data-day-id="w14d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">Apr 30</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w14d4">Done</div>
                                 <div class="workout-name" data-id="w14d4">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w14d4">✗</div>Miss</div>
@@ -2983,8 +3091,9 @@
                             <div class="notes-section" data-id="w14d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w14d4"></div>
                             <div class="note-display" data-note-display="w14d4"></div>
 
-                            <div class="day-row" data-day-id="w14d5">
-                                <div class="day-name">FRI</div><div class="day-date">May 1</div>
+                            <div class="day-row" data-date="2026-05-01" data-day-id="w14d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">May 1</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w14d5">Done</div>
                                 <div class="workout-name" data-id="w14d5">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w14d5">✗</div>Miss</div>
@@ -2994,8 +3103,9 @@
                             <div class="notes-section" data-id="w14d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w14d5"></div>
                             <div class="note-display" data-note-display="w14d5"></div>
 
-                            <div class="day-row" data-day-id="w14d6">
-                                <div class="day-name">SAT</div><div class="day-date">May 2</div>
+                            <div class="day-row" data-date="2026-05-02" data-day-id="w14d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">May 2</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w14d6">Done</div>
                                 <div class="workout-name" data-id="w14d6">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w14d6">✗</div>Miss</div>
@@ -3005,8 +3115,9 @@
                             <div class="notes-section" data-id="w14d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w14d6"></div>
                             <div class="note-display" data-note-display="w14d6"></div>
 
-                            <div class="day-row long-run" data-day-id="w14d7">
-                                <div class="day-name">SUN</div><div class="day-date">May 3</div>
+                            <div class="day-row long-run" data-date="2026-05-03" data-day-id="w14d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">May 3</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w14d7">Done</div>
                                 <div class="workout-name" data-id="w14d7">18-20km ALTERNATING MP (LITE): Easy, 2 × 3-4km @ MP, easy between 🔥 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w14d7">✗</div>Miss</div>
@@ -3032,12 +3143,13 @@
                             <div class="week-compliance"></div>
                         </div>
                         <div class="week-total">33-39 km</div>
-                        <div class="toggle-icon">▼</div>
+                        <span class="collapse-indicator">▼</span>
                     </div>
                     <div class="week-content">
                         <div class="days-grid">
-                            <div class="day-row" data-day-id="w15d1">
-                                <div class="day-name">MON</div><div class="day-date">May 4</div>
+                            <div class="day-row" data-date="2026-05-04" data-day-id="w15d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">May 4</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w15d1">Done</div>
                                 <div class="workout-name" data-id="w15d1">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w15d1">✗</div>Miss</div>
@@ -3047,8 +3159,9 @@
                             <div class="notes-section" data-id="w15d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w15d1"></div>
                             <div class="note-display" data-note-display="w15d1"></div>
 
-                            <div class="day-row" data-day-id="w15d2">
-                                <div class="day-name">TUE</div><div class="day-date">May 5</div>
+                            <div class="day-row" data-date="2026-05-05" data-day-id="w15d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">May 5</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w15d2">Done</div>
                                 <div class="workout-name" data-id="w15d2">Easy + Strides ⚡ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w15d2">✗</div>Miss</div>
@@ -3058,8 +3171,9 @@
                             <div class="notes-section" data-id="w15d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w15d2"></div>
                             <div class="note-display" data-note-display="w15d2"></div>
 
-                            <div class="day-row" data-day-id="w15d3">
-                                <div class="day-name">WED</div><div class="day-date">May 6</div>
+                            <div class="day-row" data-date="2026-05-06" data-day-id="w15d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">May 6</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w15d3">Done</div>
                                 <div class="workout-name" data-id="w15d3">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w15d3">✗</div>Miss</div>
@@ -3069,8 +3183,9 @@
                             <div class="notes-section" data-id="w15d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w15d3"></div>
                             <div class="note-display" data-note-display="w15d3"></div>
 
-                            <div class="day-row" data-day-id="w15d4">
-                                <div class="day-name">THU</div><div class="day-date">May 7</div>
+                            <div class="day-row" data-date="2026-05-07" data-day-id="w15d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">May 7</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w15d4">Done</div>
                                 <div class="workout-name" data-id="w15d4">8km (2 × 3km @ MP) 🎯 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w15d4">✗</div>Miss</div>
@@ -3080,8 +3195,9 @@
                             <div class="notes-section" data-id="w15d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w15d4"></div>
                             <div class="note-display" data-note-display="w15d4"></div>
 
-                            <div class="day-row" data-day-id="w15d5">
-                                <div class="day-name">FRI</div><div class="day-date">May 8</div>
+                            <div class="day-row" data-date="2026-05-08" data-day-id="w15d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">May 8</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w15d5">Done</div>
                                 <div class="workout-name" data-id="w15d5">Easy Recovery 🌿 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w15d5">✗</div>Miss</div>
@@ -3091,8 +3207,9 @@
                             <div class="notes-section" data-id="w15d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w15d5"></div>
                             <div class="note-display" data-note-display="w15d5"></div>
 
-                            <div class="day-row" data-day-id="w15d6">
-                                <div class="day-name">SAT</div><div class="day-date">May 9</div>
+                            <div class="day-row" data-date="2026-05-09" data-day-id="w15d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">May 9</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w15d6">Done</div>
                                 <div class="workout-name" data-id="w15d6">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w15d6">✗</div>Miss</div>
@@ -3102,8 +3219,9 @@
                             <div class="notes-section" data-id="w15d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w15d6"></div>
                             <div class="note-display" data-note-display="w15d6"></div>
 
-                            <div class="day-row" data-day-id="w15d7">
-                                <div class="day-name">SUN</div><div class="day-date">May 10</div>
+                            <div class="day-row" data-date="2026-05-10" data-day-id="w15d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">May 10</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w15d7">Done</div>
                                 <div class="workout-name" data-id="w15d7">Easy 🏃 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w15d7">✗</div>Miss</div>
@@ -3141,12 +3259,13 @@
                             <div class="week-compliance"></div>
                         </div>
                         <div class="week-total">58.2 km</div>
-                        <div class="toggle-icon">▼</div>
+                        <span class="collapse-indicator">▼</span>
                     </div>
                     <div class="week-content">
                         <div class="days-grid">
-                            <div class="day-row" data-day-id="w16d1">
-                                <div class="day-name">MON</div><div class="day-date">May 11</div>
+                            <div class="day-row" data-date="2026-05-11" data-day-id="w16d1">
+                            <div class="day-name">MON</div>
+                            <div class="day-date">May 11</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d1">Done</div>
                                 <div class="workout-name" data-id="w16d1">Easy Recovery 🌿 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w16d1">✗</div>Miss</div>
@@ -3156,8 +3275,9 @@
                             <div class="notes-section" data-id="w16d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d1"></div>
                             <div class="note-display" data-note-display="w16d1"></div>
 
-                            <div class="day-row" data-day-id="w16d2">
-                                <div class="day-name">TUE</div><div class="day-date">May 12</div>
+                            <div class="day-row" data-date="2026-05-12" data-day-id="w16d2">
+                            <div class="day-name">TUE</div>
+                            <div class="day-date">May 12</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d2">Done</div>
                                 <div class="workout-name" data-id="w16d2">Easy 🌤️ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w16d2">✗</div>Miss</div>
@@ -3167,8 +3287,9 @@
                             <div class="notes-section" data-id="w16d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d2"></div>
                             <div class="note-display" data-note-display="w16d2"></div>
 
-                            <div class="day-row" data-day-id="w16d3">
-                                <div class="day-name">WED</div><div class="day-date">May 13</div>
+                            <div class="day-row" data-date="2026-05-13" data-day-id="w16d3">
+                            <div class="day-name">WED</div>
+                            <div class="day-date">May 13</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d3">Done</div>
                                 <div class="workout-name" data-id="w16d3">6km Shakeout (2km @ MP) 🎯 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w16d3">✗</div>Miss</div>
@@ -3178,8 +3299,9 @@
                             <div class="notes-section" data-id="w16d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d3"></div>
                             <div class="note-display" data-note-display="w16d3"></div>
 
-                            <div class="day-row" data-day-id="w16d4">
-                                <div class="day-name">THU</div><div class="day-date">May 14</div>
+                            <div class="day-row" data-date="2026-05-14" data-day-id="w16d4">
+                            <div class="day-name">THU</div>
+                            <div class="day-date">May 14</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d4">Done</div>
                                 <div class="workout-name" data-id="w16d4">Rest or 2-4km Super Easy 😌 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w16d4">✗</div>Miss</div>
@@ -3189,8 +3311,9 @@
                             <div class="notes-section" data-id="w16d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d4"></div>
                             <div class="note-display" data-note-display="w16d4"></div>
 
-                            <div class="day-row" data-day-id="w16d5">
-                                <div class="day-name">FRI</div><div class="day-date">May 15</div>
+                            <div class="day-row" data-date="2026-05-15" data-day-id="w16d5">
+                            <div class="day-name">FRI</div>
+                            <div class="day-date">May 15</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d5">Done</div>
                                 <div class="workout-name" data-id="w16d5">Rest 💤 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w16d5">✗</div>Miss</div>
@@ -3200,8 +3323,9 @@
                             <div class="notes-section" data-id="w16d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d5"></div>
                             <div class="note-display" data-note-display="w16d5"></div>
 
-                            <div class="day-row long-run key-workout" data-day-id="w16d6">
-                                <div class="day-name">SAT</div><div class="day-date">May 16</div>
+                            <div class="day-row long-run key-workout" data-date="2026-05-16" data-day-id="w16d6">
+                            <div class="day-name">SAT</div>
+                            <div class="day-date">May 16</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d6">Done</div>
                                 <div class="workout-name" data-id="w16d6">🏁 RACE DAY - MARATHON 🏁 <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w16d6">✗</div>Miss</div>
@@ -3211,8 +3335,9 @@
                             <div class="notes-section" data-id="w16d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d6"></div>
                             <div class="note-display" data-note-display="w16d6"></div>
 
-                            <div class="day-row" data-day-id="w16d7">
-                                <div class="day-name">SUN</div><div class="day-date">May 17</div>
+                            <div class="day-row" data-date="2026-05-17" data-day-id="w16d7">
+                            <div class="day-name">SUN</div>
+                            <div class="day-date">May 17</div>
                                 <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d7">Done</div>
                                 <div class="workout-name" data-id="w16d7">🎊 CELEBRATION DAY! 🥳🏆✨ <span class="edit-icon">✏️</span></div>
                                 <div class="miss-btn-label"><div class="miss-btn" data-id="w16d7">✗</div>Miss</div>
@@ -3240,7 +3365,7 @@
                     </div>
                     <div class="summary-card">
                         <div class="summary-label">Peak Mileage</div>
-                        <div class="summary-value" id="peakMileage">47 km<br>(Week 1)</div>
+                        <div class="summary-value" id="peakMileage">47 km<br>Week 1</div>
                     </div>
                     <div class="summary-card">
                         <div class="summary-label">Longest Run</div>
@@ -3248,7 +3373,7 @@
                     </div>
                     <div class="summary-card">
                         <div class="summary-label">Goal Pace</div>
-                        <div class="summary-value">5:05/km<br>(8:11/mile)</div>
+                        <div class="summary-value">5:05/km<br>8:11/mile</div>
                     </div>
                 </div>
             </div>
@@ -3744,7 +3869,7 @@
             // Update peak mileage with dates
             const peakMileageEl = document.getElementById('peakMileage');
             if (peakMileageEl && peakMileage > 0) {
-                peakMileageEl.innerHTML = `${peakMileage} km<br>(${peakWeekDates})`;
+                peakMileageEl.innerHTML = `${peakMileage} km<br>${peakWeekDates}`;
             }
 
             // Update longest run with date and workout name
@@ -3995,38 +4120,106 @@
         }
     }
 
-    // Check week compliance
+    // Check week compliance for all weeks
     function checkWeekCompliance() {
-        const week = document.querySelector('.week-card');
-        const dayRows = week.querySelectorAll('.day-row:not(.rest-day)');
-        let totalWorkouts = 0;
-        let completedWorkouts = 0;
-
-        dayRows.forEach(day => {
-            const checkbox = day.querySelector('.checkbox');
-            const id = checkbox.dataset.id;
-            totalWorkouts++;
-
-            const isCompleted = localStorage.getItem(`check-${id}`) === 'true';
-            if (isCompleted) {
-                completedWorkouts++;
+        const today = new Date();
+        const todayString = today.getFullYear() + "-" +
+            String(today.getMonth()+1).padStart(2,'0') + "-" +
+            String(today.getDate()).padStart(2,'0');
+        
+        const planStartDate = new Date('2026-01-26'); // Week 1 starts Jan 26 (Monday)
+        planStartDate.setHours(0, 0, 0, 0);
+        
+        // Helper function to parse distance (same logic as in initializeTracker)
+        function parseDistance(distanceStr) {
+            if (!distanceStr) return 0;
+            distanceStr = distanceStr.replace('✏️', '').trim();
+            if (distanceStr === '—' || distanceStr === '') return 0;
+            const match = distanceStr.match(/(\d+(?:\.\d+)?)/);
+            return match ? parseFloat(match[1]) : 0;
+        }
+        
+        // Get all week cards
+        const weekCards = document.querySelectorAll('.week-card');
+        
+        weekCards.forEach((week, weekIndex) => {
+            // Calculate this week's start date
+            const weekStartDate = new Date(planStartDate);
+            weekStartDate.setDate(planStartDate.getDate() + (weekIndex * 7));
+            
+            // Get all day rows in this week
+            const dayRows = week.querySelectorAll('.day-row');
+            
+            let totalWorkoutsUpToToday = 0;
+            let completedWorkouts = 0;
+            
+            dayRows.forEach((day) => {
+                // Use data-date attribute for accurate date comparison
+                const dateAttr = day.getAttribute('data-date');
+                if (!dateAttr) return;
+                
+                // Compare date strings to avoid timezone issues
+                // dateAttr is in format YYYY-MM-DD, todayString is also YYYY-MM-DD
+                // This way we can do simple string comparison
+                if (dateAttr <= todayString) {
+                    // Check if this is a rest day using the same logic as autoStyleRestDays
+                    const workoutNameEl = day.querySelector('.workout-name');
+                    const distEl = day.querySelector('.workout-distance');
+                    
+                    if (workoutNameEl && distEl) {
+                        const workoutName = workoutNameEl.textContent.replace('✏️', '').replace('🗝️', '').trim();
+                        const hasRest = workoutName.toLowerCase().includes('rest');
+                        const km = parseDistance(distEl.textContent);
+                        const isZeroDistance = km === 0;
+                        
+                        // Debug for Week 2 only
+                        if (weekIndex === 1) {
+                            console.log('Week 2 Day:', dateAttr, '(today=' + todayString + ')', 'Name:', workoutName, 'hasRest:', hasRest, 'km:', km);
+                        }
+                        
+                        // Skip if it's a rest day (has "rest" in name AND 0km distance)
+                        if (hasRest && isZeroDistance) {
+                            if (weekIndex === 1) console.log('  -> SKIPPED (rest day)');
+                            return; // Skip this rest day
+                        }
+                    }
+                    
+                    // This is a real workout - count it
+                    totalWorkoutsUpToToday++;
+                    if (weekIndex === 1) console.log('  -> COUNTED as workout #' + totalWorkoutsUpToToday);
+                    
+                    const checkbox = day.querySelector('.checkbox');
+                    const id = checkbox.dataset.id;
+                    const isCompleted = localStorage.getItem(`check-${id}`) === 'true';
+                    
+                    if (isCompleted) {
+                        completedWorkouts++;
+                    }
+                }
+            });
+            
+            const complianceDisplay = week.querySelector('.week-compliance');
+            if (complianceDisplay) {
+                // Only show compliance if there are workouts to complete
+                if (totalWorkoutsUpToToday > 0) {
+                    const percentage = Math.round((completedWorkouts / totalWorkoutsUpToToday) * 100);
+                    complianceDisplay.textContent = `Week Compliance: ${percentage}% (${completedWorkouts}/${totalWorkoutsUpToToday} completed)`;
+                    
+                    complianceDisplay.classList.remove('good', 'average', 'poor');
+                    if (percentage >= 80) {
+                        complianceDisplay.classList.add('good');
+                    } else if (percentage >= 60) {
+                        complianceDisplay.classList.add('average');
+                    } else {
+                        complianceDisplay.classList.add('poor');
+                    }
+                } else {
+                    // Week hasn't started yet - show nothing
+                    complianceDisplay.textContent = '';
+                    complianceDisplay.classList.remove('good', 'average', 'poor');
+                }
             }
         });
-
-        const complianceDisplay = week.querySelector('.week-compliance');
-        if (complianceDisplay && totalWorkouts > 0) {
-            const percentage = Math.round((completedWorkouts / totalWorkouts) * 100);
-            complianceDisplay.textContent = `Week Compliance: ${percentage}% (${completedWorkouts}/${totalWorkouts} completed)`;
-
-            complianceDisplay.classList.remove('good', 'average', 'poor');
-            if (percentage >= 80) {
-                complianceDisplay.classList.add('good');
-            } else if (percentage >= 60) {
-                complianceDisplay.classList.add('average');
-            } else {
-                complianceDisplay.classList.add('poor');
-            }
-        }
     }
 
     // Calculate weeks to race
@@ -4209,8 +4402,9 @@
                 updateUpcomingLongRun();
                 updateNextKeyWorkout();
             }, 100);
-            // Update weeks to race daily
+            // Update weeks to race and compliance daily
             setInterval(calculateWeeksToRace, 1000 * 60 * 60 * 24);
+            setInterval(checkWeekCompliance, 1000 * 60 * 60 * 24);
         });
     } else {
         initializeTracker();
@@ -4221,9 +4415,46 @@
             updateUpcomingLongRun();
             updateNextKeyWorkout();
         }, 100);
-        // Update weeks to race daily
+        // Update weeks to race and compliance daily
         setInterval(calculateWeeksToRace, 1000 * 60 * 60 * 24);
+        setInterval(checkWeekCompliance, 1000 * 60 * 60 * 24);
     }
+</script>
+
+<script>
+// ---------- TODAY HIGHLIGHT ----------
+function highlightToday() {
+    const today = new Date();
+    const localDate = today.getFullYear() + "-" +
+        String(today.getMonth()+1).padStart(2,'0') + "-" +
+        String(today.getDate()).padStart(2,'0');
+
+    document.querySelectorAll('[data-date]').forEach(el => {
+        if(el.dataset.date === localDate){
+            el.classList.add('today-highlight');
+        } else {
+            el.classList.remove('today-highlight');
+        }
+    });
+}
+
+// ---------- MIDNIGHT AUTO REFRESH ----------
+function scheduleMidnightRefresh(){
+    const now = new Date();
+    const midnight = new Date();
+
+    midnight.setHours(24,0,0,0); // next midnight LOCAL timezone
+
+    const timeout = midnight.getTime() - now.getTime();
+
+    setTimeout(()=>{
+        location.reload();
+    }, timeout);
+}
+
+// RUN
+highlightToday();
+scheduleMidnightRefresh();
 </script>
 </body>
 </html>
