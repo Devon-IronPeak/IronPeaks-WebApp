@@ -393,13 +393,13 @@
         }
 
         .race .phase-icon {
-            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #48dbfb 100%);
+            background: linear-gradient(135deg, #f4a261 0%, #feca57 50%, #ffd93d 100%);
         }
 
         .race .week-card {
-            border-left: 5px solid #ff6b6b;
-            border-right: 5px solid #48dbfb;
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, rgba(72, 219, 251, 0.05) 100%);
+            border-left: 5px solid #f4a261;
+            border-right: 5px solid #ffd93d;
+            background: linear-gradient(135deg, rgba(244, 162, 97, 0.08) 0%, rgba(255, 217, 61, 0.08) 100%);
         }
 
         .week-card {
@@ -512,6 +512,18 @@
         .day-row.no-workout .checkbox-label,
         .day-row.no-workout .miss-btn-label {
             visibility: hidden;
+        }
+
+        /* Rest Day Styling - Blueish-greenish hue */
+        .day-row.rest-day {
+            background: linear-gradient(135deg, #d1f2eb 0%, #a7f3d0 100%);
+            border-left: 4px solid #4db8ac;
+            opacity: 0.85;
+        }
+
+        .day-row.rest-day .workout-name {
+            color: #0f766e;
+            font-weight: 600;
         }
 
         .day-row.long-run {
@@ -887,6 +899,310 @@
         .workout-name[contenteditable="true"]:focus .edit-icon,
         .workout-distance[contenteditable="true"]:focus .edit-icon {
             opacity: 0.4;
+        }
+        /* Special Day Styling - Race Day (Gold) */
+        .day-row[data-day-id="w16d6"] {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #f4a261 100%) !important;
+            color: #1a1a2e !important;
+            border: 4px solid #d4af37 !important;
+            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.3) !important;
+            font-weight: 700 !important;
+            position: relative;
+            overflow: visible;
+        }
+        
+        .day-row[data-day-id="w16d6"]::before {
+            content: '🏆';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 3rem;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .day-row[data-day-id="w16d6"] .day-name,
+        .day-row[data-day-id="w16d6"] .day-date,
+        .day-row[data-day-id="w16d6"] .workout-name,
+        .day-row[data-day-id="w16d6"] .workout-distance {
+            color: #1a1a2e !important;
+            font-weight: 700 !important;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Hide checkboxes for race day */
+        .day-row[data-day-id="w16d6"] .checkbox-label,
+        .day-row[data-day-id="w16d6"] .miss-btn-label {
+            display: none !important;
+        }
+        
+        /* Special Day Styling - Celebration Day (Party Blue) */
+        .day-row[data-day-id="w16d7"] {
+            background: linear-gradient(135deg, #48dbfb 0%, #0abde3 50%, #00a8ff 100%) !important;
+            color: white !important;
+            border: 4px solid #0097e6 !important;
+            box-shadow: 0 8px 24px rgba(72, 219, 251, 0.6), 0 0 40px rgba(72, 219, 251, 0.3) !important;
+            font-weight: 700 !important;
+            position: relative;
+            overflow: visible;
+        }
+        
+        .day-row[data-day-id="w16d7"]::before {
+            content: '🎉';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            font-size: 3rem;
+            animation: spin 3s linear infinite;
+            transform-origin: center center;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .day-row[data-day-id="w16d7"] .day-name,
+        .day-row[data-day-id="w16d7"] .day-date,
+        .day-row[data-day-id="w16d7"] .workout-name,
+        .day-row[data-day-id="w16d7"] .workout-distance {
+            color: white !important;
+            font-weight: 700 !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Hide checkboxes for celebration day */
+        .day-row[data-day-id="w16d7"] .checkbox-label,
+        .day-row[data-day-id="w16d7"] .miss-btn-label {
+            display: none !important;
+        }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+            
+            .navbar-logo {
+                height: 40px;
+            }
+            
+            .navbar-title {
+                font-size: 1.1rem;
+            }
+            
+            .nav-btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.85rem;
+            }
+            
+            .header-content {
+                padding: 2rem 1rem;
+            }
+            
+            .header-title {
+                font-size: 2rem;
+            }
+            
+            .header-subtitle {
+                font-size: 1rem;
+            }
+            
+            .content {
+                padding: 1rem 0.5rem;
+            }
+            
+            .phase-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .phase-icon {
+                font-size: 2.5rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .phase-title {
+                font-size: 1.3rem;
+            }
+            
+            .week-card {
+                padding: 1rem 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .week-title {
+                font-size: 1rem;
+                flex-wrap: wrap;
+            }
+            
+            .collapse-indicator {
+                margin-left: 0.5rem;
+            }
+            
+            .week-total {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            /* Mobile Grid Layout for Day Rows */
+            .day-row {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                gap: 0.5rem;
+                padding: 1rem;
+                position: relative;
+            }
+            
+            .day-row > div,
+            .day-row > button {
+                grid-column: 1 !important;
+            }
+            
+            .day-name {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--primary);
+            }
+            
+            .day-date {
+                font-size: 0.9rem;
+                color: var(--text-light);
+                margin-bottom: 0.5rem;
+            }
+            
+            .workout-name {
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+            }
+            
+            .workout-distance {
+                font-size: 1.05rem;
+                font-weight: 700;
+                margin-bottom: 0.75rem;
+            }
+            
+            .checkbox-label,
+            .miss-btn-label {
+                display: inline-flex !important;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 1rem;
+                margin-right: 1rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .checkbox {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .miss-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 1.1rem;
+            }
+            
+            .notes-btn {
+                font-size: 1rem;
+                padding: 0.75rem 1.5rem;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+            
+            .notes-section {
+                grid-column: 1;
+                margin-top: 0.5rem;
+            }
+            
+            .note-display {
+                grid-column: 1;
+                font-size: 0.95rem;
+                padding: 0.75rem;
+            }
+            
+            .week-focus {
+                padding: 1rem;
+                margin-top: 1rem;
+            }
+            
+            .focus-label {
+                font-size: 0.85rem;
+            }
+            
+            .focus-text {
+                font-size: 0.95rem;
+            }
+            
+            .training-summary {
+                padding: 1.5rem 1rem;
+                margin-top: 2rem;
+            }
+            
+            .training-summary h2 {
+                font-size: 1.3rem;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .summary-card {
+                padding: 1rem;
+            }
+            
+            .summary-label {
+                font-size: 0.85rem;
+            }
+            
+            .summary-value {
+                font-size: 1.3rem;
+            }
+            
+            .edit-mode-btn {
+                font-size: 0.95rem;
+                padding: 0.75rem 1.25rem;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            /* Mobile adjustments for special days */
+            .day-row[data-day-id="w16d6"]::before,
+            .day-row[data-day-id="w16d7"]::before {
+                font-size: 2rem;
+                top: -15px;
+                right: -15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navbar-title {
+                display: none;
+            }
+            
+            .header-title {
+                font-size: 1.5rem;
+            }
+            
+            .week-title {
+                font-size: 0.9rem;
+            }
+            
+            .phase-title {
+                font-size: 1.1rem;
+            }
+            
+            .nav-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -1963,7 +2279,7 @@
                         <div class="notes-section" data-id="w6d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w6d6"></div>
                         <div class="note-display" data-note-display="w6d6"></div>
 
-                        <div class="day-row long-run key-workout" data-day-id="w6d7">
+                        <div class="day-row" data-day-id="w6d7">
                             <div class="day-name">SUN</div><div class="day-date">Mar 8</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w6d7">Done</div>
                             <div class="workout-name" data-id="w6d7">26km PROGRESSION: ~10km easy, ~8-10km steady, 6-8km @ MP 🔥 <span class="edit-icon">✏️</span></div>
@@ -2084,7 +2400,7 @@
                         <div class="week-title">Week 8 | Mar 16 – Mar 22</div>
                         <div class="week-compliance"></div>
                     </div>
-                    <div class="week-total">60 km</div>
+                    <div class="week-total">58 km</div>
                     <div class="toggle-icon">▼</div>
                 </div>
                 <div class="week-content">
@@ -2103,9 +2419,9 @@
                         <div class="day-row" data-day-id="w8d2">
                             <div class="day-name">TUE</div><div class="day-date">Mar 17</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d2">Done</div>
-                            <div class="workout-name" data-id="w8d2">Easy + Bike 🚴 <span class="edit-icon">✏️</span></div>
+                            <div class="workout-name" data-id="w8d2">Easy + Strides 🏃‍♂️ <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d2">✗</div>Miss</div>
-                            <div class="workout-distance" data-id="w8d2">5 km <span class="edit-icon">✏️</span></div>
+                            <div class="workout-distance" data-id="w8d2">8 km <span class="edit-icon">✏️</span></div>
                             <button class="notes-btn" data-id="w8d2">📝 Notes</button><div></div>
                         </div>
                         <div class="notes-section" data-id="w8d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d2"></div>
@@ -2125,7 +2441,7 @@
                         <div class="day-row workout-day key-workout" data-day-id="w8d4">
                             <div class="day-name">THU</div><div class="day-date">Mar 19</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d4">Done</div>
-                            <div class="workout-name" data-id="w8d4">3 × 4km @ MP 🎯 🗝️ <span class="edit-icon">✏️</span></div>
+                            <div class="workout-name" data-id="w8d4">Intervals (VO2max) 🔥 🗝️ <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d4">✗</div>Miss</div>
                             <div class="workout-distance" data-id="w8d4">12 km <span class="edit-icon">✏️</span></div>
                             <button class="notes-btn" data-id="w8d4">📝 Notes</button><div></div>
@@ -2138,7 +2454,7 @@
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d5">Done</div>
                             <div class="workout-name" data-id="w8d5">Easy 🌿 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d5">✗</div>Miss</div>
-                            <div class="workout-distance" data-id="w8d5">5 km <span class="edit-icon">✏️</span></div>
+                            <div class="workout-distance" data-id="w8d5">10 km <span class="edit-icon">✏️</span></div>
                             <button class="notes-btn" data-id="w8d5">📝 Notes</button><div></div>
                         </div>
                         <div class="notes-section" data-id="w8d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d5"></div>
@@ -2155,12 +2471,12 @@
                         <div class="notes-section" data-id="w8d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d6"></div>
                         <div class="note-display" data-note-display="w8d6"></div>
 
-                        <div class="day-row long-run key-workout" data-day-id="w8d7">
+                        <div class="day-row long-run" data-day-id="w8d7">
                             <div class="day-name">SUN</div><div class="day-date">Mar 22</div>
                             <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w8d7">Done</div>
-                            <div class="workout-name" data-id="w8d7">30km ALTERNATING MP: 6km easy, 4km @ MP, 3km easy, 4km @ MP, 3km easy, 4km @ MP, easy to 30km 🔥 <span class="edit-icon">✏️</span></div>
+                            <div class="workout-name" data-id="w8d7">Long Easy 🏃 <span class="edit-icon">✏️</span></div>
                             <div class="miss-btn-label"><div class="miss-btn" data-id="w8d7">✗</div>Miss</div>
-                            <div class="workout-distance" data-id="w8d7">30 km <span class="edit-icon">✏️</span></div>
+                            <div class="workout-distance" data-id="w8d7">20 km <span class="edit-icon">✏️</span></div>
                             <button class="notes-btn" data-id="w8d7">📝 Notes</button><div></div>
                         </div>
                         <div class="notes-section" data-id="w8d7"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w8d7"></div>
@@ -2168,7 +2484,7 @@
                     </div>
                     <div class="week-focus">
                         <div class="focus-label">💡 Focus</div>
-                        <div class="focus-text">MASSIVE week! 30km alternating MP run - marathon simulation. This is your peak!</div>
+                        <div class="focus-text">Recovery week. Absorb the training load. Feel fresh again.</div>
                     </div>
                 </div>
             </div>
@@ -2680,7 +2996,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
                 <!-- Week 15 -->
                 <div class="week-card collapsed">
@@ -2775,103 +3090,6 @@
                         <div class="week-focus">
                             <div class="focus-label">💡 Focus</div>
                             <div class="focus-text">Final taper week. Short MP touches. Rest and prepare mentally.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Week 16 -->
-                <div class="week-card collapsed">
-                    <div class="week-header">
-                        <div class="week-title-wrapper">
-                            <div class="week-title">Week 16 | May 11 – May 17</div>
-                            <div class="week-compliance"></div>
-                        </div>
-                        <div class="week-total">58.2 km</div>
-                        <div class="toggle-icon">▼</div>
-                    </div>
-                    <div class="week-content">
-                        <div class="days-grid">
-                            <div class="day-row" data-day-id="w16d1">
-                                <div class="day-name">MON</div><div class="day-date">May 11</div>
-                                <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d1">Done</div>
-                                <div class="workout-name" data-id="w16d1">Easy Recovery 🌿 <span class="edit-icon">✏️</span></div>
-                                <div class="miss-btn-label"><div class="miss-btn" data-id="w16d1">✗</div>Miss</div>
-                                <div class="workout-distance" data-id="w16d1">5 km <span class="edit-icon">✏️</span></div>
-                                <button class="notes-btn" data-id="w16d1">📝 Notes</button><div></div>
-                            </div>
-                            <div class="notes-section" data-id="w16d1"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d1"></div>
-                            <div class="note-display" data-note-display="w16d1"></div>
-
-                            <div class="day-row" data-day-id="w16d2">
-                                <div class="day-name">TUE</div><div class="day-date">May 12</div>
-                                <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d2">Done</div>
-                                <div class="workout-name" data-id="w16d2">Easy 🌤️ <span class="edit-icon">✏️</span></div>
-                                <div class="miss-btn-label"><div class="miss-btn" data-id="w16d2">✗</div>Miss</div>
-                                <div class="workout-distance" data-id="w16d2">5 km <span class="edit-icon">✏️</span></div>
-                                <button class="notes-btn" data-id="w16d2">📝 Notes</button><div></div>
-                            </div>
-                            <div class="notes-section" data-id="w16d2"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d2"></div>
-                            <div class="note-display" data-note-display="w16d2"></div>
-
-                            <div class="day-row" data-day-id="w16d3">
-                                <div class="day-name">WED</div><div class="day-date">May 13</div>
-                                <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d3">Done</div>
-                                <div class="workout-name" data-id="w16d3">6km Shakeout (2km @ MP) 🎯 <span class="edit-icon">✏️</span></div>
-                                <div class="miss-btn-label"><div class="miss-btn" data-id="w16d3">✗</div>Miss</div>
-                                <div class="workout-distance" data-id="w16d3">6 km <span class="edit-icon">✏️</span></div>
-                                <button class="notes-btn" data-id="w16d3">📝 Notes</button><div></div>
-                            </div>
-                            <div class="notes-section" data-id="w16d3"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d3"></div>
-                            <div class="note-display" data-note-display="w16d3"></div>
-
-                            <div class="day-row" data-day-id="w16d4">
-                                <div class="day-name">THU</div><div class="day-date">May 14</div>
-                                <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d4">Done</div>
-                                <div class="workout-name" data-id="w16d4">Rest or 2-4km Super Easy 😌 <span class="edit-icon">✏️</span></div>
-                                <div class="miss-btn-label"><div class="miss-btn" data-id="w16d4">✗</div>Miss</div>
-                                <div class="workout-distance" data-id="w16d4"> <span class="edit-icon">✏️</span></div>
-                                <button class="notes-btn" data-id="w16d4">📝 Notes</button><div></div>
-                            </div>
-                            <div class="notes-section" data-id="w16d4"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d4"></div>
-                            <div class="note-display" data-note-display="w16d4"></div>
-
-                            <div class="day-row" data-day-id="w16d5">
-                                <div class="day-name">FRI</div><div class="day-date">May 15</div>
-                                <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d5">Done</div>
-                                <div class="workout-name" data-id="w16d5">Rest 💤 <span class="edit-icon">✏️</span></div>
-                                <div class="miss-btn-label"><div class="miss-btn" data-id="w16d5">✗</div>Miss</div>
-                                <div class="workout-distance" data-id="w16d5"> <span class="edit-icon">✏️</span></div>
-                                <button class="notes-btn" data-id="w16d5">📝 Notes</button><div></div>
-                            </div>
-                            <div class="notes-section" data-id="w16d5"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d5"></div>
-                            <div class="note-display" data-note-display="w16d5"></div>
-
-                            <div class="day-row long-run key-workout" data-day-id="w16d6">
-                                <div class="day-name">SAT</div><div class="day-date">May 16</div>
-                                <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d6">Done</div>
-                                <div class="workout-name" data-id="w16d6">🏁 RACE DAY - MARATHON 🏁 <span class="edit-icon">✏️</span></div>
-                                <div class="miss-btn-label"><div class="miss-btn" data-id="w16d6">✗</div>Miss</div>
-                                <div class="workout-distance" data-id="w16d6">42.2 km <span class="edit-icon">✏️</span></div>
-                                <button class="notes-btn" data-id="w16d6">📝 Notes</button><div></div>
-                            </div>
-                            <div class="notes-section" data-id="w16d6"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d6"></div>
-                            <div class="note-display" data-note-display="w16d6"></div>
-
-                            <div class="day-row" data-day-id="w16d7">
-                                <div class="day-name">SUN</div><div class="day-date">May 17</div>
-                                <div class="checkbox-label"><input type="checkbox" class="checkbox" data-id="w16d7">Done</div>
-                                <div class="workout-name" data-id="w16d7">🎊 CELEBRATION DAY! 🥳🏆✨ <span class="edit-icon">✏️</span></div>
-                                <div class="miss-btn-label"><div class="miss-btn" data-id="w16d7">✗</div>Miss</div>
-                                <div class="workout-distance" data-id="w16d7">You did it! 🌟 <span class="edit-icon">✏️</span></div>
-                                <button class="notes-btn" data-id="w16d7">📝 Notes</button><div></div>
-                            </div>
-                            <div class="notes-section" data-id="w16d7"><textarea placeholder="Add your training notes..."></textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="w16d7"></div>
-                            <div class="note-display" data-note-display="w16d7"></div>
-
-                        </div>
-                        <div class="week-focus">
-                            <div class="focus-label">💡 Focus</div>
-                            <div class="focus-text">🏁 RACE WEEK! Stay calm, trust your training, race smart. YOU GOT THIS!</div>
                         </div>
                     </div>
                 </div>
@@ -3254,12 +3472,18 @@
                 }
             });
 
-            // Find longest run
+            // Find longest run (excluding race day)
             let longestDistance = 0;
             let longestRunName = '';
             let longestRunDate = '';
 
             document.querySelectorAll('.day-row').forEach(dayRow => {
+                // Skip race day (w16d6) - the marathon itself
+                const dayId = dayRow.getAttribute('data-day-id');
+                if (dayId === 'w16d6') {
+                    return; // Skip the race day marathon
+                }
+                
                 const distEl = dayRow.querySelector('.workout-distance');
                 const nameEl = dayRow.querySelector('.workout-name');
                 const dateEl = dayRow.querySelector('.day-date');
@@ -3278,12 +3502,94 @@
                 peakMileageEl.innerHTML = `${peakMileage} km<br>(${peakWeekDates})`;
             }
 
-            // Update longest run with workout name
+            // Update longest run with date and workout name
             const longestRunEl = document.getElementById('longestRun');
             if (longestRunEl && longestDistance > 0) {
-                longestRunEl.innerHTML = `${longestDistance} km<br>${longestRunName}`;
+                longestRunEl.innerHTML = `${longestDistance} km<br>${longestRunDate}<br>${longestRunName}`;
             }
         }
+
+
+        // Calculate and update weekly totals dynamically
+        function updateWeeklyTotals() {
+            document.querySelectorAll('.week-card').forEach(weekCard => {
+                const weekTotalEl = weekCard.querySelector('.week-total');
+                if (!weekTotalEl) return;
+                
+                let totalKm = 0;
+                const dayRows = weekCard.querySelectorAll('.day-row');
+                
+                dayRows.forEach(dayRow => {
+                    const distEl = dayRow.querySelector('.workout-distance');
+                    if (distEl) {
+                        const km = parseDistance(distEl.textContent);
+                        totalKm += km;
+                    }
+                });
+                
+                // Update the week total display
+                if (totalKm > 0) {
+                    weekTotalEl.textContent = `${totalKm} km`;
+                }
+            });
+        }
+
+        // Auto-style Sundays with 10km+ as long runs (gold)
+        function autoStyleLongRuns() {
+            document.querySelectorAll('.day-row').forEach(dayRow => {
+                const dayName = dayRow.querySelector('.day-name');
+                const distEl = dayRow.querySelector('.workout-distance');
+                
+                if (dayName && distEl) {
+                    const isSunday = dayName.textContent.trim() === 'SUN';
+                    const km = parseDistance(distEl.textContent);
+                    
+                    if (isSunday && km >= 10) {
+                        // Add long-run class if not already present
+                        if (!dayRow.classList.contains('long-run')) {
+                            dayRow.classList.add('long-run');
+                        }
+                    } else if (isSunday && km < 10) {
+                        // Remove long-run class if distance drops below 10km
+                        dayRow.classList.remove('long-run');
+                    }
+                }
+            });
+        }
+
+        // Auto-style rest days (has "rest" in name and 0 or null distance)
+        function autoStyleRestDays() {
+            document.querySelectorAll('.day-row').forEach(dayRow => {
+                const workoutNameEl = dayRow.querySelector('.workout-name');
+                const distEl = dayRow.querySelector('.workout-distance');
+                
+                if (workoutNameEl && distEl) {
+                    // Get workout name and check if it contains "rest" (case insensitive)
+                    const workoutName = workoutNameEl.textContent.replace('✏️', '').replace('🗝️', '').trim();
+                    const hasRest = workoutName.toLowerCase().includes('rest');
+                    
+                    // Check if distance is 0 or null
+                    const km = parseDistance(distEl.textContent);
+                    const isZeroDistance = km === 0;
+                    
+                    if (hasRest && isZeroDistance) {
+                        // Add rest-day class if not already present
+                        if (!dayRow.classList.contains('rest-day')) {
+                            dayRow.classList.add('rest-day');
+                        }
+                    } else {
+                        // Remove rest-day class if conditions no longer met
+                        dayRow.classList.remove('rest-day');
+                    }
+                }
+            });
+        }
+
+        // Initial calculation
+        updateSummaryStats();
+        updateWeeklyTotals();
+        autoStyleLongRuns();
+        autoStyleRestDays();
 
         // Initial calculation
         updateSummaryStats();
@@ -3314,9 +3620,11 @@
         document.querySelectorAll('.day-row').forEach(dayRow => {
             updateWorkoutStatus(dayRow);
 
-            // Check if this is a key workout (has 🗝️ emoji)
+            // Check if this is a key workout (has 🗝️ emoji OR is race day)
             const workoutNameEl = dayRow.querySelector('.workout-name');
-            if (workoutNameEl && workoutNameEl.textContent.includes('🗝️')) {
+            const dayId = dayRow.getAttribute('data-day-id');
+            // Key workouts: either have 🗝️ or are race day (w16d6)
+            if (workoutNameEl && (workoutNameEl.textContent.includes('🗝️') || dayId === 'w16d6')) {
                 dayRow.classList.add('key-workout');
             }
         });
@@ -3403,6 +3711,9 @@
                     });
                     checkWeekCompliance();
                     updateSummaryStats(); // Update weekly mileage, peak mileage, and longest run
+                    updateWeeklyTotals(); // Recalculate weekly totals
+                    autoStyleLongRuns(); // Re-apply long-run styling
+                    autoStyleRestDays(); // Re-apply rest-day styling
                 }
             });
 
@@ -3434,6 +3745,8 @@
             });
             // Update summary stats after loading saved values
             updateSummaryStats();
+            autoStyleLongRuns();
+            autoStyleRestDays();
         }
     }
 
@@ -3667,5 +3980,6 @@
         setInterval(calculateWeeksToRace, 1000 * 60 * 60 * 24);
     }
 </script>
+</div>
 </body>
 </html>
