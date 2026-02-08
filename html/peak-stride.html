@@ -1230,6 +1230,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <nav class="navbar">
@@ -3265,33 +3266,233 @@
 </footer>
 
 <script>
+    // ====== SUPABASE CONFIGURATION ======
+    // 
+    // SETUP INSTRUCTIONS:
+    // 1. Create a Supabase project at https://supabase.com
+    // 2. Create a table named 'phase_states' with the following structure:
+    //    - user_session_id (text, NOT NULL)
+    //    - phase_id (text, NOT NULL)
+    //    - is_collapsed (boolean, NOT NULL, DEFAULT true)
+    //    - updated_at (timestamp with time zone, DEFAULT now())
+    //    - PRIMARY KEY (user_session_id, phase_id)
+    // 
+    // 3. SQL to create the table:
+    /*
+       CREATE TABLE phase_states (
+         user_session_id TEXT NOT NULL,
+         phase_id TEXT NOT NULL,
+         is_collapsed BOOLEAN NOT NULL DEFAULT true,
+         updated_at TIMESTAMPTZ DEFAULT now(),
+         PRIMARY KEY (user_session_id, phase_id)
+       );
+       
+       -- Enable Row Level Security (RLS)
+       ALTER TABLE phase_states ENABLE ROW LEVEL SECURITY;
+       
+       -- Create policy to allow all operations (adjust based on your security needs)
+       CREATE POLICY "Allow all operations" ON phase_states
+         FOR ALL
+         USING (true)
+         WITH CHECK (true);
+    */
+    // 
+    // 4. Replace the values below with your Supabase project credentials:
+    //    - SUPABASE_URL: Found in Project Settings > API > Project URL
+    //    - SUPABASE_ANON_KEY: Found in Project Settings > API > Project API keys > anon public
+    // 
+    // TODO: Replace these with your actual Supabase credentials
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    
+    // Initialize Supabase client
+    let supabaseClient = null;
+    try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (error) {
+        console.warn('Supabase initialization failed, falling back to localStorage:', error);
+    }
+    
+    // Get or create a user session ID
+    function getUserSessionId() {
+        let sessionId = localStorage.getItem('user_session_id');
+        if (!sessionId) {
+            sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('user_session_id', sessionId);
+        }
+        return sessionId;
+    }
+    
+    const USER_SESSION_ID = getUserSessionId();
+    
+    // Save phase state to Supabase
+    async function savePhaseState(phaseId, isCollapsed) {
+        if (!supabaseClient) {
+            // Fallback to localStorage if Supabase isn't available
+            localStorage.setItem(phaseId, isCollapsed);
+            return;
+        }
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('phase_states')
+                .upsert({
+                    user_session_id: USER_SESSION_ID,
+                    phase_id: phaseId,
+                    is_collapsed: isCollapsed,
+                    updated_at: new Date().toISOString()
+                }, {
+                    onConflict: 'user_session_id,phase_id'
+                });
+            
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error saving phase state to Supabase:', error);
+            // Fallback to localStorage
+            localStorage.setItem(phaseId, isCollapsed);
+        }
+    }
+    
+    // Load phase state from Supabase
+    async function loadPhaseState(phaseId) {
+        if (!supabaseClient) {
+            // Fallback to localStorage if Supabase isn't available
+            return localStorage.getItem(phaseId);
+        }
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('phase_states')
+                .select('is_collapsed')
+                .eq('user_session_id', USER_SESSION_ID)
+                .eq('phase_id', phaseId)
+                .single();
+            
+            if (error) {
+                if (error.code === 'PGRST116') {
+                    // No record found, return null (will default to collapsed)
+                    return null;
+                }
+                throw error;
+            }
+            
+            return data.is_collapsed.toString();
+        } catch (error) {
+            console.error('Error loading phase state from Supabase:', error);
+            // Fallback to localStorage
+            return localStorage.getItem(phaseId);
+        }
+    }
+    
+    // Save week state to Supabase
+    async function saveWeekState(weekId, isCollapsed) {
+        if (!supabaseClient) {
+            // Fallback to localStorage if Supabase isn't available
+            localStorage.setItem(weekId, isCollapsed);
+            return;
+        }
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('phase_states')
+                .upsert({
+                    user_session_id: USER_SESSION_ID,
+                    phase_id: weekId,  // Reusing the same table, just different IDs
+                    is_collapsed: isCollapsed,
+                    updated_at: new Date().toISOString()
+                }, {
+                    onConflict: 'user_session_id,phase_id'
+                });
+            
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error saving week state to Supabase:', error);
+            // Fallback to localStorage
+            localStorage.setItem(weekId, isCollapsed);
+        }
+    }
+    
+    // Load week state from Supabase
+    async function loadWeekState(weekId) {
+        if (!supabaseClient) {
+            // Fallback to localStorage if Supabase isn't available
+            return localStorage.getItem(weekId);
+        }
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('phase_states')
+                .select('is_collapsed')
+                .eq('user_session_id', USER_SESSION_ID)
+                .eq('phase_id', weekId)
+                .single();
+            
+            if (error) {
+                if (error.code === 'PGRST116') {
+                    // No record found, return null (will default to collapsed)
+                    return null;
+                }
+                throw error;
+            }
+            
+            return data.is_collapsed.toString();
+        } catch (error) {
+            console.error('Error loading week state from Supabase:', error);
+            // Fallback to localStorage
+            return localStorage.getItem(weekId);
+        }
+    }
+    
     // Initialize tracker
-    function initializeTracker() {
+    async function initializeTracker() {
         // Handle phase collapse/expand
-        document.querySelectorAll('.phase-section').forEach((phase, index) => {
+        const phases = document.querySelectorAll('.phase-section');
+        
+        for (let index = 0; index < phases.length; index++) {
+            const phase = phases[index];
             const phaseHeader = phase.querySelector('.phase-header');
             const phaseId = `phase-${index}`;
             
             // Load saved state (default to collapsed)
-            const isCollapsed = localStorage.getItem(phaseId) !== 'false';
-            if (isCollapsed) {
+            const savedState = await loadPhaseState(phaseId);
+            if (savedState === 'false') {
+                // Phase was open, remove collapsed class
+                phase.classList.remove('collapsed');
+            } else {
+                // Phase was closed or first visit, ensure collapsed class is present
                 phase.classList.add('collapsed');
             }
             
-            phaseHeader.addEventListener('click', function() {
+            phaseHeader.addEventListener('click', async function() {
                 phase.classList.toggle('collapsed');
-                // Save state
-                localStorage.setItem(phaseId, phase.classList.contains('collapsed'));
+                // Save state to Supabase
+                await savePhaseState(phaseId, phase.classList.contains('collapsed'));
             });
-        });
+        }
 
         // Handle week collapse/expand
-        document.querySelectorAll('.week-header').forEach(header => {
-            header.addEventListener('click', function() {
-                const weekCard = this.closest('.week-card');
+        const weekHeaders = document.querySelectorAll('.week-header');
+        for (let index = 0; index < weekHeaders.length; index++) {
+            const header = weekHeaders[index];
+            const weekCard = header.closest('.week-card');
+            const weekId = `week-${index}`;
+            
+            // Load saved state (default to collapsed)
+            const savedState = await loadWeekState(weekId);
+            if (savedState === 'false') {
+                // Week was open, remove collapsed class
+                weekCard.classList.remove('collapsed');
+            } else {
+                // Week was closed or first visit, ensure collapsed class is present
+                weekCard.classList.add('collapsed');
+            }
+            
+            header.addEventListener('click', async function() {
                 weekCard.classList.toggle('collapsed');
+                // Save state to Supabase
+                await saveWeekState(weekId, weekCard.classList.contains('collapsed'));
             });
-        });
+        }
 
         // Handle checkboxes for completion
         document.querySelectorAll('.checkbox').forEach(checkbox => {
