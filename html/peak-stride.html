@@ -338,6 +338,22 @@
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 3px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .phase-header:hover {
+            opacity: 0.8;
+            transform: translateX(4px);
+        }
+
+        .phase-section.collapsed .phase-header {
+            margin-bottom: 0;
+        }
+
+        .phase-section.collapsed .week-card {
+            display: none;
         }
 
         .phase-content {
@@ -414,7 +430,8 @@
         }
 
         .week-card.collapsed .days-grid,
-        .week-card.collapsed .week-focus {
+        .week-card.collapsed .week-focus,
+        .week-card.collapsed .week-content {
             display: none;
         }
 
@@ -956,15 +973,23 @@
             position: absolute;
             top: -20px;
             left: -20px;
+            width: 48px;
+            height: 48px;
             font-size: 3rem;
+            line-height: 48px;
+            text-align: center;
             animation: spin 3s linear infinite;
-            transform-origin: center center;
-            display: inline-block;
+            transform-origin: 24px 24px;
+            display: block;
         }
         
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from { 
+                transform: rotate(0deg);
+            }
+            to { 
+                transform: rotate(360deg);
+            }
         }
         
         .day-row[data-day-id="w16d7"] .day-name,
@@ -1269,7 +1294,7 @@
 
 
             <!-- PHASE 1: BASE & DURABILITY -->
-            <div class="phase-section phase1">
+            <div class="phase-section phase1 collapsed">
                 <div class="phase-header">
                     <div class="phase-content">
                         <div class="phase-icon">💪</div>
@@ -1458,7 +1483,6 @@
                         <div class="focus-text">Build leg strength + aerobic base. Easy effort, focusing on consistency.</div>
                     </div>
                 </div>
-            </div>
 
             <!-- Week 2 -->
             <div class="week-card collapsed">
@@ -2005,9 +2029,10 @@
                     </div>
                 </div>
             </div>
+            </div>
 
             <!-- PHASE 2: MARATHON BUILD -->
-            <div class="phase-section phase2">
+            <div class="phase-section phase2 collapsed">
                 <div class="phase-header">
                     <div class="phase-content">
                         <div class="phase-icon">🎯</div>
@@ -2199,7 +2224,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
             <!-- Week 6 -->
             <div class="week-card collapsed">
@@ -2488,9 +2512,10 @@
                     </div>
                 </div>
             </div>
+            </div>
 
             <!-- PHASE 3: PEAK LIKE A FREAK -->
-            <div class="phase-section phase3">
+            <div class="phase-section phase3 collapsed">
                 <div class="phase-header">
                     <div class="phase-content">
                         <div class="phase-icon">⚡</div>
@@ -2887,10 +2912,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
 
             <!-- TAPER -->
-            <div class="phase-section taper">
+            <div class="phase-section taper collapsed">
                 <div class="phase-header">
                     <div class="phase-content">
                         <div class="phase-icon">🏁</div>
@@ -3096,7 +3122,7 @@
             </div>
 
             <!-- RACE WEEK -->
-            <div class="phase-section race">
+            <div class="phase-section race collapsed">
                 <div class="phase-header">
                     <div class="phase-content">
                         <div class="phase-icon">⭐</div>
@@ -3241,6 +3267,24 @@
 <script>
     // Initialize tracker
     function initializeTracker() {
+        // Handle phase collapse/expand
+        document.querySelectorAll('.phase-section').forEach((phase, index) => {
+            const phaseHeader = phase.querySelector('.phase-header');
+            const phaseId = `phase-${index}`;
+            
+            // Load saved state (default to collapsed)
+            const isCollapsed = localStorage.getItem(phaseId) !== 'false';
+            if (isCollapsed) {
+                phase.classList.add('collapsed');
+            }
+            
+            phaseHeader.addEventListener('click', function() {
+                phase.classList.toggle('collapsed');
+                // Save state
+                localStorage.setItem(phaseId, phase.classList.contains('collapsed'));
+            });
+        });
+
         // Handle week collapse/expand
         document.querySelectorAll('.week-header').forEach(header => {
             header.addEventListener('click', function() {
@@ -3980,6 +4024,5 @@
         setInterval(calculateWeeksToRace, 1000 * 60 * 60 * 24);
     }
 </script>
-</div>
 </body>
 </html>
