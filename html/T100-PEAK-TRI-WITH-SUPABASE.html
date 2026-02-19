@@ -545,10 +545,18 @@
             color: rgba(239, 68, 68, 0.2);
             font-size: 2.5em;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
             letter-spacing: 4px;
             font-family: 'Orbitron', sans-serif;
         }
+
+        /* Ensure all day-card content is above watermarks */
+        .day-card .day-header,
+        .day-card .workouts-container,
+        .day-card .workout-item,
+        .day-card .notes-btn,
+        .day-card .note-display,
+        .day-card .notes-section { position: relative; z-index: 2; }
 
         /* Key Workout Styling */
         .day-card.key-workout {
@@ -572,7 +580,7 @@
             color: rgba(14, 165, 233, 0.35);
             font-size: 2em;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
             letter-spacing: 3px;
             font-family: 'Orbitron', sans-serif;
         }
@@ -613,7 +621,7 @@
             color: rgba(139, 69, 19, 0.35);
             font-size: 1.8em;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
             letter-spacing: 2px;
             font-family: 'Orbitron', sans-serif;
         }
@@ -635,7 +643,7 @@
             color: rgba(16, 185, 129, 0.35);
             font-size: 2.5em;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
             letter-spacing: 4px;
             font-family: 'Orbitron', sans-serif;
         }
@@ -669,7 +677,7 @@
             color: rgba(245, 158, 11, 0.40);
             font-size: 2.3em;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
             letter-spacing: 3px;
             font-family: 'Orbitron', sans-serif;
         }
@@ -696,7 +704,7 @@
             color: rgba(239, 68, 68, 0.35);
             font-size: 2.8em;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
             letter-spacing: 4px;
             font-family: 'Orbitron', sans-serif;
         }
@@ -840,57 +848,22 @@
         /* Today Highlight */
         .today-highlight {
             border: 3px solid #2196F3 !important;
-            box-shadow: 0 0 20px rgba(33, 150, 243, 0.4) !important;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2), 0 4px 18px rgba(33, 150, 243, 0.3) !important;
             position: relative;
-            overflow: visible !important;
         }
-        
-        .today-highlight::before {
-            content: '📍';
-            position: absolute;
-            top: 50%;
-            left: -15px;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
-            animation: pulse 2s ease-in-out infinite;
+
+        /* TODAY indicator via day-header text, no ::before/::after (avoids conflicting with completion watermarks) */
+        .today-highlight .day-name::after {
+            content: ' 📍';
+            font-size: 0.75rem;
+            vertical-align: middle;
         }
-        
-        .today-highlight::after {
-            content: 'TODAY';
-            position: absolute;
-            bottom: -8px;
-            right: 15px;
-            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-            color: white;
-            padding: 3px 12px;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+
+        @keyframes todayPulse {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(33,150,243,0.2), 0 4px 18px rgba(33,150,243,0.3) !important; }
+            50%       { box-shadow: 0 0 0 5px rgba(33,150,243,0.3), 0 4px 26px rgba(33,150,243,0.45) !important; }
         }
-        
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
-                transform: translateY(-50%) scale(1);
-            }
-            50% {
-                box-shadow: 0 4px 20px rgba(33, 150, 243, 0.6);
-                transform: translateY(-50%) scale(1.1);
-            }
-        }
+        .today-highlight { animation: todayPulse 3s ease-in-out infinite; }
 
         .training-summary {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(248, 249, 250, 0.05) 100%);
@@ -1204,6 +1177,7 @@
                 
                 phaseHeader.addEventListener('click', () => {
                     phaseSection.classList.toggle('collapsed');
+                    localStorage.setItem(`tri-${phaseId}-collapsed`, phaseSection.classList.contains('collapsed') ? 'true' : 'false');
                 });
                 
                 phaseSection.appendChild(phaseHeader);
@@ -1225,7 +1199,14 @@
 
         function createWeekCard(weekData) {
             const card = document.createElement('div');
-            card.className = 'week-card collapsed';
+            const weekKey = `tri-week-${weekData.week}-collapsed`;
+            const savedCollapsed = localStorage.getItem(weekKey);
+            // Default: all collapsed (null = first visit)
+            if (savedCollapsed === null || savedCollapsed === 'true') {
+                card.className = 'week-card collapsed';
+            } else {
+                card.className = 'week-card';
+            }
             
             // Compute badge totals live from descriptions (not stale seed strings)
             let swimKm = 0, bikeKm = 0, runKm = 0;
@@ -1255,6 +1236,7 @@
             
             header.addEventListener('click', () => {
                 card.classList.toggle('collapsed');
+                localStorage.setItem(weekKey, card.classList.contains('collapsed') ? 'true' : 'false');
             });
             
             const daysGrid = document.createElement('div');

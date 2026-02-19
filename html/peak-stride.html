@@ -1217,56 +1217,28 @@
         /* Today Highlight - Only Border */
         .today-highlight {
             border: 3px solid #2196F3 !important;
-            box-shadow: 0 0 20px rgba(33, 150, 243, 0.3) !important;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2), 0 4px 16px rgba(33, 150, 243, 0.25) !important;
             position: relative;
-            overflow: visible !important;
         }
-        
-        .today-highlight::before {
-            content: '📍';
-            position: absolute;
-            top: 50%;
-            left: -15px;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        .today-highlight::after {
-            content: 'TODAY';
-            position: absolute;
-            bottom: -8px;
-            right: 15px;
-            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-            color: white;
-            padding: 3px 12px;
-            border-radius: 10px;
-            font-size: 0.65rem;
+
+        /* Today label shown as part of the day-header, not ::before/::after (avoids conflict with watermarks) */
+        .today-highlight .day-name::after {
+            content: ' 📍TODAY';
+            font-size: 0.6rem;
             font-weight: 700;
-            letter-spacing: 1px;
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+            letter-spacing: 0.5px;
+            color: #2196F3;
+            vertical-align: middle;
         }
-        
+
         @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
-                transform: translateY(-50%) scale(1);
-            }
-            50% {
-                box-shadow: 0 4px 20px rgba(33, 150, 243, 0.6);
-                transform: translateY(-50%) scale(1.1);
-            }
+            0%, 100% { box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2), 0 4px 16px rgba(33, 150, 243, 0.25); }
+            50%       { box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.3), 0 4px 24px rgba(33, 150, 243, 0.4); }
+        }
+        .today-highlight { animation: todayPulse 3s ease-in-out infinite; }
+        @keyframes todayPulse {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(33,150,243,0.2), 0 4px 16px rgba(33,150,243,0.25) !important; }
+            50%       { box-shadow: 0 0 0 5px rgba(33,150,243,0.35), 0 4px 24px rgba(33,150,243,0.4) !important; }
         }
     
         /* ── MULTI-WORKOUT DAY CARDS ── */
@@ -1357,15 +1329,15 @@
 
         .day-row.completed .workout-item,
         .day-row.missed    .workout-item,
-        .day-row.partial   .workout-item { background:rgba(255,255,255,0.15); border-left-color:rgba(255,255,255,0.4); }
+        .day-row.partial   .workout-item { background:rgba(255,255,255,0.15); border-left-color:rgba(255,255,255,0.4); position:relative; z-index:2; }
 
         /* COMPLETED watermark */
         .day-row.completed { position:relative; overflow:hidden; }
         .day-row.completed::after {
             content:'COMPLETED'; position:absolute; top:50%; left:50%;
             transform:translate(-50%,-50%); font-weight:bold;
-            color:rgba(255,255,255,.22); font-size:2.2em;
-            pointer-events:none; z-index:1; letter-spacing:4px;
+            color:rgba(255,255,255,.18); font-size:2em;
+            pointer-events:none; z-index:0; letter-spacing:4px;
             white-space: nowrap;
         }
 
@@ -1374,18 +1346,25 @@
         .day-row.missed::after {
             content:'MISSED'; position:absolute; top:50%; left:50%;
             transform:translate(-50%,-50%); font-weight:bold;
-            color:rgba(255,255,255,.25); font-size:2.5em;
-            pointer-events:none; z-index:1; letter-spacing:4px;
+            color:rgba(255,255,255,.2); font-size:2.2em;
+            pointer-events:none; z-index:0; letter-spacing:4px;
         }
 
         /* PARTIAL watermark */
         .day-row.partial::after {
             content:'PARTIAL'; position:absolute; top:50%; left:50%;
             transform:translate(-50%,-50%) rotate(-8deg); font-weight:bold;
-            color:rgba(255,255,255,.28); font-size:2.4em;
-            pointer-events:none; z-index:1; letter-spacing:4px;
+            color:rgba(255,255,255,.22); font-size:2.1em;
+            pointer-events:none; z-index:0; letter-spacing:4px;
             white-space: nowrap;
         }
+
+        /* Ensure day content is always above watermarks */
+        .day-row .day-header-row,
+        .day-row .workouts-container,
+        .day-row .notes-btn,
+        .day-row .notes-section,
+        .day-row .note-display { position:relative; z-index:2; }
 
         .day-row { position:relative; }
 
@@ -1830,10 +1809,8 @@ if (editModeBtn) {
 
         if (editMode) {
             this.textContent = '💾 Save Changes';
-            // Expand ALL weeks and phases so add buttons are visible
-            document.querySelectorAll('.week-card.collapsed, .phase-section.collapsed').forEach(el => {
-                el.classList.remove('collapsed');
-            });
+            // DO NOT expand weeks — keep them as the user left them
+            // Only show add buttons on visible (non-collapsed) day-rows
             allDescs.forEach(el => {
                 el.contentEditable = 'true';
                 el.style.cursor = 'text';
@@ -2092,47 +2069,82 @@ function updateOverviewStats() {
     const ulr = document.getElementById('upcomingLongRun');
     if (ulr) ulr.textContent = longRun || '--';
 
-    // Next key workout
+    // Next key workout — include today and future, skip already-completed key workouts
     let nextKey = 'TBD';
     for (const row of document.querySelectorAll('.day-row')) {
         const d = row.getAttribute('data-date');
-        if (!d || d <= todayStr) continue;
+        if (!d || d < todayStr) continue; // strictly past only — today included
         const descs = row.querySelectorAll('.workout-desc');
         for (const desc of descs) {
             if (desc.textContent.includes('🗝️')) {
+                // Skip if this specific workout is already completed
+                const item = desc.closest('.workout-item');
+                const cb = item?.querySelector('.checkbox');
+                if (cb && cb.checked) continue;
                 const dayName = row.querySelector('.day-name')?.textContent||'';
                 const dayDate = row.querySelector('.day-date')?.textContent||'';
                 let name = desc.textContent.replace(/[✏️🗝️]/g,'').trim();
                 if (name.length>45) name=name.slice(0,42)+'...';
-                nextKey = dayName+' '+dayDate+': '+name;
+                nextKey = dayName+' '+dayDate+':\n'+name;
                 break;
             }
         }
         if (nextKey!=='TBD') break;
     }
     const nk = document.getElementById('nextKeyWorkout');
-    if (nk) nk.textContent = nextKey;
+    if (nk) {
+        if (nextKey === 'TBD') {
+            nk.innerHTML = 'TBD';
+        } else {
+            // nextKey has format "DAY DATE:\nworkout name"
+            const parts = nextKey.split('\n');
+            nk.innerHTML = `<span style="font-size:0.75em;font-weight:600;display:block;margin-bottom:2px">${parts[0]}</span><span style="font-size:0.85em">${parts[1]||''}</span>`;
+        }
+    }
 }
 
 function updateSummaryStats() {
-    let peak=0, longest=0;
+    let peak=0, peakWeekTitle='', longest=0, longestDesc='', longestDate='';
     document.querySelectorAll('.week-card').forEach(wc => {
         const el = wc.querySelector('.week-total');
         const m  = el?.textContent.match(/([\d.]+)/);
-        if (m) { const v=parseFloat(m[1]); if (v>peak) peak=v; }
+        if (m) {
+            const v=parseFloat(m[1]);
+            if (v>peak) {
+                peak=v;
+                // Get week title (e.g. "Week 14 | Apr 27 – May 3")
+                peakWeekTitle = wc.querySelector('.week-title')?.textContent || '';
+            }
+        }
         // Skip the entire race phase — those are not training runs
         if (wc.closest('.phase-section.race')) return;
         wc.querySelectorAll('.workout-item').forEach(item => {
             if (item.classList.contains('rest')||item.classList.contains('mobility')) return;
             const dist = item.querySelector('.workout-dist');
             const km   = parseKm(dist?.textContent);
-            if (km > longest) longest = km;
+            if (km > longest) {
+                longest = km;
+                longestDesc = item.querySelector('.workout-desc')?.textContent.replace(/[✏️🗝️]/g,'').trim() || '';
+                // get the date from the parent day-row
+                const row = item.closest('.day-row');
+                const dayName = row?.querySelector('.day-name')?.textContent || '';
+                const dayDate = row?.querySelector('.day-date')?.textContent || '';
+                longestDate = dayName + ' ' + dayDate;
+            }
         });
     });
     const pe=document.getElementById('peakMileage');
     const le=document.getElementById('longestRun');
-    if (pe) pe.textContent = peak>0 ? peak+' km' : '--';
-    if (le) le.textContent = longest>0 ? longest+' km' : '--';
+    if (pe) {
+        pe.innerHTML = peak>0
+            ? `${peak} km<div style="font-size:0.7rem;font-weight:500;color:#64748b;margin-top:3px;line-height:1.3">${peakWeekTitle}</div>`
+            : '--';
+    }
+    if (le) {
+        le.innerHTML = longest>0
+            ? `${longest} km<div style="font-size:0.7rem;font-weight:500;color:#64748b;margin-top:3px;line-height:1.3">${longestDesc ? longestDesc+'<br>' : ''}${longestDate}</div>`
+            : '--';
+    }
 }
 
 // =====================================================
