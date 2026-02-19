@@ -1393,17 +1393,23 @@
         // Initialize the plan
         function initializePlan() {
             const container = document.getElementById('training-plan');
-            
-            // Rebuild phases fresh from trainingData on every call
-            const phases = {
-                "Post-Marathon Transition": { icon: "🟢", weeks: [] },
-                "Engine Build": { icon: "🔵", weeks: [] },
-                "Peak Build": { icon: "🟣", weeks: [] },
-                "Sharpen": { icon: "🟠", weeks: [] },
-                "Race Week": { icon: "🔴", weeks: [] }
+            container.innerHTML = '';
+
+            // Phase icon map — fallback to ⚪ for any unknown phase name
+            const phaseIconMap = {
+                "Post-Marathon Transition": "🟢",
+                "Engine Build": "🔵",
+                "Peak Build": "🟣",
+                "Sharpen": "🟠",
+                "Race Week": "🔴"
             };
+
+            // Build phases dynamically from trainingData — handles any phase name from DB
+            const phases = {};
             trainingData.forEach(week => {
-                if (phases[week.phase]) phases[week.phase].weeks.push(week);
+                const p = week.phase || 'Training';
+                if (!phases[p]) phases[p] = { icon: phaseIconMap[p] || '⚪', weeks: [] };
+                phases[p].weeks.push(week);
             });
             
             Object.entries(phases).forEach(([phaseName, phaseData], phaseIndex) => {
