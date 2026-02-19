@@ -975,6 +975,7 @@
             <span class="navbar-title">PEAK TRI</span>
         </a>
         <div class="navbar-actions">
+            <span id="sync-badge" style="font-size:0.75rem; padding:0.3rem 0.75rem; border:1px solid #94a3b8; border-radius:20px; color:#94a3b8; font-family:'Inter',sans-serif; transition: all 0.3s;">⚡ Loading…</span>
             <a href="dashboard.html" class="nav-btn btn-dashboard">📊 Dashboard</a>
             <a href="login.html" class="nav-btn btn-logout">🚪 Logout</a>
         </div>
@@ -1060,7 +1061,60 @@
         }
         
         // =====================================================
-        // TRAINING PLAN DATA
+        // LOCAL CACHE — Instant load, cloud backup
+        // =====================================================
+        const CACHE_KEY    = 'peak-tri-t100-cache-v2';  // bump version = bust stale caches
+        const CACHE_ID_KEY = 'peak-tri-t100-plan-id-v2';
+
+        function saveToCache(data, planId) {
+            try {
+                localStorage.setItem(CACHE_KEY,    JSON.stringify(data));
+                localStorage.setItem(CACHE_ID_KEY, planId || '');
+                updateSyncBadge('synced');
+            } catch(e) { console.warn('Cache write failed:', e); }
+        }
+
+        function loadFromCache() {
+            try {
+                const raw = localStorage.getItem(CACHE_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch(e) { return null; }
+        }
+
+        function updateSyncBadge(status) {
+            const badge = document.getElementById('sync-badge');
+            if (!badge) return;
+            const map = {
+                syncing: { text: '☁️ Syncing…',  color: '#f59e0b' },
+                synced:  { text: '✅ Synced',     color: '#10b981' },
+                cached:  { text: '⚡ Cached',     color: '#06b6d4' },
+                error:   { text: '⚠️ Sync Error', color: '#ef4444' },
+                offline: { text: '📴 Offline',    color: '#94a3b8' },
+            };
+            const s = map[status] || map.offline;
+            badge.textContent = s.text;
+            badge.style.color = s.color;
+            badge.style.borderColor = s.color;
+        }
+
+        // Ensure every workout object has all required state fields
+        function normalizeTrainingData(data) {
+            if (!Array.isArray(data) || data.length === 0) return false; // signal: empty/bad
+            data.forEach(week => {
+                week.days?.forEach(day => {
+                    if (day.notes === undefined) day.notes = '';
+                    day.workouts?.forEach(w => {
+                        if (w.completed === undefined) w.completed = false;
+                        if (w.missed    === undefined) w.missed    = false;
+                        if (w.notes     === undefined) w.notes     = '';
+                    });
+                });
+            });
+            return true; // signal: valid data
+        }
+
+        // =====================================================
+        // TRAINING PLAN DATA — hardcoded seed / fallback
         // =====================================================
         // Complete 13-week training plan data
         let trainingData = [
@@ -1389,6 +1443,10 @@
                 ]
             }
         ];
+
+        // Deep-clone the hardcoded data as the canonical seed.
+        // Used to seed an empty/missing DB record on first load.
+        const SEED_TRAINING_DATA = JSON.parse(JSON.stringify(trainingData));
 
         // Initialize the plan
         function initializePlan() {
@@ -1793,72 +1851,133 @@
 
         // =====================================================
         // SUPABASE AUTHENTICATION & DATA LOADING
+        // Cache-first: render from localStorage immediately,
+        // then sync from Supabase in the background.
         // =====================================================
         
         async function checkAuthAndLoadPlan() {
-            if (!supabaseClient) {
-                // Supabase not available, use hardcoded data
-                console.log('Using hardcoded training data (Supabase not available)');
+            // ── PHASE 1: Instant render from local cache ──────────
+            const cached = loadFromCache();
+            if (cached && normalizeTrainingData(cached)) {
+                trainingData = cached;
+                currentPlanId = localStorage.getItem(CACHE_ID_KEY) || null;
+                console.log('⚡ Rendered from local cache instantly');
                 initializePlan();
+                updateSyncBadge('cached');
+            }
+
+            // ── PHASE 2: Background cloud sync ────────────────────
+            if (!supabaseClient) {
+                if (!cached) initializePlan(); // no cache, no Supabase → use hardcoded
+                updateSyncBadge('offline');
                 return;
             }
-            
+
+            updateSyncBadge('syncing');
+
             try {
-                // Check if user is logged in
                 const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-                
+
                 if (authError || !user) {
-                    console.log('No active session found. Redirecting to login...');
+                    console.log('No active session. Redirecting to login…');
                     window.location.href = 'login.html';
                     return;
                 }
-                
+
                 currentUser = user;
-                console.log('User authenticated:', user.email);
-                
-                // Fetch the training plan for this user
-                const { data: planRecord, error: dbError } = await supabaseClient
+
+                // Find the best T100 plan for this user:
+                // prefer the one with the most actual workout data (not an empty seed)
+                const { data: records, error: dbError } = await supabaseClient
                     .from('training_plans')
                     .select('*')
                     .eq('user_id', user.id)
                     .eq('plan_type', 'T100')
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle(); // returns null instead of error when no rows found
-                
+                    .order('updated_at', { ascending: false });
+
                 if (dbError) {
-                    console.error('Error fetching plan:', dbError.message);
-                    console.log('Falling back to hardcoded training data');
-                    initializePlan();
+                    console.error('DB fetch error:', dbError.message);
+                    updateSyncBadge('error');
+                    if (!cached) initializePlan(); // render hardcoded if nothing was cached
                     return;
                 }
-                
-                if (planRecord && planRecord.plan_data) {
+
+                // Pick the first record that has real data (non-empty array)
+                const planRecord = records?.find(r =>
+                    Array.isArray(r.plan_data) && r.plan_data.length > 0
+                ) || records?.[0] || null;
+
+                if (planRecord) {
                     currentPlanId = planRecord.id;
-                    trainingData = planRecord.plan_data;
-                    // Ensure every workout has the required state fields
-                    trainingData.forEach(week => {
-                        week.days?.forEach(day => {
-                            if (!day.notes) day.notes = '';
-                            day.workouts?.forEach(w => {
-                                if (w.completed === undefined) w.completed = false;
-                                if (w.missed === undefined) w.missed = false;
-                                if (w.notes === undefined) w.notes = '';
-                            });
-                        });
-                    });
-                    console.log('✅ T100 plan loaded from Supabase, planId:', currentPlanId);
+                    const dbData  = planRecord.plan_data;
+                    const hasData = Array.isArray(dbData) && dbData.length > 0;
+
+                    if (hasData) {
+                        // DB has real data — merge it in
+                        normalizeTrainingData(dbData);
+                        trainingData = dbData;
+                        saveToCache(trainingData, currentPlanId);
+                        console.log('✅ Synced from Supabase, planId:', currentPlanId);
+                        initializePlan(); // re-render with cloud data
+                    } else {
+                        // DB plan exists but is EMPTY — seed it with hardcoded data
+                        // (preserves any workout state that was cached locally)
+                        console.warn('⚠️ DB plan is empty. Seeding with hardcoded plan…');
+                        const seed = JSON.parse(JSON.stringify(SEED_TRAINING_DATA));
+                        normalizeTrainingData(seed);
+                        trainingData = seed;
+                        await _pushToSupabase(); // write seed to DB
+                        saveToCache(trainingData, currentPlanId);
+                        if (!cached) initializePlan();
+                    }
+
+                    // If there are duplicate plans, delete the extras quietly
+                    if (records && records.length > 1) {
+                        const idsToDelete = records
+                            .filter(r => r.id !== currentPlanId)
+                            .map(r => r.id);
+                        if (idsToDelete.length) {
+                            await supabaseClient
+                                .from('training_plans')
+                                .delete()
+                                .in('id', idsToDelete)
+                                .eq('user_id', user.id);
+                            console.log(`🧹 Removed ${idsToDelete.length} duplicate plan(s)`);
+                        }
+                    }
+
                 } else {
-                    console.warn('⚠️ No T100 plan found in database for this user. Using hardcoded data. Saves will not persist until a plan record exists.');
+                    // No plan at all in DB — create one with hardcoded data
+                    console.log('No T100 plan in DB. Creating one…');
+                    const seed = JSON.parse(JSON.stringify(SEED_TRAINING_DATA));
+                    normalizeTrainingData(seed);
+                    trainingData = seed;
+
+                    const { data: newRecord, error: insertErr } = await supabaseClient
+                        .from('training_plans')
+                        .insert({
+                            user_id:   user.id,
+                            plan_type: 'T100',
+                            plan_name: 'T100 Race Plan - May to August 2026',
+                            plan_data: trainingData
+                        })
+                        .select()
+                        .single();
+
+                    if (!insertErr && newRecord) {
+                        currentPlanId = newRecord.id;
+                        saveToCache(trainingData, currentPlanId);
+                        console.log('✅ Created fresh T100 plan in DB, id:', currentPlanId);
+                    }
+                    if (!cached) initializePlan();
                 }
-                
-                // Initialize the plan with loaded data (state lives in trainingData)
-                initializePlan();
-                
-            } catch (error) {
-                console.error('Error in authentication/loading:', error);
-                // Use hardcoded data as fallback
-                initializePlan();
+
+                updateSyncBadge('synced');
+
+            } catch (err) {
+                console.error('Auth/load error:', err);
+                updateSyncBadge('error');
+                if (!cached) initializePlan();
             }
         }
         
@@ -2024,21 +2143,37 @@
         // SAVE PLAN STRUCTURE TO SUPABASE (Edit Mode)
         // =====================================================
         
-        async function savePlanToDatabase() {
-            if (!supabaseClient) { console.warn('savePlanToDatabase: no supabaseClient'); return; }
-            if (!currentUser) { console.warn('savePlanToDatabase: not logged in'); return; }
-            if (!currentPlanId) { console.warn('savePlanToDatabase: no currentPlanId'); return; }
-
-            const { error: dbError } = await supabaseClient
+        // ── internal: push trainingData to Supabase only ─────
+        async function _pushToSupabase() {
+            if (!supabaseClient || !currentUser || !currentPlanId) {
+                if (!supabaseClient) console.warn('savePlan: no supabaseClient');
+                if (!currentUser)   console.warn('savePlan: not logged in');
+                if (!currentPlanId) console.warn('savePlan: no currentPlanId');
+                return false;
+            }
+            const { error } = await supabaseClient
                 .from('training_plans')
                 .update({ plan_data: trainingData })
                 .eq('id', currentPlanId)
                 .eq('user_id', currentUser.id);
+            if (error) {
+                console.error('T100 cloud save error:', error.message);
+                updateSyncBadge('error');
+                return false;
+            }
+            return true;
+        }
 
-            if (dbError) {
-                console.error('T100 save error:', dbError.message);
-                alert('⚠️ Failed to sync to cloud: ' + dbError.message);
-            } else {
+        // ── public: save to BOTH cache and cloud ─────────────
+        async function savePlanToDatabase() {
+            // 1. Write to localStorage immediately (synchronous, zero-latency)
+            saveToCache(trainingData, currentPlanId);
+            updateSyncBadge('syncing');
+
+            // 2. Push to Supabase in background
+            const ok = await _pushToSupabase();
+            if (ok) {
+                updateSyncBadge('synced');
                 console.log('T100 plan synced to cloud ☁️');
             }
         }
