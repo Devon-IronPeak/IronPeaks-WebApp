@@ -1536,7 +1536,7 @@
             const workoutsContainer = document.createElement('div');
             workoutsContainer.className = 'workouts-container';
             
-            // Find the week index in trainingData for handleWorkoutToggle
+            // Find the week index in trainingData for toggleWorkoutState
             const weekIndex = trainingData.findIndex(w => w.week === weekNum);
             
             dayData.workouts.forEach((workout, workoutIdx) => {
@@ -1554,11 +1554,11 @@
                         <div class="workout-description" data-workout-id="w${weekNum}d${dayIndex}w${workoutIdx}">${timePrefix}${workout.desc}</div>
                     </div>
                     <div class="miss-btn-wrapper">
-                        <div class="miss-btn ${isMissedClass}" onclick="handleWorkoutToggle(${weekIndex}, ${dayIndex}, ${workoutIdx}, 'missed')">✗</div>
+                        <div class="miss-btn ${isMissedClass}" onclick="toggleWorkoutState(${weekIndex}, ${dayIndex}, ${workoutIdx}, 'missed')">✗</div>
                         <span class="miss-label">Miss</span>
                     </div>
                     <div class="checkbox-wrapper">
-                        <input type="checkbox" class="checkbox" ${isChecked} onchange="handleWorkoutToggle(${weekIndex}, ${dayIndex}, ${workoutIdx}, 'completed')">
+                        <input type="checkbox" class="checkbox" ${isChecked} onchange="toggleWorkoutState(${weekIndex}, ${dayIndex}, ${workoutIdx}, 'completed')">
                         <span class="checkbox-label">Done</span>
                     </div>
                 `;
@@ -1941,36 +1941,37 @@
             if (te) te.textContent = '~' + Math.round(planBikeHrs + planRunHrs + planSwimKm / 2) + ' hrs';
         }
         
-        async function handleWorkoutToggle(weekIndex, dayIndex, workoutIndex, toggleType) {
-            // 1. Locate the workout in trainingData
+        async function toggleWorkoutState(weekIndex, dayIndex, workoutIndex, stateType) {
+            // 1. Find the exact workout in the JSON state
             const workout = trainingData[weekIndex]?.days[dayIndex]?.workouts[workoutIndex];
             if (!workout) return;
 
-            // 2. Update state (mutually exclusive)
-            if (toggleType === 'completed') {
+            // 2. Flip the boolean state (mutually exclusive)
+            if (stateType === 'completed') {
                 workout.completed = !workout.completed;
-                if (workout.completed) workout.missed = false;
-            } else if (toggleType === 'missed') {
+                if (workout.completed) workout.missed = false; // Cannot be both
+            } else if (stateType === 'missed') {
                 workout.missed = !workout.missed;
-                if (workout.missed) workout.completed = false;
+                if (workout.missed) workout.completed = false; // Cannot be both
             }
 
-            // 3. Surgical DOM update — no full re-render, week cards stay open
+            // 3. Surgical DOM update — keeps week cards open (no collapse flash)
             const weekNum = trainingData[weekIndex].week;
             const descEl = document.querySelector(
-                '.workout-description[data-workout-id="w' + weekNum + 'd' + dayIndex + 'w' + workoutIndex + '"]'
+                `.workout-description[data-workout-id="w${weekNum}d${dayIndex}w${workoutIndex}"]`
             );
             if (descEl) {
                 const workoutItem = descEl.closest('.workout-item');
-                const dayCard = descEl.closest('.day-card');
-                const checkbox = workoutItem && workoutItem.querySelector('.checkbox');
-                const missBtn  = workoutItem && workoutItem.querySelector('.miss-btn');
+                const dayCard     = descEl.closest('.day-card');
+                const checkbox    = workoutItem?.querySelector('.checkbox');
+                const missBtn     = workoutItem?.querySelector('.miss-btn');
                 if (checkbox) checkbox.checked = workout.completed;
                 if (missBtn)  missBtn.classList.toggle('active', workout.missed);
-                if (dayCard)  updateDayCompletion(dayCard);
+                // Recalculate day-level completion badge AND weekly compliance %
+                if (dayCard)  updateDayCompletion(dayCard); // calls checkWeekCompliance internally
             }
 
-            // 4. Persist to Supabase
+            // 4. Immediately push the updated array to the cloud
             await savePlanToDatabase();
         }
 
