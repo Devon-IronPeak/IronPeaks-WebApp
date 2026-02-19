@@ -1548,7 +1548,7 @@ function loadFromCache() {
 }
 
 // ── Collapse state (localStorage only) ───────────────
-function saveCollapse(id, collapsed) { localStorage.setItem('ps-cl-'+id, collapsed?'1':'0'); }
+function saveCollapse(id, collapsed) { localStorage.setItem('ps-cl-'+id, collapsed ? '1' : '0'); }
 function loadCollapse(id) { return localStorage.getItem('ps-cl-'+id); }
 
 // ── Utilities ─────────────────────────────────────────
@@ -1604,10 +1604,11 @@ function initializePlan() {
 
 function renderPhase(phase, pi) {
     const sec = document.createElement('div');
-    sec.className = 'phase-section ' + phase.cssClass + ' collapsed';
+    sec.className = 'phase-section ' + phase.cssClass;
 
-    // restore saved collapse
-    if (loadCollapse('ph'+pi) === '0') sec.classList.remove('collapsed');
+    // Default OPEN; only collapse if user explicitly collapsed it (saved as '1')
+    const savedPhase = loadCollapse('ph'+pi);
+    if (savedPhase === '1') sec.classList.add('collapsed');
 
     const hdr = document.createElement('div');
     hdr.className = 'phase-header';
@@ -1628,8 +1629,11 @@ function renderPhase(phase, pi) {
 function renderWeek(week, pi, wi) {
     const uid  = 'ph'+pi+'wk'+wi;
     const card = document.createElement('div');
-    card.className = 'week-card collapsed';
-    if (loadCollapse(uid) === '0') card.classList.remove('collapsed');
+    card.className = 'week-card';
+
+    // Default OPEN; only collapse if user explicitly collapsed it (saved as '1')
+    const savedWeek = loadCollapse(uid);
+    if (savedWeek === '1') card.classList.add('collapsed');
 
     // calc total km for week header
     let totalKm = 0;
@@ -2311,19 +2315,19 @@ async function checkAuthAndLoadPlan() {
         }
 
         if (dbErr||!plan) {
-            if (!cached) showNoPlanMessage('No Marathon plan found. Run SEED-PEAK-STRIDE.sql.');
+            if (!cached) showNoPlanMessage('No Marathon plan found. Please upload a plan from the dashboard.');
             return;
         }
         currentPlanId = plan.id;
+        // Update the active-plan-id so cache stays in sync
+        localStorage.setItem('active-plan-id', plan.id);
         const dbData  = plan.plan_data;
         if (dbData?.phases?.length) {
             trainingData = migratePlanData(dbData);
             saveToCache(trainingData, currentPlanId);
             initializePlan();
         } else if (!cached) {
-            trainingData = JSON.parse(JSON.stringify(DEFAULT_PLAN_DATA));
-            await savePlanToDatabase();
-            initializePlan();
+            showNoPlanMessage('Plan data is empty or invalid. Please re-upload the plan JSON from the dashboard.');
         }
     } catch(e) {
         console.error('PS load error:',e);
