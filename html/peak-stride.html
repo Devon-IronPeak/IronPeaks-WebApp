@@ -1535,7 +1535,15 @@ function saveToCache(data, id) {
     } catch(e) {}
 }
 function loadFromCache() {
-    try { const r = localStorage.getItem(CACHE_KEY); return r ? JSON.parse(r) : null; }
+    try {
+        const r = localStorage.getItem(CACHE_KEY);
+        if (!r) return null;
+        // Only use cache if it matches the currently selected plan
+        const cachedId = localStorage.getItem(CACHE_ID);
+        const activePlanId = localStorage.getItem('active-plan-id');
+        if (activePlanId && cachedId !== activePlanId) return null;
+        return JSON.parse(r);
+    }
     catch(e) { return null; }
 }
 
@@ -2282,10 +2290,25 @@ async function checkAuthAndLoadPlan() {
         if (error||!user) { if (!cached) showNoPlanMessage('Please log in.'); return; }
         currentUser = user;
 
-        const {data:plan,error:dbErr} = await supabaseClient
-            .from('training_plans').select('*')
-            .eq('user_id',user.id).eq('plan_type','Marathon')
-            .order('created_at',{ascending:false}).limit(1).single();
+        // Prefer the plan selected in the dashboard (active-plan-id),
+        // fall back to the cached plan ID, then the most recent Marathon plan.
+        const activePlanId = localStorage.getItem('active-plan-id') || localStorage.getItem(CACHE_ID);
+        let plan, dbErr;
+        if (activePlanId) {
+            const res = await supabaseClient
+                .from('training_plans').select('*')
+                .eq('id', activePlanId).eq('user_id', user.id)
+                .eq('plan_type', 'Marathon').single();
+            plan = res.data; dbErr = res.error;
+        }
+        // If no active plan found, fall back to most recent Marathon plan
+        if (!plan) {
+            const res = await supabaseClient
+                .from('training_plans').select('*')
+                .eq('user_id', user.id).eq('plan_type', 'Marathon')
+                .order('created_at', {ascending: false}).limit(1).single();
+            plan = res.data; dbErr = res.error;
+        }
 
         if (dbErr||!plan) {
             if (!cached) showNoPlanMessage('No Marathon plan found. Run SEED-PEAK-STRIDE.sql.');
