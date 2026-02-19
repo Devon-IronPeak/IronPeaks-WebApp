@@ -2169,10 +2169,13 @@ function updateSummaryStats() {
         wc.querySelectorAll('.workout-item').forEach(item => {
             if (item.classList.contains('rest')||item.classList.contains('mobility')) return;
             const dist = item.querySelector('.workout-dist');
-            const km   = parseKm(dist?.textContent);
+            const descEl = item.querySelector('.workout-desc');
+            // Fall back to parsing km from desc text when distance field is empty (e.g. "🗝️ 32km Long Run")
+            let km = parseKm(dist?.textContent);
+            if (!km && descEl?.textContent) km = parseKm(descEl.textContent);
             if (km > longest) {
                 longest = km;
-                longestDesc = item.querySelector('.workout-desc')?.textContent.replace(/[✏️🗝️]/g,'').trim() || '';
+                longestDesc = descEl?.textContent.replace(/[✏️🗝️]/g,'').trim() || '';
                 // get the date from the parent day-row
                 const row = item.closest('.day-row');
                 const dayName = row?.querySelector('.day-name')?.textContent || '';
