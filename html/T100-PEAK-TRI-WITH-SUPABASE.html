@@ -1889,70 +1889,57 @@
         }
 
         function updateTotals() {
-            // Recompute week badge totals from trainingData descriptions
-            // (totals stored in weekData.totals are used for header badges)
-            // Also compute plan-wide totals for the summary section
+            // Use stored weekData.totals strings for badges (accurate, from DB)
+            // Re-parse descriptions for the summary section aggregate totals
             let planSwimKm = 0, planBikeHrs = 0, planRunHrs = 0;
 
-            trainingData.forEach((weekData, weekIdx) => {
+            trainingData.forEach(weekData => {
                 let weekSwimKm = 0, weekBikeHrs = 0, weekRunHrs = 0;
 
                 weekData.days?.forEach(day => {
                     day.workouts?.forEach(w => {
                         const amt = parseAmount(w.desc);
-                        if (w.type === 'swim') weekSwimKm += amt;
+                        if (w.type === 'swim')     weekSwimKm  += amt;
                         else if (w.type === 'bike') weekBikeHrs += amt;
-                        else if (w.type === 'run') weekRunHrs += amt;
+                        else if (w.type === 'run')  weekRunHrs  += amt;
                     });
                 });
-
-                // Update weekData.totals so next render picks it up
-                weekData.totals = {
-                    swim: formatAmount(weekSwimKm, 'km'),
-                    bike: formatAmount(weekBikeHrs, 'hrs'),
-                    run: formatAmount(weekRunHrs, 'hrs')
-                };
-
-                // Update the live week header badges in the DOM
-                const weekCards = document.querySelectorAll('.week-card');
-                const weekCard = weekCards[weekIdx];
-                if (weekCard) {
-                    const swimBadge = weekCard.querySelector('.swim-badge');
-                    const bikeBadge = weekCard.querySelector('.bike-badge');
-                    const runBadge  = weekCard.querySelector('.run-badge');
-                    if (swimBadge) swimBadge.textContent = `🏊 ${weekData.totals.swim}`;
-                    if (bikeBadge) bikeBadge.textContent = `🚴 ${weekData.totals.bike}`;
-                    if (runBadge)  runBadge.textContent  = `🏃 ${weekData.totals.run}`;
-                }
 
                 planSwimKm  += weekSwimKm;
                 planBikeHrs += weekBikeHrs;
                 planRunHrs  += weekRunHrs;
+
+                // Update week header badges — locate card by week number in title
+                document.querySelectorAll('.week-title').forEach(el => {
+                    if (el.textContent.startsWith('Week ' + weekData.week + ' |')) {
+                        const wc = el.closest('.week-card');
+                        if (!wc) return;
+                        const sb = wc.querySelector('.swim-badge');
+                        const bb = wc.querySelector('.bike-badge');
+                        const rb = wc.querySelector('.run-badge');
+                        if (sb) sb.textContent = '\uD83C\uDFC4 ' + formatAmount(weekSwimKm, 'km');
+                        if (bb) bb.textContent = '\uD83D\uDEB4 ' + formatAmount(weekBikeHrs, 'hrs');
+                        if (rb) rb.textContent = '\uD83C\uDFC3 ' + formatAmount(weekRunHrs, 'hrs');
+                    }
+                });
             });
 
-            // Update top stat cards
-            const statBike = document.querySelector('#training-plan')?.closest('.container')?.querySelector('.stat-card:nth-child(3) .stat-value');
-            const statRun  = document.querySelector('#training-plan')?.closest('.container')?.querySelector('.stat-card:nth-child(4) .stat-value');
-
-            // Update summary section
-            const totalSwimEl = document.getElementById('totalSwim');
-            const totalBikeEl = document.getElementById('totalBike');
-            const totalRunEl  = document.getElementById('totalRun');
-            const totalTimeEl = document.getElementById('totalTime');
-            if (totalSwimEl) totalSwimEl.textContent = formatAmount(planSwimKm, 'km');
-            if (totalBikeEl) totalBikeEl.textContent = formatAmount(planBikeHrs, 'hrs');
-            if (totalRunEl)  totalRunEl.textContent  = formatAmount(planRunHrs, 'hrs');
-            if (totalTimeEl) {
-                const totalHrs = planBikeHrs + planRunHrs + (planSwimKm / 2); // rough swim time estimate
-                totalTimeEl.textContent = `~${Math.round(totalHrs)} hrs`;
-            }
+            // Update summary cards
+            const se = document.getElementById('totalSwim');
+            const be = document.getElementById('totalBike');
+            const re = document.getElementById('totalRun');
+            const te = document.getElementById('totalTime');
+            if (se) se.textContent = formatAmount(planSwimKm, 'km');
+            if (be) be.textContent = formatAmount(planBikeHrs, 'hrs');
+            if (re) re.textContent = formatAmount(planRunHrs, 'hrs');
+            if (te) te.textContent = '~' + Math.round(planBikeHrs + planRunHrs + planSwimKm / 2) + ' hrs';
         }
         
         async function handleWorkoutToggle(weekIndex, dayIndex, workoutIndex, toggleType) {
             // 1. Locate the workout in trainingData
             const workout = trainingData[weekIndex]?.days[dayIndex]?.workouts[workoutIndex];
             if (!workout) return;
-            
+
             // 2. Update state (mutually exclusive)
             if (toggleType === 'completed') {
                 workout.completed = !workout.completed;
@@ -1961,14 +1948,22 @@
                 workout.missed = !workout.missed;
                 if (workout.missed) workout.completed = false;
             }
-            
-            // 3. Re-render to reflect new state (initializePlan rebuilds phases internally)
-            const container = document.getElementById('training-plan');
-            if (container) {
-                container.innerHTML = '';
-                initializePlan();
+
+            // 3. Surgical DOM update — no full re-render, week cards stay open
+            const weekNum = trainingData[weekIndex].week;
+            const descEl = document.querySelector(
+                '.workout-description[data-workout-id="w' + weekNum + 'd' + dayIndex + 'w' + workoutIndex + '"]'
+            );
+            if (descEl) {
+                const workoutItem = descEl.closest('.workout-item');
+                const dayCard = descEl.closest('.day-card');
+                const checkbox = workoutItem && workoutItem.querySelector('.checkbox');
+                const missBtn  = workoutItem && workoutItem.querySelector('.miss-btn');
+                if (checkbox) checkbox.checked = workout.completed;
+                if (missBtn)  missBtn.classList.toggle('active', workout.missed);
+                if (dayCard)  updateDayCompletion(dayCard);
             }
-            
+
             // 4. Persist to Supabase
             await savePlanToDatabase();
         }
