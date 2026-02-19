@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Peak Tri - T100 Training">
+    <title>Peak Tri | T100 Training Plan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        textarea {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        :root {
+            --tri-swim: #0EA5E9;
+            --tri-bike: #F59E0B;
+            --tri-run: #EF4444;
+            --tri-strength: #8B5CF6;
+            --tri-brick: #EC4899;
+            --bg-dark: #0a0e27;
+            --bg-card: #151b3d;
+            --text-light: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #1e293b;
+            --accent-cyan: #06b6d4;
+            --success: #10b981;
+            --phase1: #10b981;
+            --phase2: #f59e0b;
+            --phase3: #ef4444;
+            --phase4: #8b5cf6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            background-attachment: fixed;
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid var(--accent-cyan);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .navbar-logo {
+            height: 50px;
+            width: auto;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--tri-swim), var(--tri-bike), var(--tri-run));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-dashboard {
+            background: rgba(14, 165, 233, 0.2);
+            color: var(--tri-swim);
+            border: 2px solid var(--tri-swim);
+        }
+
+        .btn-dashboard:hover {
+            background: var(--tri-swim);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            padding: 3rem 0 2rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, var(--tri-swim), var(--tri-bike), var(--tri-run));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .phase-section {
+            margin-bottom: 3rem;
+        }
+
+        .phase-section.collapsed .week-card {
+            display: none;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .phase-header:hover {
+            opacity: 0.8;
+            transform: translateX(4px);
+        }
+
+        .phase-section.collapsed .phase-header {
+            margin-bottom: 0;
+        }
+
+        .phase-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .phase-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--tri-swim), var(--tri-bike));
+        }
+
+        .phase1 .phase-icon-wrapper {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .phase2 .phase-icon-wrapper {
+            background: linear-gradient(135deg, var(--tri-bike), #d97706);
+        }
+
+        .phase3 .phase-icon-wrapper {
+            background: linear-gradient(135deg, var(--tri-run), #dc2626);
+        }
+
+        .phase4 .phase-icon-wrapper {
+            background: linear-gradient(135deg, var(--tri-strength), #7c3aed);
+        }
+
+        .phase-info {
+            flex: 1;
+        }
+
+        .phase-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-light);
+        }
+
+        .phase-icon {
+            font-size: 2rem;
+        }
+
+        .week-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .week-card.collapsed .week-header {
+            margin-bottom: 0;
+            padding-bottom: 0.5rem;
+        }
+
+        .week-title-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            flex: 1;
+        }
+
+        .week-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .week-compliance {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #6b7280;
+            display: none;
+        }
+
+        .week-card.collapsed .week-compliance {
+            display: block;
+        }
+
+        .week-compliance.good { color: #059669; }
+        .week-compliance.average { color: #d97706; }
+        .week-compliance.poor { color: #dc2626; }
+
+        .week-totals {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            align-items: center;
+        }
+
+        .week-total-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .swim-badge { background: rgba(14, 165, 233, 0.2); color: var(--tri-swim); }
+        .bike-badge { background: rgba(245, 158, 11, 0.2); color: var(--tri-bike); }
+        .run-badge { background: rgba(239, 68, 68, 0.2); color: var(--tri-run); }
+
+        .collapse-indicator {
+            font-size: 0.8em;
+            color: var(--text-dim);
+            transition: transform 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .week-card.collapsed .collapse-indicator {
+            transform: rotate(-90deg);
+        }
+
+        .days-grid {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .week-card.collapsed .days-grid {
+            display: none;
+        }
+
+        .day-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .day-card:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+        }
+
+        .day-name {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+        }
+
+        .day-date {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .workouts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .workout-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .workout-item:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .workout-item.swim { border-left-color: var(--tri-swim); }
+        .workout-item.bike { border-left-color: var(--tri-bike); }
+        .workout-item.run { border-left-color: var(--tri-run); }
+        .workout-item.strength { border-left-color: var(--tri-strength); }
+        .workout-item.brick { border-left-color: var(--tri-brick); }
+        .workout-item.race { border-left-color: gold; }
+        .workout-item.rest { border-left-color: var(--text-dim); }
+
+        .workout-icon {
+            font-size: 1.2rem;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .workout-details {
+            flex: 1;
+        }
+
+        .workout-type {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .workout-description {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 0.15rem;
+        }
+
+        .workout-time {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--success);
+        }
+
+        .checkbox-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .day-card.completed {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
+            border-color: var(--success);
+        }
+
+        .day-card.completed .day-name,
+        .day-card.completed .day-date,
+        .day-card.completed .workout-type,
+        .day-card.completed .workout-description {
+            color: var(--text-light);
+        }
+
+        .day-card.missed {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.15));
+            border-color: #ef4444;
+        }
+
+        .day-card.missed .day-name,
+        .day-card.missed .day-date,
+        .day-card.missed .workout-type,
+        .day-card.missed .workout-description {
+            color: var(--text-light);
+        }
+
+        .day-card.missed::after {
+            content: 'MISSED';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: rgba(239, 68, 68, 0.2);
+            font-size: 2.5em;
+            pointer-events: none;
+            z-index: 1;
+            letter-spacing: 4px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Key Workout Styling */
+        .day-card.key-workout {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(6, 182, 212, 0.18));
+            border-left: 4px solid var(--tri-swim);
+        }
+
+        .day-card.key-workout.completed {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.45), rgba(6, 182, 212, 0.35));
+            border-color: var(--tri-swim);
+            position: relative;
+        }
+
+        .day-card.key-workout.completed::after {
+            content: 'KEY WORKOUT COMPLETED';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: rgba(14, 165, 233, 0.35);
+            font-size: 2em;
+            pointer-events: none;
+            z-index: 1;
+            letter-spacing: 3px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Brick Workout Styling */
+        .day-card.brick-workout {
+            background: 
+                linear-gradient(45deg, rgba(160, 82, 45, 0.20) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(160, 82, 45, 0.20) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(160, 82, 45, 0.20) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(160, 82, 45, 0.20) 75%),
+                linear-gradient(135deg, rgba(139, 69, 19, 0.25), rgba(101, 67, 33, 0.18));
+            background-size: 20px 20px, 20px 20px, 20px 20px, 20px 20px, 100% 100%;
+            background-position: 0 0, 10px 0, 10px -10px, 0px 10px, 0 0;
+            border-left: 4px solid #8B4513;
+        }
+
+        .day-card.brick-workout.completed {
+            background: 
+                linear-gradient(45deg, rgba(160, 82, 45, 0.35) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(160, 82, 45, 0.35) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(160, 82, 45, 0.35) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(160, 82, 45, 0.35) 75%),
+                linear-gradient(135deg, rgba(139, 69, 19, 0.45), rgba(101, 67, 33, 0.35));
+            background-size: 20px 20px, 20px 20px, 20px 20px, 20px 20px, 100% 100%;
+            background-position: 0 0, 10px 0, 10px -10px, 0px 10px, 0 0;
+            border-color: #8B4513;
+            position: relative;
+        }
+
+        .day-card.brick-workout.completed::after {
+            content: 'BRICK WORKOUT COMPLETED';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: rgba(139, 69, 19, 0.35);
+            font-size: 1.8em;
+            pointer-events: none;
+            z-index: 1;
+            letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Completed Day Styling */
+        .day-card.completed:not(.key-workout):not(.brick-workout) {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.30), rgba(5, 150, 105, 0.25));
+            border-color: var(--success);
+            position: relative;
+        }
+
+        .day-card.completed:not(.key-workout):not(.brick-workout)::after {
+            content: 'COMPLETED';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: rgba(16, 185, 129, 0.35);
+            font-size: 2.5em;
+            pointer-events: none;
+            z-index: 1;
+            letter-spacing: 4px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .day-card.completed .day-name,
+        .day-card.completed .day-date,
+        .day-card.completed .workout-type,
+        .day-card.completed .workout-description {
+            color: var(--text-light);
+        }
+
+        /* Partial Completion Styling - some workouts done, some missed */
+        .day-card.partial-completion {
+            background: linear-gradient(135deg, 
+                rgba(245, 158, 11, 0.25) 0%, 
+                rgba(245, 158, 11, 0.20) 50%,
+                rgba(16, 185, 129, 0.20) 50%,
+                rgba(16, 185, 129, 0.25) 100%);
+            border-left: 4px solid #f59e0b;
+            border-right: 4px solid #10b981;
+            position: relative;
+        }
+
+        .day-card.partial-completion::after {
+            content: 'PARTIAL';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: rgba(245, 158, 11, 0.40);
+            font-size: 2.3em;
+            pointer-events: none;
+            z-index: 1;
+            letter-spacing: 3px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .day-card.missed {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.28), rgba(220, 38, 38, 0.22));
+            border-color: #ef4444;
+        }
+
+        .day-card.missed .day-name,
+        .day-card.missed .day-date,
+        .day-card.missed .workout-type,
+        .day-card.missed .workout-description {
+            color: var(--text-light);
+        }
+
+        .day-card.missed::after {
+            content: 'MISSED';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: rgba(239, 68, 68, 0.35);
+            font-size: 2.8em;
+            pointer-events: none;
+            z-index: 1;
+            letter-spacing: 4px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Notes Section */
+        .notes-section {
+            display: none;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin-top: 0.75rem;
+        }
+
+        .notes-section.active {
+            display: block;
+        }
+
+        .notes-section textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+
+        .notes-section textarea:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        .save-note-btn {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--accent-cyan);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-note-btn:hover {
+            background: var(--tri-swim);
+            transform: translateY(-2px);
+        }
+
+        .notes-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(100, 116, 139, 0.2);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            margin-top: 0.5rem;
+        }
+
+        .notes-btn:hover {
+            background: rgba(100, 116, 139, 0.3);
+            color: var(--text-light);
+        }
+
+        .note-display {
+            display: none;
+            padding: 0.75rem;
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 3px solid var(--accent-cyan);
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            white-space: pre-wrap;
+        }
+
+        .note-display.has-note {
+            display: block;
+        }
+
+        /* Rest Day - No Checkboxes */
+        .day-card.rest-day {
+            background: linear-gradient(135deg, rgba(148, 163, 184, 0.08), rgba(100, 116, 139, 0.05));
+            opacity: 0.85;
+        }
+
+        .day-card.rest-day .checkbox-wrapper {
+            display: none;
+        }
+
+        .day-card.rest-day .miss-btn-wrapper {
+            display: none;
+        }
+
+        /* Miss Button */
+        .miss-btn-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .miss-btn {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            border-radius: 4px;
+            color: transparent;
+            font-size: 1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .miss-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .miss-btn.active {
+            background: #ef4444;
+            color: white;
+        }
+
+        .miss-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        /* Today Highlight */
+        .today-highlight {
+            border: 3px solid #2196F3 !important;
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.4) !important;
+            position: relative;
+            overflow: visible !important;
+        }
+        
+        .today-highlight::before {
+            content: '📍';
+            position: absolute;
+            top: 50%;
+            left: -15px;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .today-highlight::after {
+            content: 'TODAY';
+            position: absolute;
+            bottom: -8px;
+            right: 15px;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+                transform: translateY(-50%) scale(1);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(33, 150, 243, 0.6);
+                transform: translateY(-50%) scale(1.1);
+            }
+        }
+
+        .training-summary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(248, 249, 250, 0.05) 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+        }
+
+        .training-summary h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cyan);
+            text-align: center;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent-cyan);
+        }
+
+        .summary-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            line-height: 1.4;
+        }
+
+        .edit-mode-btn {
+            background: linear-gradient(135deg, var(--tri-bike), #d97706);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .edit-mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4);
+        }
+
+        .edit-mode-btn.active {
+            background: linear-gradient(135deg, var(--success), #059669);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header-title {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .week-totals {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="dashboard.html" class="navbar-brand">
+            <img src="logo.png" alt="Iron Peak Logo" class="navbar-logo">
+            <span class="navbar-title">PEAK TRI</span>
+        </a>
+        <div class="navbar-actions">
+            <a href="dashboard.html" class="nav-btn btn-dashboard">📊 Dashboard</a>
+            <a href="login.html" class="nav-btn btn-logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="header-title">T100 TRAINING PLAN</h1>
+            <p class="header-subtitle">📅 May 18 – Aug 16, 2026 | 🏊 🚴 🏃 13 Weeks to Race Day</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Weeks to Race</div>
+                <div class="stat-value" id="weeksToRace">13</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Current Week</div>
+                <div class="stat-value" id="currentWeek">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Bike</div>
+                <div class="stat-value">54<span style="font-size:1rem;">hrs</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Run</div>
+                <div class="stat-value">23<span style="font-size:1rem;">hrs</span></div>
+            </div>
+        </div>
+
+        <div id="training-plan"></div>
+
+        <!-- TRAINING SUMMARY -->
+        <div class="training-summary">
+            <h2>📊 TRAINING SUMMARY</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">Total Swim</div>
+                    <div class="summary-value">83 km</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Total Bike</div>
+                    <div class="summary-value">54 hrs</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Total Run</div>
+                    <div class="summary-value">23 hrs</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Total Time</div>
+                    <div class="summary-value">~145 hrs</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT MODE BUTTON -->
+        <div style="text-align: center; margin: 2rem 0;">
+            <button class="edit-mode-btn" id="editModeBtn">✏️ Edit Workouts</button>
+        </div>
+    </div>
+
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // =====================================================
+        // SUPABASE CONFIGURATION AND INITIALIZATION
+        // =====================================================
+        const SUPABASE_URL = 'https://yecqupxvbazsgzqgmzmc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3F1cHh2YmF6c2d6cWdtem1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MzU4NDcsImV4cCI6MjA4NjAxMTg0N30._8MxQKOgs-IeezPUTumvHPaFDj1n4R-TYOFv-eXuBZk';
+        
+        let supabaseClient;
+        let currentUser = null;
+        let currentPlanId = null;
+        
+        // Try to initialize Supabase, fallback to localStorage if it fails
+        try {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase initialized successfully');
+        } catch (error) {
+            console.error('Supabase initialization failed, falling back to localStorage:', error);
+            supabaseClient = null;
+        }
+        
+        // =====================================================
+        // TRAINING PLAN DATA
+        // =====================================================
+        // Complete 13-week training plan data
+        let trainingData = [
+            // WEEK 1
+            {
+                week: 1,
+                phase: "Post-Marathon Transition",
+                phaseIcon: "🟢",
+                startDate: "2026-05-18",
+                totals: { swim: "3.0km", bike: "2.5hrs", run: "35min" },
+                days: [
+                    { day: "MON", date: "May 18", workouts: [{ type: "rest", icon: "💤", desc: "OFF / Mobility" }] },
+                    { day: "TUE", date: "May 19", workouts: [{ type: "bike", icon: "🚴", time: "6pm", desc: "60min Z1-Z2" }] },
+                    { day: "WED", date: "May 20", workouts: [{ type: "swim", icon: "🏊", time: "6am", desc: "1500m easy" }] },
+                    { day: "THU", date: "May 21", workouts: [{ type: "swim", icon: "🏊", time: "6am", desc: "1500m drills" }] },
+                    { day: "FRI", date: "May 22", workouts: [{ type: "rest", icon: "🚶", desc: "Walk or mobility" }] },
+                    { day: "SAT", date: "May 23", workouts: [{ type: "bike", icon: "🚴", desc: "90min Z2" }] },
+                    { day: "SUN", date: "May 24", workouts: [{ type: "run", icon: "🏃", desc: "35min easy soft surface" }] }
+                ]
+            },
+            // WEEK 2
+            {
+                week: 2,
+                phase: "Post-Marathon Transition",
+                phaseIcon: "🟢",
+                startDate: "2026-05-25",
+                totals: { swim: "3.6km", bike: "3.5hrs", run: "1hr" },
+                days: [
+                    { day: "MON", date: "May 25", workouts: [{ type: "strength", icon: "💪", time: "6pm", desc: "Weights light + core" }] },
+                    { day: "TUE", date: "May 26", workouts: [
+                        { type: "swim", icon: "🏊", time: "6am", desc: "1800m" },
+                        { type: "bike", icon: "🚴", time: "6pm", desc: "3×8min SS" }
+                    ]},
+                    { day: "WED", date: "May 27", workouts: [{ type: "run", icon: "🏃", desc: "45min Z2" }] },
+                    { day: "THU", date: "May 28", workouts: [{ type: "run", icon: "🏃", time: "6am", desc: "Track 4×800 controlled" }] },
+                    { day: "FRI", date: "May 29", workouts: [{ type: "swim", icon: "🏊", time: "6am", desc: "1800m drills" }] },
+                    { day: "SAT", date: "May 30", workouts: [{ type: "bike", icon: "🚴", desc: "2hr Z2" }] },
+                    { day: "SUN", date: "May 31", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 90min + Run 20min" }] }
+                ]
+            },
+            // WEEK 3
+            {
+                week: 3,
+                phase: "Engine Build",
+                phaseIcon: "🔵",
+                startDate: "2026-06-01",
+                totals: { swim: "6.5km", bike: "3.7hrs", run: "2hr" },
+                days: [
+                    { day: "MON", date: "Jun 1", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2000m" },
+                        { type: "strength", icon: "💪", desc: "Weights" }
+                    ]},
+                    { day: "TUE", date: "Jun 2", workouts: [
+                        { type: "run", icon: "🏃", time: "AM", desc: "30min easy" },
+                        { type: "bike", icon: "🚴", time: "PM", desc: "4×10min SS" }
+                    ]},
+                    { day: "WED", date: "Jun 3", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2500m" },
+                        { type: "run", icon: "🏃", desc: "50min" }
+                    ]},
+                    { day: "THU", date: "Jun 4", workouts: [
+                        { type: "run", icon: "🏃", time: "AM", desc: "Track 5×800" },
+                        { type: "bike", icon: "🚴", time: "PM", desc: "45min easy" }
+                    ]},
+                    { day: "FRI", date: "Jun 5", workouts: [{ type: "swim", icon: "🏊", desc: "2000m drills" }] },
+                    { day: "SAT", date: "Jun 6", workouts: [{ type: "bike", icon: "🚴", desc: "2.5hr" }] },
+                    { day: "SUN", date: "Jun 7", workouts: [{ type: "run", icon: "🏃", desc: "75min" }] }
+                ]
+            },
+            // WEEK 4
+            {
+                week: 4,
+                phase: "Engine Build",
+                phaseIcon: "🔵",
+                startDate: "2026-06-08",
+                totals: { swim: "6.8km", bike: "5hrs", run: "1.5hr" },
+                days: [
+                    { day: "MON", date: "Jun 8", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2000m" },
+                        { type: "strength", icon: "💪", desc: "Weights" }
+                    ]},
+                    { day: "TUE", date: "Jun 9", workouts: [
+                        { type: "run", icon: "🏃", desc: "30min" },
+                        { type: "bike", icon: "🚴", desc: "3×15min SS" }
+                    ]},
+                    { day: "WED", date: "Jun 10", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2600m" },
+                        { type: "run", icon: "🏃", desc: "55min" }
+                    ]},
+                    { day: "THU", date: "Jun 11", workouts: [
+                        { type: "run", icon: "🏃", desc: "Track 3×1600" },
+                        { type: "brick", icon: "🧱", desc: "Brick 10min" }
+                    ]},
+                    { day: "FRI", date: "Jun 12", workouts: [{ type: "swim", icon: "🏊", desc: "2200m speed" }] },
+                    { day: "SAT", date: "Jun 13", workouts: [{ type: "bike", icon: "🚴", desc: "3hr" }] },
+                    { day: "SUN", date: "Jun 14", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 2hr + Run 30min" }] }
+                ]
+            },
+            // WEEK 5
+            {
+                week: 5,
+                phase: "Engine Build",
+                phaseIcon: "🔵",
+                startDate: "2026-06-15",
+                totals: { swim: "7.0km", bike: "5hrs", run: "2.5hr" },
+                days: [
+                    { day: "MON", date: "Jun 15", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2200m" },
+                        { type: "strength", icon: "💪", desc: "Weights" }
+                    ]},
+                    { day: "TUE", date: "Jun 16", workouts: [{ type: "bike", icon: "🚴", desc: "2×20min SS" }] },
+                    { day: "WED", date: "Jun 17", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2800m" },
+                        { type: "run", icon: "🏃", desc: "60min" }
+                    ]},
+                    { day: "THU", date: "Jun 18", workouts: [
+                        { type: "run", icon: "🏃", desc: "Track 6×800" },
+                        { type: "bike", icon: "🚴", desc: "60min" }
+                    ]},
+                    { day: "FRI", date: "Jun 19", workouts: [{ type: "swim", icon: "🏊", desc: "2000m drills" }] },
+                    { day: "SAT", date: "Jun 20", workouts: [{ type: "bike", icon: "🚴", desc: "3hr steady" }] },
+                    { day: "SUN", date: "Jun 21", workouts: [{ type: "run", icon: "🏃", desc: "90min" }] }
+                ]
+            },
+            // WEEK 6 (Recovery)
+            {
+                week: 6,
+                phase: "Engine Build",
+                phaseIcon: "🔵",
+                startDate: "2026-06-22",
+                totals: { swim: "5.8km", bike: "3hrs", run: "1.9hr" },
+                days: [
+                    { day: "MON", date: "Jun 22", workouts: [
+                        { type: "swim", icon: "🏊", desc: "1800m" },
+                        { type: "strength", icon: "💪", desc: "Light weights" }
+                    ]},
+                    { day: "TUE", date: "Jun 23", workouts: [{ type: "bike", icon: "🚴", desc: "60min aerobic" }] },
+                    { day: "WED", date: "Jun 24", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2200m" },
+                        { type: "run", icon: "🏃", desc: "45min" }
+                    ]},
+                    { day: "THU", date: "Jun 25", workouts: [{ type: "run", icon: "🏃", desc: "Track 4×800 easy" }] },
+                    { day: "FRI", date: "Jun 26", workouts: [{ type: "swim", icon: "🏊", desc: "1800m" }] },
+                    { day: "SAT", date: "Jun 27", workouts: [{ type: "bike", icon: "🚴", desc: "2hr" }] },
+                    { day: "SUN", date: "Jun 28", workouts: [{ type: "run", icon: "🏃", desc: "70min" }] }
+                ]
+            },
+            // WEEK 7
+            {
+                week: 7,
+                phase: "Peak Build",
+                phaseIcon: "🟣",
+                startDate: "2026-06-29",
+                totals: { swim: "7.6km", bike: "5.5hrs", run: "1.9hr" },
+                days: [
+                    { day: "MON", date: "Jun 29", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2200m" },
+                        { type: "strength", icon: "💪", desc: "Heavy weights" }
+                    ]},
+                    { day: "TUE", date: "Jun 30", workouts: [
+                        { type: "run", icon: "🏃", desc: "30min" },
+                        { type: "bike", icon: "🚴", desc: "3×15min SS" }
+                    ]},
+                    { day: "WED", date: "Jul 1", workouts: [
+                        { type: "swim", icon: "🏊", desc: "3000m" },
+                        { type: "run", icon: "🏃", desc: "60min" }
+                    ]},
+                    { day: "THU", date: "Jul 2", workouts: [
+                        { type: "run", icon: "🏃", desc: "Track 4×1600" },
+                        { type: "brick", icon: "🧱", desc: "Brick 15min" }
+                    ]},
+                    { day: "FRI", date: "Jul 3", workouts: [{ type: "swim", icon: "🏊", desc: "2400m speed" }] },
+                    { day: "SAT", date: "Jul 4", workouts: [{ type: "bike", icon: "🚴", desc: "3.5hr" }] },
+                    { day: "SUN", date: "Jul 5", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 2hr + Run 35min" }] }
+                ]
+            },
+            // WEEK 8
+            {
+                week: 8,
+                phase: "Peak Build",
+                phaseIcon: "🟣",
+                startDate: "2026-07-06",
+                totals: { swim: "7.2km", bike: "6.5hrs", run: "2.5hr" },
+                days: [
+                    { day: "MON", date: "Jul 6", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2000m" },
+                        { type: "strength", icon: "💪", desc: "Weights" }
+                    ]},
+                    { day: "TUE", date: "Jul 7", workouts: [{ type: "bike", icon: "🚴", desc: "2×25min SS" }] },
+                    { day: "WED", date: "Jul 8", workouts: [
+                        { type: "swim", icon: "🏊", desc: "3200m" },
+                        { type: "run", icon: "🏃", desc: "65min" }
+                    ]},
+                    { day: "THU", date: "Jul 9", workouts: [
+                        { type: "run", icon: "🏃", desc: "Tempo 8km" },
+                        { type: "bike", icon: "🚴", desc: "45min" }
+                    ]},
+                    { day: "FRI", date: "Jul 10", workouts: [{ type: "swim", icon: "🏊", desc: "2000m drills" }] },
+                    { day: "SAT", date: "Jul 11", workouts: [{ type: "bike", icon: "🚴", desc: "3.5hr w/ 2×30min RP" }] },
+                    { day: "SUN", date: "Jul 12", workouts: [{ type: "run", icon: "🏃", desc: "1h45" }] }
+                ]
+            },
+            // WEEK 9
+            {
+                week: 9,
+                phase: "Peak Build",
+                phaseIcon: "🟣",
+                startDate: "2026-07-13",
+                totals: { swim: "7.6km", bike: "6.5hrs", run: "2.1hr" },
+                days: [
+                    { day: "MON", date: "Jul 13", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2200m" },
+                        { type: "strength", icon: "💪", desc: "Weights" }
+                    ]},
+                    { day: "TUE", date: "Jul 14", workouts: [
+                        { type: "run", icon: "🏃", desc: "25min" },
+                        { type: "bike", icon: "🚴", desc: "75min RP continuous" }
+                    ]},
+                    { day: "WED", date: "Jul 15", workouts: [
+                        { type: "swim", icon: "🏊", desc: "3000m" },
+                        { type: "run", icon: "🏃", desc: "60min" }
+                    ]},
+                    { day: "THU", date: "Jul 16", workouts: [
+                        { type: "run", icon: "🏃", desc: "Track 6×800" },
+                        { type: "brick", icon: "🧱", desc: "Brick 20min" }
+                    ]},
+                    { day: "FRI", date: "Jul 17", workouts: [{ type: "swim", icon: "🏊", desc: "2400m" }] },
+                    { day: "SAT", date: "Jul 18", workouts: [{ type: "bike", icon: "🚴", desc: "4hr" }] },
+                    { day: "SUN", date: "Jul 19", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 90min + Run 40min" }] }
+                ]
+            },
+            // WEEK 10 (Big Simulation)
+            {
+                week: 10,
+                phase: "Peak Build",
+                phaseIcon: "🟣",
+                startDate: "2026-07-20",
+                totals: { swim: "7.2km", bike: "4.5hrs", run: "3hr" },
+                days: [
+                    { day: "MON", date: "Jul 20", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2000m" },
+                        { type: "strength", icon: "💪", desc: "Weights" }
+                    ]},
+                    { day: "TUE", date: "Jul 21", workouts: [{ type: "bike", icon: "🚴", desc: "80min RP continuous" }] },
+                    { day: "WED", date: "Jul 22", workouts: [
+                        { type: "swim", icon: "🏊", desc: "3200m" },
+                        { type: "run", icon: "🏃", desc: "60min" }
+                    ]},
+                    { day: "THU", date: "Jul 23", workouts: [
+                        { type: "run", icon: "🏃", desc: "Tempo 10km" },
+                        { type: "bike", icon: "🚴", desc: "45min" }
+                    ]},
+                    { day: "FRI", date: "Jul 24", workouts: [{ type: "swim", icon: "🏊", desc: "2000m drills" }] },
+                    { day: "SAT", date: "Jul 25", workouts: [{ type: "brick", icon: "🧱", desc: "SIMULATION: Bike 60km RP + Run 12km" }] },
+                    { day: "SUN", date: "Jul 26", workouts: [{ type: "run", icon: "🏃", desc: "75min recovery" }] }
+                ]
+            },
+            // WEEK 11
+            {
+                week: 11,
+                phase: "Sharpen",
+                phaseIcon: "🟠",
+                startDate: "2026-07-27",
+                totals: { swim: "6.5km", bike: "5.5hrs", run: "2hr" },
+                days: [
+                    { day: "MON", date: "Jul 27", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2000m" },
+                        { type: "strength", icon: "💪", desc: "Moderate weights" }
+                    ]},
+                    { day: "TUE", date: "Jul 28", workouts: [{ type: "bike", icon: "🚴", desc: "3×12min RP" }] },
+                    { day: "WED", date: "Jul 29", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2500m" },
+                        { type: "run", icon: "🏃", desc: "50min" }
+                    ]},
+                    { day: "THU", date: "Jul 30", workouts: [{ type: "run", icon: "🏃", desc: "Track 5×800" }] },
+                    { day: "FRI", date: "Jul 31", workouts: [{ type: "swim", icon: "🏊", desc: "2000m speed" }] },
+                    { day: "SAT", date: "Aug 1", workouts: [{ type: "bike", icon: "🚴", desc: "3hr w/ race fueling" }] },
+                    { day: "SUN", date: "Aug 2", workouts: [{ type: "run", icon: "🏃", desc: "75min" }] }
+                ]
+            },
+            // WEEK 12
+            {
+                week: 12,
+                phase: "Sharpen",
+                phaseIcon: "🟠",
+                startDate: "2026-08-03",
+                totals: { swim: "5.5km", bike: "4hrs", run: "1.9hr" },
+                days: [
+                    { day: "MON", date: "Aug 3", workouts: [
+                        { type: "swim", icon: "🏊", desc: "1800m" },
+                        { type: "strength", icon: "💪", desc: "Light weights" }
+                    ]},
+                    { day: "TUE", date: "Aug 4", workouts: [{ type: "bike", icon: "🚴", desc: "60min RP" }] },
+                    { day: "WED", date: "Aug 5", workouts: [
+                        { type: "swim", icon: "🏊", desc: "2200m" },
+                        { type: "run", icon: "🏃", desc: "45min" }
+                    ]},
+                    { day: "THU", date: "Aug 6", workouts: [{ type: "run", icon: "🏃", desc: "Track 4×800 sharp" }] },
+                    { day: "FRI", date: "Aug 7", workouts: [{ type: "swim", icon: "🏊", desc: "1500m easy" }] },
+                    { day: "SAT", date: "Aug 8", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 90min + Run 25min" }] },
+                    { day: "SUN", date: "Aug 9", workouts: [{ type: "run", icon: "🏃", desc: "60min easy" }] }
+                ]
+            },
+            // WEEK 13 (Race Week)
+            {
+                week: 13,
+                phase: "Race Week",
+                phaseIcon: "🔴",
+                startDate: "2026-08-10",
+                totals: { swim: "2.7km", bike: "1.5hrs", run: "1hr" },
+                days: [
+                    { day: "MON", date: "Aug 10", workouts: [{ type: "swim", icon: "🏊", desc: "1500m easy" }] },
+                    { day: "TUE", date: "Aug 11", workouts: [{ type: "bike", icon: "🚴", desc: "45min w/ 2×5min RP" }] },
+                    { day: "WED", date: "Aug 12", workouts: [{ type: "run", icon: "🏃", desc: "40min w/ 3×5min tempo" }] },
+                    { day: "THU", date: "Aug 13", workouts: [
+                        { type: "swim", icon: "🏊", desc: "1200m" },
+                        { type: "run", icon: "🏃", desc: "Strides" }
+                    ]},
+                    { day: "FRI", date: "Aug 14", workouts: [{ type: "rest", icon: "💤", desc: "OFF or 20min spin" }] },
+                    { day: "SAT", date: "Aug 15", workouts: [
+                        { type: "swim", icon: "🏊", desc: "15min" },
+                        { type: "bike", icon: "🚴", desc: "15min" },
+                        { type: "run", icon: "🏃", desc: "10min jog" }
+                    ]},
+                    { day: "SUN", date: "Aug 16", workouts: [{ type: "race", icon: "🏆", desc: "T100 RACE DAY!" }] }
+                ]
+            }
+        ];
+
+        // Group weeks by phase
+        const phases = {
+            "Post-Marathon Transition": { icon: "🟢", weeks: [] },
+            "Engine Build": { icon: "🔵", weeks: [] },
+            "Peak Build": { icon: "🟣", weeks: [] },
+            "Sharpen": { icon: "🟠", weeks: [] },
+            "Race Week": { icon: "🔴", weeks: [] }
+        };
+
+        trainingData.forEach(week => {
+            if (!phases[week.phase].weeks) phases[week.phase].weeks = [];
+            phases[week.phase].weeks.push(week);
+        });
+
+        // Initialize the plan
+        function initializePlan() {
+            const container = document.getElementById('training-plan');
+            
+            Object.entries(phases).forEach(([phaseName, phaseData], phaseIndex) => {
+                if (phaseData.weeks.length === 0) return;
+                
+                const phaseSection = document.createElement('div');
+                const phaseClass = `phase${phaseIndex + 1}`;
+                phaseSection.className = `phase-section ${phaseClass}`;
+                
+                // Check if this phase was previously collapsed (default to collapsed)
+                const phaseId = `phase-${phaseIndex}`;
+                const wasCollapsed = localStorage.getItem(`tri-${phaseId}-collapsed`);
+                if (wasCollapsed === null || wasCollapsed === 'true') {
+                    phaseSection.classList.add('collapsed');
+                }
+                
+                const phaseHeader = document.createElement('div');
+                phaseHeader.className = 'phase-header';
+                phaseHeader.innerHTML = `
+                    <div class="phase-content">
+                        <div class="phase-icon-wrapper">
+                            <span class="phase-icon">${phaseData.icon}</span>
+                        </div>
+                        <div class="phase-info">
+                            <h2 class="phase-title">${phaseName}</h2>
+                        </div>
+                    </div>
+                `;
+                
+                phaseHeader.addEventListener('click', () => {
+                    phaseSection.classList.toggle('collapsed');
+                    // Save collapse state
+                    const isCollapsed = phaseSection.classList.contains('collapsed');
+                    localStorage.setItem(`tri-${phaseId}-collapsed`, isCollapsed);
+                    
+                    // Save to Supabase
+                    savePhaseStateToDB(phaseId, isCollapsed);
+                });
+                
+                phaseSection.appendChild(phaseHeader);
+                
+                phaseData.weeks.forEach(week => {
+                    const weekCard = createWeekCard(week);
+                    phaseSection.appendChild(weekCard);
+                });
+                
+                container.appendChild(phaseSection);
+            });
+            
+            highlightToday();
+            updateCurrentWeek();
+            updateWeeksToRace();
+            checkWeekCompliance();
+        }
+
+        function createWeekCard(weekData) {
+            const card = document.createElement('div');
+            card.className = 'week-card collapsed';
+            
+            const header = document.createElement('div');
+            header.className = 'week-header';
+            header.innerHTML = `
+                <div class="week-title-wrapper">
+                    <div class="week-title">Week ${weekData.week} | ${weekData.days[0].date} – ${weekData.days[6].date}</div>
+                    <div class="week-compliance"></div>
+                </div>
+                <div class="week-totals">
+                    <span class="week-total-badge swim-badge">🏊 ${weekData.totals.swim}</span>
+                    <span class="week-total-badge bike-badge">🚴 ${weekData.totals.bike}</span>
+                    <span class="week-total-badge run-badge">🏃 ${weekData.totals.run}</span>
+                </div>
+                <span class="collapse-indicator">▼</span>
+            `;
+            
+            header.addEventListener('click', () => {
+                card.classList.toggle('collapsed');
+            });
+            
+            const daysGrid = document.createElement('div');
+            daysGrid.className = 'days-grid';
+            
+            weekData.days.forEach((day, dayIndex) => {
+                const dayCard = createDayCard(day, weekData.week, dayIndex);
+                daysGrid.appendChild(dayCard);
+            });
+            
+            card.appendChild(header);
+            card.appendChild(daysGrid);
+            
+            return card;
+        }
+
+        function createDayCard(dayData, weekNum, dayIndex) {
+            const card = document.createElement('div');
+            card.className = 'day-card';
+            card.setAttribute('data-date', convertToISODate(dayData.date, weekNum, dayIndex));
+            card.setAttribute('data-day-id', `w${weekNum}d${dayIndex}`);
+            
+            // Check if this is a rest day (all workouts are rest type)
+            const isRestDay = dayData.workouts.every(w => w.type === 'rest');
+            if (isRestDay) {
+                card.classList.add('rest-day');
+            }
+            
+            // Check if this is a key workout day (has 🗝️ emoji in description)
+            const hasKeyWorkout = dayData.workouts.some(w => 
+                w.desc.includes('🗝️')
+            );
+            if (hasKeyWorkout && !isRestDay) {
+                card.classList.add('key-workout');
+            }
+            
+            // Check if this is a brick workout (has 🧱 in workout name or type is brick)
+            const isBrickWorkout = dayData.workouts.some(w => 
+                w.type === 'brick' || 
+                w.desc.includes('🧱')
+            );
+            if (isBrickWorkout && !isRestDay) {
+                card.classList.add('brick-workout');
+            }
+            
+            const header = document.createElement('div');
+            header.className = 'day-header';
+            header.innerHTML = `
+                <div class="day-name">${dayData.day}</div>
+                <div class="day-date">${dayData.date}</div>
+            `;
+            
+            const workoutsContainer = document.createElement('div');
+            workoutsContainer.className = 'workouts-container';
+            
+            dayData.workouts.forEach((workout, workoutIdx) => {
+                const workoutItem = document.createElement('div');
+                workoutItem.className = `workout-item ${workout.type}`;
+                
+                const timePrefix = workout.time ? `<span class="workout-time">${workout.time}:</span> ` : '';
+                
+                workoutItem.innerHTML = `
+                    <span class="workout-icon">${workout.icon}</span>
+                    <div class="workout-details">
+                        <div class="workout-type">${workout.type}</div>
+                        <div class="workout-description" data-workout-id="w${weekNum}d${dayIndex}w${workoutIdx}">${timePrefix}${workout.desc}</div>
+                    </div>
+                    <div class="miss-btn-wrapper">
+                        <div class="miss-btn" data-id="w${weekNum}d${dayIndex}w${workoutIdx}-miss">✗</div>
+                        <span class="miss-label">Miss</span>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox" data-id="w${weekNum}d${dayIndex}w${workoutIdx}">
+                        <span class="checkbox-label">Done</span>
+                    </div>
+                `;
+                
+                workoutsContainer.appendChild(workoutItem);
+            });
+            
+            card.appendChild(header);
+            card.appendChild(workoutsContainer);
+            
+            // Add notes button
+            const notesBtn = document.createElement('button');
+            notesBtn.className = 'notes-btn';
+            notesBtn.textContent = '📝 Notes';
+            
+            // Add note display area (for saved notes)
+            const noteDisplay = document.createElement('div');
+            noteDisplay.className = 'note-display';
+            const dayId = `w${weekNum}d${dayIndex}`;
+            const savedNote = localStorage.getItem(`tri-note-${dayId}`);
+            if (savedNote) {
+                noteDisplay.textContent = savedNote;
+                noteDisplay.classList.add('has-note');
+            }
+            
+            // Add notes section (for editing)
+            const notesSection = document.createElement('div');
+            notesSection.className = 'notes-section';
+            notesSection.innerHTML = `
+                <textarea placeholder="Add notes about this day's training..."></textarea>
+                <button class="save-note-btn">💾 Save Note</button>
+            `;
+            
+            const textarea = notesSection.querySelector('textarea');
+            if (savedNote) {
+                textarea.value = savedNote;
+            }
+            
+            notesBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notesSection.classList.toggle('active');
+            });
+            
+            const saveBtn = notesSection.querySelector('.save-note-btn');
+            saveBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const noteText = textarea.value.trim();
+                if (noteText) {
+                    localStorage.setItem(`tri-note-${dayId}`, noteText);
+                    noteDisplay.textContent = noteText;
+                    noteDisplay.classList.add('has-note');
+                } else {
+                    localStorage.removeItem(`tri-note-${dayId}`);
+                    noteDisplay.classList.remove('has-note');
+                }
+                
+                // Save to Supabase
+                saveDayNoteToDB(dayId, noteText);
+                
+                notesSection.classList.remove('active');
+            });
+            
+            card.appendChild(notesBtn);
+            card.appendChild(noteDisplay);
+            card.appendChild(notesSection);
+            
+            // Setup checkboxes
+            const checkboxes = card.querySelectorAll('.checkbox');
+            checkboxes.forEach(cb => {
+                const saved = localStorage.getItem(`tri-${cb.dataset.id}`);
+                if (saved === 'true') {
+                    cb.checked = true;
+                }
+                
+                cb.addEventListener('change', function() {
+                    localStorage.setItem(`tri-${this.dataset.id}`, this.checked);
+                    
+                    // Save to Supabase
+                    const workoutId = this.dataset.id;
+                    const isMissed = localStorage.getItem(`tri-${workoutId}-miss`) === 'true';
+                    saveWorkoutProgressToDB(workoutId, this.checked, isMissed);
+                    
+                    // Uncheck miss button if completing
+                    if (this.checked) {
+                        const missBtn = this.closest('.workout-item').querySelector('.miss-btn');
+                        if (missBtn && missBtn.classList.contains('active')) {
+                            missBtn.classList.remove('active');
+                            localStorage.setItem(`tri-${missBtn.dataset.id}`, 'false');
+                            // Update Supabase
+                            saveWorkoutProgressToDB(workoutId, true, false);
+                        }
+                    }
+                    
+                    updateDayCompletion(card);
+                });
+            });
+            
+            // Setup miss buttons
+            const missButtons = card.querySelectorAll('.miss-btn');
+            missButtons.forEach(missBtn => {
+                const saved = localStorage.getItem(`tri-${missBtn.dataset.id}`);
+                if (saved === 'true') {
+                    missBtn.classList.add('active');
+                }
+                
+                missBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    const checkbox = this.closest('.workout-item').querySelector('.checkbox');
+                    const workoutId = this.dataset.id.replace('-miss', '');
+                    
+                    if (this.classList.contains('active')) {
+                        this.classList.remove('active');
+                        localStorage.setItem(`tri-${this.dataset.id}`, 'false');
+                        // Update Supabase
+                        const isCompleted = checkbox && checkbox.checked;
+                        saveWorkoutProgressToDB(workoutId, isCompleted, false);
+                    } else {
+                        this.classList.add('active');
+                        localStorage.setItem(`tri-${this.dataset.id}`, 'true');
+                        
+                        // Uncheck checkbox if marking as missed
+                        if (checkbox && checkbox.checked) {
+                            checkbox.checked = false;
+                            localStorage.setItem(`tri-${checkbox.dataset.id}`, 'false');
+                        }
+                        
+                        // Update Supabase
+                        saveWorkoutProgressToDB(workoutId, false, true);
+                    }
+                    
+                    updateDayCompletion(card);
+                });
+            });
+            
+            // Initial state update
+            updateDayCompletion(card);
+            
+            return card;
+        }
+
+        function updateDayCompletion(dayCard) {
+            const checkboxes = dayCard.querySelectorAll('.checkbox');
+            const missButtons = dayCard.querySelectorAll('.miss-btn');
+            
+            const totalWorkouts = checkboxes.length;
+            const completedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const missedCount = Array.from(missButtons).filter(mb => mb.classList.contains('active')).length;
+            
+            // Remove all state classes first
+            dayCard.classList.remove('completed', 'missed', 'partial-completion');
+            
+            // Determine state
+            if (totalWorkouts === 0) {
+                // No workouts (shouldn't happen, but handle it)
+                return;
+            } else if (missedCount > 0 && completedCount > 0) {
+                // PARTIAL: Some missed, some completed - show split state
+                dayCard.classList.add('partial-completion');
+            } else if (completedCount === totalWorkouts) {
+                // ALL COMPLETED
+                dayCard.classList.add('completed');
+            } else if (missedCount > 0 && completedCount === 0) {
+                // ALL MISSED (none completed)
+                dayCard.classList.add('missed');
+            }
+            // else: neither completed nor missed - normal state
+            
+            // Update weekly compliance
+            checkWeekCompliance();
+        }
+
+        function convertToISODate(dateStr, weekNum, dayIndex) {
+            // Map weeks to start dates
+            const weekStarts = [
+                "2026-05-18", "2026-05-25", "2026-06-01", "2026-06-08",
+                "2026-06-15", "2026-06-22", "2026-06-29", "2026-07-06",
+                "2026-07-13", "2026-07-20", "2026-07-27", "2026-08-03",
+                "2026-08-10"
+            ];
+            
+            const startDate = new Date(weekStarts[weekNum - 1]);
+            const targetDate = new Date(startDate);
+            targetDate.setDate(startDate.getDate() + dayIndex);
+            
+            return targetDate.toISOString().split('T')[0];
+        }
+
+        function highlightToday() {
+            const today = new Date();
+            const localDate = today.getFullYear() + "-" +
+                String(today.getMonth()+1).padStart(2,'0') + "-" +
+                String(today.getDate()).padStart(2,'0');
+
+            document.querySelectorAll('[data-date]').forEach(el => {
+                if(el.dataset.date === localDate){
+                    el.classList.add('today-highlight');
+                } else {
+                    el.classList.remove('today-highlight');
+                }
+            });
+        }
+
+        function scheduleMidnightRefresh(){
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setHours(24,0,0,0);
+            const timeout = midnight.getTime() - now.getTime();
+            setTimeout(() => { location.reload(); }, timeout);
+        }
+
+        function updateCurrentWeek() {
+            const today = new Date();
+            const planStart = new Date('2026-05-18');
+            const diffTime = today - planStart;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const currentWeek = Math.floor(diffDays / 7) + 1;
+            
+            const weekEl = document.getElementById('currentWeek');
+            if (weekEl && currentWeek >= 1 && currentWeek <= 13) {
+                weekEl.textContent = currentWeek;
+            } else if (weekEl) {
+                weekEl.textContent = '--';
+            }
+        }
+
+        function updateWeeksToRace() {
+            const raceDate = new Date('2026-08-16');
+            const today = new Date();
+            const diffTime = raceDate - today;
+            const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+            
+            const weeksEl = document.getElementById('weeksToRace');
+            if (weeksEl) {
+                if (diffWeeks <= 0) {
+                    weeksEl.innerHTML = 'RACE<br>WEEK!';
+                    weeksEl.style.fontSize = '1.5rem';
+                } else {
+                    weeksEl.textContent = diffWeeks;
+                }
+            }
+        }
+
+        // Check week compliance for all weeks
+        function checkWeekCompliance() {
+            const today = new Date();
+            const todayString = today.getFullYear() + "-" +
+                String(today.getMonth()+1).padStart(2,'0') + "-" +
+                String(today.getDate()).padStart(2,'0');
+            
+            const planStartDate = new Date('2026-05-18'); // Week 1 starts May 18
+            planStartDate.setHours(0, 0, 0, 0);
+            
+            // Get all week cards
+            const weekCards = document.querySelectorAll('.week-card');
+            
+            weekCards.forEach((week, weekIndex) => {
+                // Calculate this week's start date
+                const weekStartDate = new Date(planStartDate);
+                weekStartDate.setDate(planStartDate.getDate() + (weekIndex * 7));
+                
+                // Get all day cards in this week (excluding rest days)
+                const dayCards = week.querySelectorAll('.day-card:not(.rest-day)');
+                
+                let totalWorkoutsUpToToday = 0;
+                let completedWorkouts = 0;
+                
+                dayCards.forEach((day) => {
+                    const dateAttr = day.getAttribute('data-date');
+                    if (!dateAttr) return;
+                    
+                    // Compare date strings
+                    if (dateAttr <= todayString) {
+                        // Count all checkboxes in this day
+                        const checkboxes = day.querySelectorAll('.checkbox');
+                        checkboxes.forEach(checkbox => {
+                            totalWorkoutsUpToToday++;
+                            if (checkbox.checked) {
+                                completedWorkouts++;
+                            }
+                        });
+                    }
+                });
+                
+                const complianceDisplay = week.querySelector('.week-compliance');
+                if (complianceDisplay) {
+                    if (totalWorkoutsUpToToday > 0) {
+                        const percentage = Math.round((completedWorkouts / totalWorkoutsUpToToday) * 100);
+                        complianceDisplay.textContent = `Week Compliance: ${percentage}% (${completedWorkouts}/${totalWorkoutsUpToToday} completed)`;
+                        
+                        complianceDisplay.classList.remove('good', 'average', 'poor');
+                        if (percentage >= 80) {
+                            complianceDisplay.classList.add('good');
+                        } else if (percentage >= 60) {
+                            complianceDisplay.classList.add('average');
+                        } else {
+                            complianceDisplay.classList.add('poor');
+                        }
+                    } else {
+                        complianceDisplay.textContent = '';
+                        complianceDisplay.classList.remove('good', 'average', 'poor');
+                    }
+                }
+            });
+        }
+
+        // =====================================================
+        // SUPABASE AUTHENTICATION & DATA LOADING
+        // =====================================================
+        
+        async function checkAuthAndLoadPlan() {
+            if (!supabaseClient) {
+                // Supabase not available, use hardcoded data
+                console.log('Using hardcoded training data (Supabase not available)');
+                initializePlan();
+                return;
+            }
+            
+            try {
+                // Check if user is logged in
+                const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+                
+                if (authError || !user) {
+                    console.log('No active session found. Redirecting to login...');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                currentUser = user;
+                console.log('User authenticated:', user.email);
+                
+                // Fetch the training plan for this user
+                const { data: planRecord, error: dbError } = await supabaseClient
+                    .from('training_plans')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .eq('plan_type', 'T100')
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
+                
+                if (dbError) {
+                    console.error('Error fetching plan:', dbError.message);
+                    // Use hardcoded data as fallback
+                    console.log('Using hardcoded training data (database error)');
+                    initializePlan();
+                    return;
+                }
+                
+                if (planRecord && planRecord.plan_data) {
+                    currentPlanId = planRecord.id;
+                    trainingData = planRecord.plan_data;
+                    console.log('Loaded training plan from database');
+                }
+                
+                // Load workout progress from database
+                await loadWorkoutProgressFromDB();
+                
+                // Load day notes from database
+                await loadDayNotesFromDB();
+                
+                // Load phase states from database
+                await loadPhaseStatesFromDB();
+                
+                // Initialize the plan with loaded data
+                initializePlan();
+                
+            } catch (error) {
+                console.error('Error in authentication/loading:', error);
+                // Use hardcoded data as fallback
+                initializePlan();
+            }
+        }
+        
+        // =====================================================
+        // DATABASE SYNC FUNCTIONS
+        // =====================================================
+        
+        async function loadWorkoutProgressFromDB() {
+            if (!supabaseClient || !currentUser || !currentPlanId) return;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('workout_progress')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('plan_id', currentPlanId);
+                
+                if (!error && data) {
+                    // Restore workout progress to localStorage
+                    data.forEach(record => {
+                        if (record.is_completed) {
+                            localStorage.setItem(`tri-${record.workout_id}`, 'true');
+                        }
+                        if (record.is_missed) {
+                            localStorage.setItem(`tri-${record.workout_id}-miss`, 'true');
+                        }
+                    });
+                    console.log(`Loaded ${data.length} workout progress records`);
+                }
+            } catch (error) {
+                console.error('Error loading workout progress:', error);
+            }
+        }
+        
+        async function loadDayNotesFromDB() {
+            if (!supabaseClient || !currentUser || !currentPlanId) return;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('day_notes')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('plan_id', currentPlanId);
+                
+                if (!error && data) {
+                    // Restore day notes to localStorage
+                    data.forEach(record => {
+                        if (record.note_text) {
+                            localStorage.setItem(`tri-note-${record.day_id}`, record.note_text);
+                        }
+                    });
+                    console.log(`Loaded ${data.length} day notes`);
+                }
+            } catch (error) {
+                console.error('Error loading day notes:', error);
+            }
+        }
+        
+        async function loadPhaseStatesFromDB() {
+            if (!supabaseClient || !currentUser || !currentPlanId) return;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('phase_states')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('plan_id', currentPlanId);
+                
+                if (!error && data) {
+                    // Restore phase collapse states to localStorage
+                    data.forEach(record => {
+                        localStorage.setItem(`tri-${record.phase_id}-collapsed`, String(record.is_collapsed));
+                    });
+                    console.log(`Loaded ${data.length} phase states`);
+                }
+            } catch (error) {
+                console.error('Error loading phase states:', error);
+            }
+        }
+        
+        async function saveWorkoutProgressToDB(workoutId, isCompleted, isMissed) {
+            if (!supabaseClient || !currentUser || !currentPlanId) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('workout_progress')
+                    .upsert({
+                        user_id: currentUser.id,
+                        plan_id: currentPlanId,
+                        workout_id: workoutId,
+                        is_completed: isCompleted,
+                        is_missed: isMissed,
+                        completed_at: isCompleted ? new Date().toISOString() : null
+                    }, {
+                        onConflict: 'user_id,plan_id,workout_id'
+                    });
+                
+                if (error) {
+                    console.error('Error saving workout progress:', error);
+                }
+            } catch (error) {
+                console.error('Error in saveWorkoutProgressToDB:', error);
+            }
+        }
+        
+        async function saveDayNoteToDB(dayId, noteText) {
+            if (!supabaseClient || !currentUser || !currentPlanId) return;
+            
+            try {
+                if (noteText && noteText.trim()) {
+                    const { error } = await supabaseClient
+                        .from('day_notes')
+                        .upsert({
+                            user_id: currentUser.id,
+                            plan_id: currentPlanId,
+                            day_id: dayId,
+                            note_text: noteText
+                        }, {
+                            onConflict: 'user_id,plan_id,day_id'
+                        });
+                    
+                    if (error) {
+                        console.error('Error saving day note:', error);
+                    }
+                } else {
+                    // Delete note if empty
+                    const { error } = await supabaseClient
+                        .from('day_notes')
+                        .delete()
+                        .eq('user_id', currentUser.id)
+                        .eq('plan_id', currentPlanId)
+                        .eq('day_id', dayId);
+                    
+                    if (error) {
+                        console.error('Error deleting day note:', error);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in saveDayNoteToDB:', error);
+            }
+        }
+        
+        async function savePhaseStateToDB(phaseId, isCollapsed) {
+            if (!supabaseClient || !currentUser || !currentPlanId) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('phase_states')
+                    .upsert({
+                        user_id: currentUser.id,
+                        plan_id: currentPlanId,
+                        phase_id: phaseId,
+                        is_collapsed: isCollapsed
+                    }, {
+                        onConflict: 'user_id,plan_id,phase_id'
+                    });
+                
+                if (error) {
+                    console.error('Error saving phase state:', error);
+                }
+            } catch (error) {
+                console.error('Error in savePhaseStateToDB:', error);
+            }
+        }
+        
+        // Logout function
+        async function handleLogout(event) {
+            event.preventDefault();
+            
+            if (!supabaseClient) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const { error } = await supabaseClient.auth.signOut();
+            if (!error) {
+                window.location.href = 'login.html';
+            } else {
+                console.error('Error logging out:', error.message);
+            }
+        }
+        
+        // Attach logout handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutBtn = document.querySelector('.btn-logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
+        });
+        
+        // =====================================================
+        // INITIALIZE ON PAGE LOAD
+        // =====================================================
+        
+        // Initialize - check auth and load plan
+        document.addEventListener('DOMContentLoaded', checkAuthAndLoadPlan);
+        scheduleMidnightRefresh();
+
+        // Edit Mode Functionality
+        const editModeBtn = document.getElementById('editModeBtn');
+        let editMode = false;
+
+        if (editModeBtn) {
+            editModeBtn.addEventListener('click', () => {
+                editMode = !editMode;
+                editModeBtn.classList.toggle('active');
+                editModeBtn.textContent = editMode ? '✅ Editing Mode ON' : '✏️ Edit Workouts';
+                
+                // Toggle contenteditable on all workout descriptions
+                document.querySelectorAll('.workout-description').forEach(desc => {
+                    if (editMode) {
+                        desc.contentEditable = 'true';
+                        desc.style.cursor = 'text';
+                        desc.style.border = '1px dashed var(--accent-cyan)';
+                        desc.style.padding = '4px';
+                        desc.style.borderRadius = '4px';
+                        
+                        // Add key workout toggle button
+                        const keyBtn = document.createElement('button');
+                        keyBtn.className = 'key-toggle-btn';
+                        keyBtn.textContent = desc.textContent.includes('🗝️') ? '🗝️' : '+ 🗝️';
+                        keyBtn.style.cssText = 'margin-left: 8px; padding: 2px 8px; background: rgba(14, 165, 233, 0.2); border: 1px solid var(--tri-swim); border-radius: 4px; cursor: pointer; font-size: 0.85rem;';
+                        keyBtn.onclick = (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (desc.textContent.includes('🗝️')) {
+                                desc.textContent = desc.textContent.replace('🗝️', '').trim();
+                                keyBtn.textContent = '+ 🗝️';
+                            } else {
+                                desc.textContent = '🗝️ ' + desc.textContent;
+                                keyBtn.textContent = '🗝️';
+                            }
+                            refreshDayCardClasses(desc.closest('.day-card'));
+                        };
+                        
+                        // Add brick workout toggle button
+                        const brickBtn = document.createElement('button');
+                        brickBtn.className = 'brick-toggle-btn';
+                        brickBtn.textContent = desc.textContent.includes('🧱') ? '🧱' : '+ 🧱';
+                        brickBtn.style.cssText = 'margin-left: 4px; padding: 2px 8px; background: rgba(139, 69, 19, 0.2); border: 1px solid #8B4513; border-radius: 4px; cursor: pointer; font-size: 0.85rem;';
+                        brickBtn.onclick = (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (desc.textContent.includes('🧱')) {
+                                desc.textContent = desc.textContent.replace('🧱', '').trim();
+                                brickBtn.textContent = '+ 🧱';
+                            } else {
+                                desc.textContent = '🧱 ' + desc.textContent;
+                                brickBtn.textContent = '🧱';
+                            }
+                            refreshDayCardClasses(desc.closest('.day-card'));
+                        };
+                        
+                        const workoutItem = desc.closest('.workout-item');
+                        if (!workoutItem.querySelector('.key-toggle-btn')) {
+                            workoutItem.appendChild(keyBtn);
+                        }
+                        if (!workoutItem.querySelector('.brick-toggle-btn')) {
+                            workoutItem.appendChild(brickBtn);
+                        }
+                        
+                    } else {
+                        desc.contentEditable = 'false';
+                        desc.style.cursor = 'default';
+                        desc.style.border = 'none';
+                        desc.style.padding = '0';
+                        
+                        // Remove toggle buttons
+                        const workoutItem = desc.closest('.workout-item');
+                        const keyBtn = workoutItem.querySelector('.key-toggle-btn');
+                        const brickBtn = workoutItem.querySelector('.brick-toggle-btn');
+                        if (keyBtn) keyBtn.remove();
+                        if (brickBtn) brickBtn.remove();
+                    }
+                });
+                
+                // Show/hide add/delete buttons
+                document.querySelectorAll('.day-card').forEach(dayCard => {
+                    if (editMode) {
+                        // Add "Add Workout" button
+                        if (!dayCard.querySelector('.add-workout-btn')) {
+                            const addBtn = document.createElement('button');
+                            addBtn.className = 'add-workout-btn';
+                            addBtn.textContent = '➕ Add Workout';
+                            addBtn.style.cssText = 'margin-top: 0.5rem; padding: 0.5rem 1rem; background: var(--success); color: white; border: none; border-radius: 6px; cursor: pointer; font-family: "Orbitron", sans-serif; font-size: 0.85rem;';
+                            addBtn.onclick = () => addWorkout(dayCard);
+                            dayCard.querySelector('.workouts-container').appendChild(addBtn);
+                        }
+                        
+                        // Add delete buttons to each workout
+                        dayCard.querySelectorAll('.workout-item').forEach(item => {
+                            if (!item.querySelector('.delete-workout-btn')) {
+                                const delBtn = document.createElement('button');
+                                delBtn.className = 'delete-workout-btn';
+                                delBtn.textContent = '🗑️';
+                                delBtn.style.cssText = 'padding: 4px 8px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; font-size: 1rem;';
+                                delBtn.onclick = () => {
+                                    item.remove();
+                                    refreshDayCardClasses(dayCard);
+                                };
+                                item.appendChild(delBtn);
+                            }
+                        });
+                    } else {
+                        // Remove add/delete buttons
+                        const addBtn = dayCard.querySelector('.add-workout-btn');
+                        if (addBtn) addBtn.remove();
+                        dayCard.querySelectorAll('.delete-workout-btn').forEach(btn => btn.remove());
+                    }
+                });
+            });
+        }
+        
+        function addWorkout(dayCard) {
+            const workoutsContainer = dayCard.querySelector('.workouts-container');
+            const newWorkoutItem = document.createElement('div');
+            newWorkoutItem.className = 'workout-item run';
+            newWorkoutItem.innerHTML = `
+                <span class="workout-icon">🏃</span>
+                <div class="workout-details">
+                    <div class="workout-type">run</div>
+                    <div class="workout-description" contenteditable="true" style="cursor: text; border: 1px dashed var(--accent-cyan); padding: 4px; border-radius: 4px;">New Workout</div>
+                </div>
+                <button class="delete-workout-btn" style="padding: 4px 8px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; font-size: 1rem;">🗑️</button>
+                <div class="miss-btn-wrapper">
+                    <div class="miss-btn">✗</div>
+                    <span class="miss-label">Miss</span>
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox">
+                    <span class="checkbox-label">Done</span>
+                </div>
+            `;
+            
+            // Insert before the add button
+            const addBtn = workoutsContainer.querySelector('.add-workout-btn');
+            workoutsContainer.insertBefore(newWorkoutItem, addBtn);
+            
+            // Setup delete button
+            const delBtn = newWorkoutItem.querySelector('.delete-workout-btn');
+            delBtn.onclick = () => {
+                newWorkoutItem.remove();
+                refreshDayCardClasses(dayCard);
+            };
+            
+            refreshDayCardClasses(dayCard);
+        }
+        
+        function refreshDayCardClasses(dayCard) {
+            // Re-check key workout and brick workout status
+            const workoutDescs = Array.from(dayCard.querySelectorAll('.workout-description')).map(d => d.textContent);
+            
+            const hasKeyWorkout = workoutDescs.some(desc => desc.includes('🗝️'));
+            const hasBrickWorkout = workoutDescs.some(desc => desc.includes('🧱'));
+            
+            dayCard.classList.remove('key-workout', 'brick-workout');
+            
+            if (hasKeyWorkout) {
+                dayCard.classList.add('key-workout');
+            }
+            if (hasBrickWorkout) {
+                dayCard.classList.add('brick-workout');
+            }
+        }
+    </script>
+</body>
+</html>
