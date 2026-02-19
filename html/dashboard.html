@@ -180,6 +180,7 @@
             border-radius: 20px;
             backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 2rem;
         }
 
         .quick-actions h2 {
@@ -228,6 +229,194 @@
             font-size: 1.1rem;
         }
 
+        /* Training Plans Section */
+        .training-plans-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .training-plans-section h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-card {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .plan-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .plan-card.active-plan {
+            border-color: #4ade80;
+            border-width: 3px;
+        }
+
+        .plan-card.active-plan::after {
+            content: '✓ ACTIVE';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4ade80;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .plan-type-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-type-marathon {
+            background: rgba(239, 68, 68, 0.3);
+            border: 1px solid #ef4444;
+        }
+
+        .plan-type-t100 {
+            background: rgba(14, 165, 233, 0.3);
+            border: 1px solid #0ea5e9;
+        }
+
+        .plan-type-custom {
+            background: rgba(168, 85, 247, 0.3);
+            border: 1px solid #a855f7;
+        }
+
+        .plan-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .plan-dates {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .plan-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .plan-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.6rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .plan-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .plan-btn-select {
+            background: rgba(74, 144, 226, 0.3);
+            border-color: #4a90e2;
+        }
+
+        .plan-btn-select:hover {
+            background: rgba(74, 144, 226, 0.5);
+        }
+
+        .plan-btn-archive {
+            background: rgba(245, 158, 11, 0.3);
+            border-color: #f59e0b;
+        }
+
+        .plan-btn-archive:hover {
+            background: rgba(245, 158, 11, 0.5);
+        }
+
+        .plan-btn-delete {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: #ef4444;
+        }
+
+        .plan-btn-delete:hover {
+            background: rgba(239, 68, 68, 0.5);
+        }
+
+        .create-plan-btn {
+            display: block;
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(74, 144, 226, 0.3);
+            border: 2px dashed #4a90e2;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .create-plan-btn:hover {
+            background: rgba(74, 144, 226, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            opacity: 0.8;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
         .loading {
             text-align: center;
             padding: 2rem;
@@ -264,6 +453,10 @@
             .stat-card .value {
                 font-size: 2rem;
             }
+
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -292,8 +485,8 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="icon">🏃</div>
-                <h3>Workouts This Week</h3>
-                <div class="value">0</div>
+                <h3>Active Plans</h3>
+                <div class="value" id="active-plans-count">0</div>
             </div>
             <div class="stat-card">
                 <div class="icon">🔥</div>
@@ -307,7 +500,7 @@
             </div>
             <div class="stat-card">
                 <div class="icon">🏆</div>
-                <h3>Personal Records</h3>
+                <h3>Completed Plans</h3>
                 <div class="value">0</div>
             </div>
         </div>
@@ -315,22 +508,29 @@
         <div class="quick-actions">
             <h2>⚡ Quick Actions</h2>
             <div class="action-grid">
-                <a href="peak-stride.html" class="action-btn">
+                <a href="#" id="current-plan-btn" class="action-btn">
                     <div class="icon">🏋️</div>
-                    <div class="label">Peak Stride Training</div>
+                    <div class="label">Current Training</div>
                 </a>
                 <a href="#" class="action-btn">
                     <div class="icon">📊</div>
                     <div class="label">View Progress</div>
                 </a>
-                <a href="#" class="action-btn">
-                    <div class="icon">📝</div>
-                    <div class="label">Training Plans</div>
+                <a href="#training-plans" class="action-btn">
+                    <div class="icon">📋</div>
+                    <div class="label">Manage Plans</div>
                 </a>
-                <a href="T100-PEAK-TRI-WITH-SUPABASE.html" class="action-btn">
+                <a href="#" class="action-btn">
                     <div class="icon">⚙️</div>
                     <div class="label">Settings</div>
                 </a>
+            </div>
+        </div>
+
+        <div class="training-plans-section" id="training-plans">
+            <h2>📋 Training Plans</h2>
+            <div id="plans-container">
+                <!-- Plans will be loaded here -->
             </div>
         </div>
     </div>
@@ -341,45 +541,243 @@
 </footer>
 
 <!-- Load Supabase JS Library -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<!-- Load Supabase Config -->
-<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://yecqupxvbazsgzqgmzmc.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3F1cHh2YmF6c2d6cWdtem1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MzU4NDcsImV4cCI6MjA4NjAxMTg0N30._8MxQKOgs-IeezPUTumvHPaFDj1n4R-TYOFv-eXuBZk';
+    
+    let supabaseClient;
+    try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (error) {
+        console.error('Supabase initialization failed:', error);
+    }
+
     const loadingDiv = document.getElementById('loading');
     const dashboardContent = document.getElementById('dashboard-content');
     const userEmailSpan = document.getElementById('user-email');
     const usernameSpan = document.getElementById('username');
     const logoutBtn = document.getElementById('logout-btn');
+    const plansContainer = document.getElementById('plans-container');
+    const currentPlanBtn = document.getElementById('current-plan-btn');
+    const activePlansCount = document.getElementById('active-plans-count');
+
+    let currentUser = null;
+    let userPlans = [];
+    let activePlanId = null;
 
     // Check authentication status
     async function checkAuth() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-
-        if (!session) {
-            // Not logged in, redirect to login
+        if (!supabaseClient) {
             window.location.href = 'login.html';
             return;
         }
 
-        // User is logged in
-        const user = session.user;
-        userEmailSpan.textContent = user.email;
+        const { data: { session } } = await supabaseClient.auth.getSession();
 
-        // Try to get username from user metadata
-        if (user.user_metadata && user.user_metadata.username) {
-            usernameSpan.textContent = user.user_metadata.username;
-        } else {
-            // Fallback to email username
-            usernameSpan.textContent = user.email.split('@')[0];
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
         }
+
+        currentUser = session.user;
+        userEmailSpan.textContent = currentUser.email;
+
+        if (currentUser.user_metadata && currentUser.user_metadata.username) {
+            usernameSpan.textContent = currentUser.user_metadata.username;
+        } else {
+            usernameSpan.textContent = currentUser.email.split('@')[0];
+        }
+
+        // Load user's training plans
+        await loadUserPlans();
 
         // Show dashboard
         loadingDiv.classList.add('hidden');
         dashboardContent.classList.remove('hidden');
+    }
 
-        // Load user stats (you can implement this later with your database)
-        // await loadUserStats(user.id);
+    // Load user's training plans from database
+    async function loadUserPlans() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('training_plans')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            userPlans = data || [];
+            activePlansCount.textContent = userPlans.length;
+
+            // Get active plan from localStorage or default to first plan
+            activePlanId = localStorage.getItem('active-plan-id') || (userPlans[0]?.id);
+            if (activePlanId) {
+                localStorage.setItem('active-plan-id', activePlanId);
+            }
+
+            renderPlans();
+        } catch (error) {
+            console.error('Error loading plans:', error);
+            renderEmptyState();
+        }
+    }
+
+    // Render training plans
+    function renderPlans() {
+        if (userPlans.length === 0) {
+            renderEmptyState();
+            currentPlanBtn.href = '#';
+            currentPlanBtn.style.opacity = '0.5';
+            currentPlanBtn.style.pointerEvents = 'none';
+            return;
+        }
+
+        // Update current plan button
+        const activePlan = userPlans.find(p => p.id === activePlanId);
+        if (activePlan) {
+            const planUrl = getPlanUrl(activePlan.plan_type);
+            currentPlanBtn.href = planUrl;
+            currentPlanBtn.style.opacity = '1';
+            currentPlanBtn.style.pointerEvents = 'auto';
+        }
+
+        const plansHTML = userPlans.map(plan => {
+            const isActive = plan.id === activePlanId;
+            const planTypeClass = `plan-type-${plan.plan_type.toLowerCase()}`;
+            const planUrl = getPlanUrl(plan.plan_type);
+
+            return `
+                <div class="plan-card ${isActive ? 'active-plan' : ''}" data-plan-id="${plan.id}">
+                    <div class="plan-type-badge ${planTypeClass}">${plan.plan_type}</div>
+                    <div class="plan-name">${plan.plan_name}</div>
+                    <div class="plan-dates">Created: ${new Date(plan.created_at).toLocaleDateString()}</div>
+                    <div class="plan-actions">
+                        ${!isActive ? `<button class="plan-btn plan-btn-select" onclick="selectPlan('${plan.id}')">✓ Select</button>` : ''}
+                        <a href="${planUrl}" class="plan-btn">👁️ Open</a>
+                        <button class="plan-btn plan-btn-archive" onclick="archivePlan('${plan.id}')">📦 Archive</button>
+                        <button class="plan-btn plan-btn-delete" onclick="deletePlan('${plan.id}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const createButton = userPlans.length < 3 ? `
+            <button class="create-plan-btn" onclick="createNewPlan()">
+                ➕ Create New Training Plan (${userPlans.length}/3)
+            </button>
+        ` : `
+            <div style="text-align: center; padding: 1rem; opacity: 0.7;">
+                Maximum of 3 active plans reached. Archive or delete a plan to create a new one.
+            </div>
+        `;
+
+        plansContainer.innerHTML = `
+            <div class="plans-grid">
+                ${plansHTML}
+            </div>
+            ${createButton}
+        `;
+    }
+
+    // Render empty state
+    function renderEmptyState() {
+        plansContainer.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">📋</div>
+                <h3>No Training Plans Yet</h3>
+                <p>Create your first training plan to get started!</p>
+            </div>
+            <button class="create-plan-btn" onclick="createNewPlan()">
+                ➕ Create Your First Training Plan
+            </button>
+        `;
+    }
+
+    // Get plan URL based on type
+    function getPlanUrl(planType) {
+        switch (planType) {
+            case 'Marathon':
+                return 'peak-stride.html';
+            case 'T100':
+                return 'T100-PEAK-TRI-WITH-SUPABASE.html';
+            default:
+                return '#';
+        }
+    }
+
+    // Select a plan as active
+    async function selectPlan(planId) {
+        activePlanId = planId;
+        localStorage.setItem('active-plan-id', planId);
+        await loadUserPlans(); // Refresh display
+    }
+
+    // Archive a plan
+    async function archivePlan(planId) {
+        if (!confirm('Archive this training plan? You can restore it later.')) {
+            return;
+        }
+
+        try {
+            // In a full implementation, you'd move this to an archived_plans table
+            // For now, we'll just mark it with metadata
+            const { error } = await supabaseClient
+                .from('training_plans')
+                .update({ 
+                    plan_name: '[ARCHIVED] ' + userPlans.find(p => p.id === planId).plan_name 
+                })
+                .eq('id', planId);
+
+            if (error) throw error;
+
+            alert('Plan archived successfully!');
+            await loadUserPlans();
+        } catch (error) {
+            console.error('Error archiving plan:', error);
+            alert('Error archiving plan. Please try again.');
+        }
+    }
+
+    // Delete a plan
+    async function deletePlan(planId) {
+        if (!confirm('Are you sure you want to DELETE this training plan? This cannot be undone!')) {
+            return;
+        }
+
+        if (!confirm('This will permanently delete all workout progress, notes, and data. Are you absolutely sure?')) {
+            return;
+        }
+
+        try {
+            const { error } = await supabaseClient
+                .from('training_plans')
+                .delete()
+                .eq('id', planId);
+
+            if (error) throw error;
+
+            // If deleted plan was active, clear active plan
+            if (activePlanId === planId) {
+                localStorage.removeItem('active-plan-id');
+                activePlanId = null;
+            }
+
+            alert('Plan deleted successfully.');
+            await loadUserPlans();
+        } catch (error) {
+            console.error('Error deleting plan:', error);
+            alert('Error deleting plan. Please try again.');
+        }
+    }
+
+    // Create new plan (placeholder)
+    function createNewPlan() {
+        alert('Plan creation interface coming soon!\n\nYou can manually insert a plan into the database for now.');
+        // In future: Open modal/page to create new plan
     }
 
     // Logout function
@@ -399,7 +797,7 @@
     });
 
     // Listen for auth changes
-    supabaseClient.auth.onAuthStateChange((event, session) => {
+    supabaseClient?.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_OUT') {
             window.location.href = 'index.html';
         }
