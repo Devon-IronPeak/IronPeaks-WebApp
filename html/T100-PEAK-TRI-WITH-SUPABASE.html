@@ -1351,10 +1351,15 @@
                 card.classList.add('brick-workout');
             }
             
+            // Derive day name from ISO date (works even if dayData.day is absent in seeder data)
+            const isoDate = convertToISODate(dayData.date, weekNum, dayIndex);
+            const _dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+            const computedDayName = dayData.day || _dayNames[new Date(isoDate + 'T12:00:00').getDay()];
+
             const header = document.createElement('div');
             header.className = 'day-header';
             header.innerHTML = `
-                <div class="day-name">${dayData.day}</div>
+                <div class="day-name">${computedDayName}</div>
                 <div class="day-date">${dayData.date}</div>
             `;
             
