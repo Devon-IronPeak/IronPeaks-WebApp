@@ -1013,19 +1013,19 @@
             <div class="summary-grid">
                 <div class="summary-card">
                     <div class="summary-label">Total Swim</div>
-                    <div class="summary-value">83 km</div>
+                    <div class="summary-value" id="totalSwim">83 km</div>
                 </div>
                 <div class="summary-card">
                     <div class="summary-label">Total Bike</div>
-                    <div class="summary-value">54 hrs</div>
+                    <div class="summary-value" id="totalBike">54 hrs</div>
                 </div>
                 <div class="summary-card">
                     <div class="summary-label">Total Run</div>
-                    <div class="summary-value">23 hrs</div>
+                    <div class="summary-value" id="totalRun">23 hrs</div>
                 </div>
                 <div class="summary-card">
                     <div class="summary-label">Total Time</div>
-                    <div class="summary-value">~145 hrs</div>
+                    <div class="summary-value" id="totalTime">~145 hrs</div>
                 </div>
             </div>
         </div>
@@ -1437,12 +1437,6 @@
                 
                 phaseHeader.addEventListener('click', () => {
                     phaseSection.classList.toggle('collapsed');
-                    // Save collapse state
-                    const isCollapsed = phaseSection.classList.contains('collapsed');
-                    localStorage.setItem(`tri-${phaseId}-collapsed`, isCollapsed);
-                    
-                    // Save to Supabase
-                    savePhaseStateToDB(phaseId, isCollapsed);
                 });
                 
                 phaseSection.appendChild(phaseHeader);
@@ -1459,6 +1453,7 @@
             updateCurrentWeek();
             updateWeeksToRace();
             checkWeekCompliance();
+            updateTotals();
         }
 
         function createWeekCard(weekData) {
@@ -1866,6 +1861,94 @@
         // STATE-DRIVEN WORKOUT TOGGLE — Single Source of Truth
         // =====================================================
         
+        // Parse a duration/distance string to a numeric value in hours (for time) or km (for distance)
+        function parseAmount(str) {
+            if (!str) return 0;
+            str = str.toString().trim().toLowerCase();
+            // Hours: "2hr", "2.5hrs", "2h", "120min", "90min"
+            const hrMatch = str.match(/(\d+(?:\.\d+)?)\s*hr/);
+            if (hrMatch) return parseFloat(hrMatch[1]);
+            const minMatch = str.match(/(\d+(?:\.\d+)?)\s*min/);
+            if (minMatch) return parseFloat(minMatch[1]) / 60;
+            // Distance: "2500m", "2.5km"
+            const kmMatch = str.match(/(\d+(?:\.\d+)?)\s*km/);
+            if (kmMatch) return parseFloat(kmMatch[1]);
+            const mMatch = str.match(/(\d+(?:\.\d+)?)\s*m\b/);
+            if (mMatch) return parseFloat(mMatch[1]) / 1000;
+            // Plain number
+            const numMatch = str.match(/(\d+(?:\.\d+)?)/);
+            if (numMatch) return parseFloat(numMatch[1]);
+            return 0;
+        }
+
+        function formatAmount(val, unit) {
+            if (val === 0) return `0 ${unit}`;
+            if (unit === 'km') return `${Math.round(val * 10) / 10} km`;
+            // hours
+            if (val < 1) return `${Math.round(val * 60)}min`;
+            return `${Math.round(val * 10) / 10} hrs`;
+        }
+
+        function updateTotals() {
+            // Recompute week badge totals from trainingData descriptions
+            // (totals stored in weekData.totals are used for header badges)
+            // Also compute plan-wide totals for the summary section
+            let planSwimKm = 0, planBikeHrs = 0, planRunHrs = 0;
+
+            trainingData.forEach((weekData, weekIdx) => {
+                let weekSwimKm = 0, weekBikeHrs = 0, weekRunHrs = 0;
+
+                weekData.days?.forEach(day => {
+                    day.workouts?.forEach(w => {
+                        const amt = parseAmount(w.desc);
+                        if (w.type === 'swim') weekSwimKm += amt;
+                        else if (w.type === 'bike') weekBikeHrs += amt;
+                        else if (w.type === 'run') weekRunHrs += amt;
+                    });
+                });
+
+                // Update weekData.totals so next render picks it up
+                weekData.totals = {
+                    swim: formatAmount(weekSwimKm, 'km'),
+                    bike: formatAmount(weekBikeHrs, 'hrs'),
+                    run: formatAmount(weekRunHrs, 'hrs')
+                };
+
+                // Update the live week header badges in the DOM
+                const weekCards = document.querySelectorAll('.week-card');
+                const weekCard = weekCards[weekIdx];
+                if (weekCard) {
+                    const swimBadge = weekCard.querySelector('.swim-badge');
+                    const bikeBadge = weekCard.querySelector('.bike-badge');
+                    const runBadge  = weekCard.querySelector('.run-badge');
+                    if (swimBadge) swimBadge.textContent = `🏊 ${weekData.totals.swim}`;
+                    if (bikeBadge) bikeBadge.textContent = `🚴 ${weekData.totals.bike}`;
+                    if (runBadge)  runBadge.textContent  = `🏃 ${weekData.totals.run}`;
+                }
+
+                planSwimKm  += weekSwimKm;
+                planBikeHrs += weekBikeHrs;
+                planRunHrs  += weekRunHrs;
+            });
+
+            // Update top stat cards
+            const statBike = document.querySelector('#training-plan')?.closest('.container')?.querySelector('.stat-card:nth-child(3) .stat-value');
+            const statRun  = document.querySelector('#training-plan')?.closest('.container')?.querySelector('.stat-card:nth-child(4) .stat-value');
+
+            // Update summary section
+            const totalSwimEl = document.getElementById('totalSwim');
+            const totalBikeEl = document.getElementById('totalBike');
+            const totalRunEl  = document.getElementById('totalRun');
+            const totalTimeEl = document.getElementById('totalTime');
+            if (totalSwimEl) totalSwimEl.textContent = formatAmount(planSwimKm, 'km');
+            if (totalBikeEl) totalBikeEl.textContent = formatAmount(planBikeHrs, 'hrs');
+            if (totalRunEl)  totalRunEl.textContent  = formatAmount(planRunHrs, 'hrs');
+            if (totalTimeEl) {
+                const totalHrs = planBikeHrs + planRunHrs + (planSwimKm / 2); // rough swim time estimate
+                totalTimeEl.textContent = `~${Math.round(totalHrs)} hrs`;
+            }
+        }
+        
         async function handleWorkoutToggle(weekIndex, dayIndex, workoutIndex, toggleType) {
             // 1. Locate the workout in trainingData
             const workout = trainingData[weekIndex]?.days[dayIndex]?.workouts[workoutIndex];
@@ -1889,8 +1972,7 @@
             }
             
             // 4. Persist to Supabase
-            await savePlanToDatabase();
-        }
+            await savePlanToDatabase();        }
 
         // =====================================================
         // DATABASE SYNC FUNCTIONS
@@ -2089,6 +2171,7 @@
                     });
                     // Save updated trainingData to Supabase
                     await savePlanToDatabase();
+                    updateTotals();
                     editModeBtn.disabled = false;
                     editModeBtn.textContent = '✏️ Edit Workouts';
                 } else {
@@ -2099,37 +2182,78 @@
         
         function addWorkout(dayCard) {
             const workoutsContainer = dayCard.querySelector('.workouts-container');
-            const newWorkoutItem = document.createElement('div');
-            newWorkoutItem.className = 'workout-item run';
-            newWorkoutItem.innerHTML = `
-                <span class="workout-icon">🏃</span>
-                <div class="workout-details">
-                    <div class="workout-type">run</div>
-                    <div class="workout-description" contenteditable="true" style="cursor: text; border: 1px dashed var(--accent-cyan); padding: 4px; border-radius: 4px;">New Workout</div>
-                </div>
-                <button class="delete-workout-btn" style="padding: 4px 8px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; font-size: 1rem;">🗑️</button>
-                <div class="miss-btn-wrapper">
-                    <div class="miss-btn">✗</div>
-                    <span class="miss-label">Miss</span>
-                </div>
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" class="checkbox">
-                    <span class="checkbox-label">Done</span>
-                </div>
-            `;
             
-            // Insert before the add button
-            const addBtn = workoutsContainer.querySelector('.add-workout-btn');
-            workoutsContainer.insertBefore(newWorkoutItem, addBtn);
-            
-            // Setup delete button
-            const delBtn = newWorkoutItem.querySelector('.delete-workout-btn');
-            delBtn.onclick = () => {
-                newWorkoutItem.remove();
-                refreshDayCardClasses(dayCard);
+            // Type config
+            const types = {
+                swim:     { icon: '🏊', label: 'Swim' },
+                bike:     { icon: '🚴', label: 'Bike' },
+                run:      { icon: '🏃', label: 'Run' },
+                strength: { icon: '💪', label: 'Strength' },
+                rest:     { icon: '😴', label: 'Rest' }
             };
-            
-            refreshDayCardClasses(dayCard);
+
+            // Build selector UI
+            const selectorEl = document.createElement('div');
+            selectorEl.className = 'workout-type-selector';
+            selectorEl.style.cssText = 'display: flex; flex-direction: column; gap: 0.5rem; padding: 0.75rem; background: rgba(6,182,212,0.08); border: 1px dashed var(--accent-cyan); border-radius: 8px; margin-bottom: 0.5rem;';
+            selectorEl.innerHTML = `
+                <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">Choose Workout Type</div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    ${Object.entries(types).map(([key, t]) => `
+                        <button data-type="${key}" style="padding: 0.4rem 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; cursor: pointer; font-size: 0.9rem; transition: all 0.2s;" 
+                            onmouseover="this.style.background='rgba(6,182,212,0.25)';this.style.borderColor='var(--accent-cyan)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.2)'">
+                            ${t.icon} ${t.label}
+                        </button>
+                    `).join('')}
+                </div>
+                <button class="cancel-add-btn" style="align-self: flex-start; padding: 0.3rem 0.7rem; background: transparent; border: 1px solid rgba(239,68,68,0.4); border-radius: 6px; color: #ef4444; cursor: pointer; font-size: 0.8rem;">✕ Cancel</button>
+            `;
+
+            const addBtn = workoutsContainer.querySelector('.add-workout-btn');
+            workoutsContainer.insertBefore(selectorEl, addBtn);
+
+            // Cancel
+            selectorEl.querySelector('.cancel-add-btn').onclick = () => selectorEl.remove();
+
+            // Type chosen
+            selectorEl.querySelectorAll('[data-type]').forEach(btn => {
+                btn.onclick = () => {
+                    const chosenType = btn.dataset.type;
+                    const { icon } = types[chosenType];
+                    selectorEl.remove();
+
+                    const newWorkoutItem = document.createElement('div');
+                    newWorkoutItem.className = `workout-item ${chosenType}`;
+                    newWorkoutItem.innerHTML = `
+                        <span class="workout-icon">${icon}</span>
+                        <div class="workout-details">
+                            <div class="workout-type">${chosenType}</div>
+                            <div class="workout-description" contenteditable="true" style="cursor: text; border: 1px dashed var(--accent-cyan); padding: 4px; border-radius: 4px;">New ${types[chosenType].label} workout</div>
+                        </div>
+                        <button class="delete-workout-btn" style="padding: 4px 8px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; font-size: 1rem;">🗑️</button>
+                        <div class="miss-btn-wrapper">
+                            <div class="miss-btn">✗</div>
+                            <span class="miss-label">Miss</span>
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" class="checkbox">
+                            <span class="checkbox-label">Done</span>
+                        </div>
+                    `;
+
+                    workoutsContainer.insertBefore(newWorkoutItem, addBtn);
+
+                    newWorkoutItem.querySelector('.delete-workout-btn').onclick = () => {
+                        newWorkoutItem.remove();
+                        refreshDayCardClasses(dayCard);
+                    };
+
+                    // Focus the description for immediate editing
+                    newWorkoutItem.querySelector('.workout-description').focus();
+                    refreshDayCardClasses(dayCard);
+                };
+            });
         }
         
         function refreshDayCardClasses(dayCard) {

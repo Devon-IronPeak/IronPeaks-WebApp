@@ -3395,21 +3395,26 @@
     // SETUP INSTRUCTIONS:
     // 1. Create a Supabase project at https://supabase.com
     // 2. Create a table named 'phase_states' with the following structure:
-    //    - user_session_id (text, NOT NULL)
+    //    - user_id (text, NOT NULL)
     //    - phase_id (text, NOT NULL)
     //    - is_collapsed (boolean, NOT NULL, DEFAULT true)
     //    - updated_at (timestamp with time zone, DEFAULT now())
-    //    - PRIMARY KEY (user_session_id, phase_id)
+    //    - PRIMARY KEY (user_id, phase_id)
     // 
     // 3. SQL to create the table:
     /*
        CREATE TABLE phase_states (
-         user_session_id TEXT NOT NULL,
+         user_id TEXT NOT NULL,
          phase_id TEXT NOT NULL,
          is_collapsed BOOLEAN NOT NULL DEFAULT true,
          updated_at TIMESTAMPTZ DEFAULT now(),
-         PRIMARY KEY (user_session_id, phase_id)
+         PRIMARY KEY (user_id, phase_id)
        );
+       
+       -- If upgrading from old user_session_id schema, run:
+       -- ALTER TABLE phase_states RENAME COLUMN user_session_id TO user_id;
+       -- ALTER TABLE phase_states DROP CONSTRAINT phase_states_pkey;
+       -- ALTER TABLE phase_states ADD PRIMARY KEY (user_id, phase_id);
        
        -- Enable Row Level Security (RLS)
        ALTER TABLE phase_states ENABLE ROW LEVEL SECURITY;
@@ -3451,27 +3456,24 @@
     // Save phase state to Supabase
     async function savePhaseState(phaseId, isCollapsed) {
         if (!supabaseClient) {
-            // Fallback to localStorage if Supabase isn't available
             localStorage.setItem(phaseId, isCollapsed);
             return;
         }
-        
         try {
-            const { data, error } = await supabaseClient
+            const userId = psCurrentUser?.id || USER_SESSION_ID;
+            const { error } = await supabaseClient
                 .from('phase_states')
                 .upsert({
-                    user_session_id: USER_SESSION_ID,
+                    user_id: userId,
                     phase_id: phaseId,
                     is_collapsed: isCollapsed,
                     updated_at: new Date().toISOString()
                 }, {
-                    onConflict: 'user_session_id,phase_id'
+                    onConflict: 'user_id,phase_id'
                 });
-            
             if (error) throw error;
         } catch (error) {
             console.error('Error saving phase state to Supabase:', error);
-            // Fallback to localStorage
             localStorage.setItem(phaseId, isCollapsed);
         }
     }
@@ -3479,30 +3481,24 @@
     // Load phase state from Supabase
     async function loadPhaseState(phaseId) {
         if (!supabaseClient) {
-            // Fallback to localStorage if Supabase isn't available
             return localStorage.getItem(phaseId);
         }
-        
         try {
+            const userId = psCurrentUser?.id || USER_SESSION_ID;
             const { data, error } = await supabaseClient
                 .from('phase_states')
                 .select('is_collapsed')
-                .eq('user_session_id', USER_SESSION_ID)
+                .eq('user_id', userId)
                 .eq('phase_id', phaseId)
                 .single();
             
             if (error) {
-                if (error.code === 'PGRST116') {
-                    // No record found, return null (will default to collapsed)
-                    return null;
-                }
+                if (error.code === 'PGRST116') return null;
                 throw error;
             }
-            
             return data.is_collapsed.toString();
         } catch (error) {
             console.error('Error loading phase state from Supabase:', error);
-            // Fallback to localStorage
             return localStorage.getItem(phaseId);
         }
     }
@@ -3593,27 +3589,24 @@
     // Save week state to Supabase
     async function saveWeekState(weekId, isCollapsed) {
         if (!supabaseClient) {
-            // Fallback to localStorage if Supabase isn't available
             localStorage.setItem(weekId, isCollapsed);
             return;
         }
-        
         try {
-            const { data, error } = await supabaseClient
+            const userId = psCurrentUser?.id || USER_SESSION_ID;
+            const { error } = await supabaseClient
                 .from('phase_states')
                 .upsert({
-                    user_session_id: USER_SESSION_ID,
-                    phase_id: weekId,  // Reusing the same table, just different IDs
+                    user_id: userId,
+                    phase_id: weekId,
                     is_collapsed: isCollapsed,
                     updated_at: new Date().toISOString()
                 }, {
-                    onConflict: 'user_session_id,phase_id'
+                    onConflict: 'user_id,phase_id'
                 });
-            
             if (error) throw error;
         } catch (error) {
             console.error('Error saving week state to Supabase:', error);
-            // Fallback to localStorage
             localStorage.setItem(weekId, isCollapsed);
         }
     }
@@ -3621,30 +3614,24 @@
     // Load week state from Supabase
     async function loadWeekState(weekId) {
         if (!supabaseClient) {
-            // Fallback to localStorage if Supabase isn't available
             return localStorage.getItem(weekId);
         }
-        
         try {
+            const userId = psCurrentUser?.id || USER_SESSION_ID;
             const { data, error } = await supabaseClient
                 .from('phase_states')
                 .select('is_collapsed')
-                .eq('user_session_id', USER_SESSION_ID)
+                .eq('user_id', userId)
                 .eq('phase_id', weekId)
                 .single();
             
             if (error) {
-                if (error.code === 'PGRST116') {
-                    // No record found, return null (will default to collapsed)
-                    return null;
-                }
+                if (error.code === 'PGRST116') return null;
                 throw error;
             }
-            
             return data.is_collapsed.toString();
         } catch (error) {
             console.error('Error loading week state from Supabase:', error);
-            // Fallback to localStorage
             return localStorage.getItem(weekId);
         }
     }
