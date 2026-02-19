@@ -1213,6 +1213,27 @@
                 padding: 0.4rem 0.6rem;
                 font-size: 0.8rem;
             }
+
+            /* Prevent edit-mode buttons from overflowing on small screens */
+            .workout-item {
+                padding: 0.4rem;
+                gap: 0.4rem;
+            }
+            .workout-desc[contenteditable="true"],
+            .workout-dist[contenteditable="true"] {
+                font-size: 0.85rem;
+                padding: 2px 4px;
+            }
+            .key-toggle-btn, .delete-workout-btn {
+                padding: 2px 5px;
+                font-size: 0.75rem;
+            }
+            .miss-btn-wrap, .check-wrap {
+                font-size: 0.7rem;
+            }
+            .miss-btn-wrap span, .check-wrap span {
+                display: none; /* hide "Miss" / "Done" text labels on very small screens */
+            }
         }
         /* Today Highlight - Only Border */
         .today-highlight {
@@ -1270,17 +1291,27 @@
             background: rgba(255,255,255,0.6);
             border-left: 3px solid #ccc;
             transition: all 0.25s ease;
+            flex-wrap: wrap;
+            overflow: hidden;
         }
         .workout-item.run      { border-left-color: var(--mountain-blue); }
         .workout-item.bike     { border-left-color: var(--peak-gold); }
         .workout-item.swim     { border-left-color: var(--success); }
         .workout-item.rest,
-        .workout-item.mobility { border-left-color: #a78bfa; }
+        .workout-item.mobility { border-left-color: rgba(101, 174, 120, 0.6); background: rgba(134,197,152,0.12); }
         .workout-item.key-item { border-left-color: #0284c7; background: rgba(14,165,233,0.08); }
 
-        .workout-icon   { font-size: 1.1rem; min-width: 22px; text-align:center; }
-        .workout-desc   { flex: 1; font-size: 0.9rem; font-weight:600; color:var(--text); }
-        .workout-dist   { font-size: 0.85rem; font-weight:700; color:var(--accent); min-width:50px; text-align:right; }
+        /* Rest day row — soft sage green, no miss/done controls */
+        .day-row.rest-day {
+            background: linear-gradient(135deg, rgba(134, 197, 152, 0.18) 0%, rgba(101, 174, 120, 0.13) 100%);
+            border-left: 3px solid rgba(101, 174, 120, 0.5);
+        }
+        .day-row.rest-day .miss-btn-wrap,
+        .day-row.rest-day .check-wrap { display: none !important; }
+
+        .workout-icon   { font-size: 1.1rem; min-width: 22px; text-align:center; flex-shrink: 0; }
+        .workout-desc   { flex: 1; min-width: 0; font-size: 0.9rem; font-weight:600; color:var(--text); overflow-wrap: break-word; word-break: break-word; }
+        .workout-dist   { font-size: 0.85rem; font-weight:700; color:var(--accent); min-width:50px; text-align:right; flex-shrink: 0; }
 
         .miss-btn-wrap, .check-wrap {
             display: flex; align-items:center; gap:0.35rem;
@@ -1640,6 +1671,10 @@ function renderDay(day) {
 
     // CSS type classes (rest-day, long-run, etc from original)
     (day.cssClasses || []).forEach(c => row.classList.add(c));
+
+    // Auto-detect rest day: all workouts are rest/mobility type
+    const allRest = (day.workouts || []).length > 0 && (day.workouts || []).every(w => w.type === 'rest' || w.type === 'mobility');
+    if (allRest) row.classList.add('rest-day');
 
     // Day header
     const dayHdr = document.createElement('div');
@@ -2069,36 +2104,31 @@ function updateOverviewStats() {
     const ulr = document.getElementById('upcomingLongRun');
     if (ulr) ulr.textContent = longRun || '--';
 
-    // Next key workout — include today and future, skip already-completed key workouts
-    let nextKey = 'TBD';
-    for (const row of document.querySelectorAll('.day-row')) {
-        const d = row.getAttribute('data-date');
-        if (!d || d < todayStr) continue; // strictly past only — today included
-        const descs = row.querySelectorAll('.workout-desc');
-        for (const desc of descs) {
-            if (desc.textContent.includes('🗝️')) {
-                // Skip if this specific workout is already completed
-                const item = desc.closest('.workout-item');
-                const cb = item?.querySelector('.checkbox');
-                if (cb && cb.checked) continue;
-                const dayName = row.querySelector('.day-name')?.textContent||'';
-                const dayDate = row.querySelector('.day-date')?.textContent||'';
-                let name = desc.textContent.replace(/[✏️🗝️]/g,'').trim();
-                if (name.length>45) name=name.slice(0,42)+'...';
-                nextKey = dayName+' '+dayDate+':\n'+name;
-                break;
+    // Next key workout — scan trainingData directly (reliable, not DOM-dependent)
+    let nkDay = null, nkWorkout = null;
+    outer: for (const phase of (trainingData?.phases || [])) {
+        for (const week of (phase.weeks || [])) {
+            for (const day of (week.days || [])) {
+                if (!day.date || day.date < todayStr) continue;
+                const isKeyDay = (day.cssClasses || []).includes('key-workout');
+                for (const w of (day.workouts || [])) {
+                    const isKey = isKeyDay || (w.desc && w.desc.includes('🗝️'));
+                    if (isKey && w.type !== 'rest' && !w.completed) {
+                        nkDay = day; nkWorkout = w;
+                        break outer;
+                    }
+                }
             }
         }
-        if (nextKey!=='TBD') break;
     }
     const nk = document.getElementById('nextKeyWorkout');
     if (nk) {
-        if (nextKey === 'TBD') {
+        if (!nkDay) {
             nk.innerHTML = 'TBD';
         } else {
-            // nextKey has format "DAY DATE:\nworkout name"
-            const parts = nextKey.split('\n');
-            nk.innerHTML = `<span style="font-size:0.75em;font-weight:600;display:block;margin-bottom:2px">${parts[0]}</span><span style="font-size:0.85em">${parts[1]||''}</span>`;
+            let name = (nkWorkout.desc || '').replace(/🗝️/g,'').trim();
+            if (name.length > 50) name = name.slice(0, 47) + '…';
+            nk.innerHTML = `<span style="font-size:0.75em;font-weight:600;display:block;margin-bottom:2px">${nkDay.dayName} ${nkDay.dayDate}</span><span style="font-size:0.85em">${name}</span>`;
         }
     }
 }

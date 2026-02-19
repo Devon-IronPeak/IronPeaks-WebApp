@@ -1262,6 +1262,12 @@
             item.className = `workout-item ${workout.type || 'run'}`;
 
             const timePrefix = workout.time ? `<span class="workout-time">${workout.time}:</span> ` : '';
+            // Strip any accumulated time prefix from desc (in case it was saved with it baked in)
+            let cleanDesc = (workout.desc || '').replace(/^(\d{1,2}(?::\d{2})?(?:am|pm):\s*)+/gi, '');
+            if (workout.time) {
+                const escapedTime = workout.time.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                cleanDesc = cleanDesc.replace(new RegExp('^(' + escapedTime + ':\\s*)+', 'gi'), '');
+            }
             const isChecked  = workout.completed ? 'checked' : '';
             const isMissedClass = workout.missed ? 'active' : '';
             const distVal = workout.distance || '';
@@ -1271,7 +1277,7 @@
                 <span class="workout-icon">${workout.icon || '🏃'}</span>
                 <div class="workout-details">
                     <div class="workout-type">${workout.type || 'run'}</div>
-                    <div class="workout-description"${hasId ? ` data-workout-id="w${weekNum}d${dayIndex}w${workoutIdx}"` : ''}>${timePrefix}${workout.desc || ''}</div>
+                    <div class="workout-description"${hasId ? ` data-workout-id="w${weekNum}d${dayIndex}w${workoutIdx}"` : ''}>${timePrefix}${cleanDesc}</div>
                     <div class="workout-distance">${distVal}</div>
                 </div>
                 <div class="miss-btn-wrapper">
@@ -2097,10 +2103,20 @@
                             const ep = existId?.match(/w(\d+)d(\d+)w(\d+)/);
                             const existing = ep ? weekData.days[dayIdx].workouts[parseInt(ep[3])] : null;
 
+                            // Strip rendered time prefix from desc (it's stored separately in workout.time)
+                            let rawDesc = descEl?.textContent.trim() || '';
+                            // Remove leading "HH:MMam/pm: " or "6pm: " patterns that got baked in
+                            if (existing?.time) {
+                                const escapedTime = existing.time.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                rawDesc = rawDesc.replace(new RegExp('^(' + escapedTime + ':\\s*)+'), '');
+                            }
+                            // Also strip any generic time pattern at the start (e.g. "6am: ", "6:30pm: ")
+                            rawDesc = rawDesc.replace(/^(\d{1,2}(?::\d{2})?(?:am|pm):\s*)+/i, '');
+
                             newWorkouts.push({
                                 type,
                                 icon: existing?.icon || typeIcons[type] || '🏃',
-                                desc: descEl?.textContent.trim() || '',
+                                desc: rawDesc,
                                 distance: distEl?.textContent.trim() || '',
                                 time: existing?.time || '',
                                 completed: checkbox?.checked || false,
