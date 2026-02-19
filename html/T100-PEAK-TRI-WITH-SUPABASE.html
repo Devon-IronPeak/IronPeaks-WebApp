@@ -1117,337 +1117,14 @@
         // TRAINING PLAN DATA — hardcoded seed / fallback
         // =====================================================
         // Complete 13-week training plan data
-        let trainingData = [
-            // WEEK 1
-            {
-                week: 1,
-                phase: "Post-Marathon Transition",
-                phaseIcon: "🟢",
-                startDate: "2026-05-18",
-                totals: { swim: "3.0km", bike: "2.5hrs", run: "35min" },
-                days: [
-                    { day: "MON", date: "May 18", workouts: [{ type: "rest", icon: "💤", desc: "OFF / Mobility" }] },
-                    { day: "TUE", date: "May 19", workouts: [{ type: "bike", icon: "🚴", time: "6pm", desc: "60min Z1-Z2" }] },
-                    { day: "WED", date: "May 20", workouts: [{ type: "swim", icon: "🏊", time: "6am", desc: "1500m easy" }] },
-                    { day: "THU", date: "May 21", workouts: [{ type: "swim", icon: "🏊", time: "6am", desc: "1500m drills" }] },
-                    { day: "FRI", date: "May 22", workouts: [{ type: "rest", icon: "🚶", desc: "Walk or mobility" }] },
-                    { day: "SAT", date: "May 23", workouts: [{ type: "bike", icon: "🚴", desc: "90min Z2" }] },
-                    { day: "SUN", date: "May 24", workouts: [{ type: "run", icon: "🏃", desc: "35min easy soft surface" }] }
-                ]
-            },
-            // WEEK 2
-            {
-                week: 2,
-                phase: "Post-Marathon Transition",
-                phaseIcon: "🟢",
-                startDate: "2026-05-25",
-                totals: { swim: "3.6km", bike: "3.5hrs", run: "1hr" },
-                days: [
-                    { day: "MON", date: "May 25", workouts: [{ type: "strength", icon: "💪", time: "6pm", desc: "Weights light + core" }] },
-                    { day: "TUE", date: "May 26", workouts: [
-                        { type: "swim", icon: "🏊", time: "6am", desc: "1800m" },
-                        { type: "bike", icon: "🚴", time: "6pm", desc: "3×8min SS" }
-                    ]},
-                    { day: "WED", date: "May 27", workouts: [{ type: "run", icon: "🏃", desc: "45min Z2" }] },
-                    { day: "THU", date: "May 28", workouts: [{ type: "run", icon: "🏃", time: "6am", desc: "Track 4×800 controlled" }] },
-                    { day: "FRI", date: "May 29", workouts: [{ type: "swim", icon: "🏊", time: "6am", desc: "1800m drills" }] },
-                    { day: "SAT", date: "May 30", workouts: [{ type: "bike", icon: "🚴", desc: "2hr Z2" }] },
-                    { day: "SUN", date: "May 31", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 90min + Run 20min" }] }
-                ]
-            },
-            // WEEK 3
-            {
-                week: 3,
-                phase: "Engine Build",
-                phaseIcon: "🔵",
-                startDate: "2026-06-01",
-                totals: { swim: "6.5km", bike: "3.7hrs", run: "2hr" },
-                days: [
-                    { day: "MON", date: "Jun 1", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2000m" },
-                        { type: "strength", icon: "💪", desc: "Weights" }
-                    ]},
-                    { day: "TUE", date: "Jun 2", workouts: [
-                        { type: "run", icon: "🏃", time: "AM", desc: "30min easy" },
-                        { type: "bike", icon: "🚴", time: "PM", desc: "4×10min SS" }
-                    ]},
-                    { day: "WED", date: "Jun 3", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2500m" },
-                        { type: "run", icon: "🏃", desc: "50min" }
-                    ]},
-                    { day: "THU", date: "Jun 4", workouts: [
-                        { type: "run", icon: "🏃", time: "AM", desc: "Track 5×800" },
-                        { type: "bike", icon: "🚴", time: "PM", desc: "45min easy" }
-                    ]},
-                    { day: "FRI", date: "Jun 5", workouts: [{ type: "swim", icon: "🏊", desc: "2000m drills" }] },
-                    { day: "SAT", date: "Jun 6", workouts: [{ type: "bike", icon: "🚴", desc: "2.5hr" }] },
-                    { day: "SUN", date: "Jun 7", workouts: [{ type: "run", icon: "🏃", desc: "75min" }] }
-                ]
-            },
-            // WEEK 4
-            {
-                week: 4,
-                phase: "Engine Build",
-                phaseIcon: "🔵",
-                startDate: "2026-06-08",
-                totals: { swim: "6.8km", bike: "5hrs", run: "1.5hr" },
-                days: [
-                    { day: "MON", date: "Jun 8", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2000m" },
-                        { type: "strength", icon: "💪", desc: "Weights" }
-                    ]},
-                    { day: "TUE", date: "Jun 9", workouts: [
-                        { type: "run", icon: "🏃", desc: "30min" },
-                        { type: "bike", icon: "🚴", desc: "3×15min SS" }
-                    ]},
-                    { day: "WED", date: "Jun 10", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2600m" },
-                        { type: "run", icon: "🏃", desc: "55min" }
-                    ]},
-                    { day: "THU", date: "Jun 11", workouts: [
-                        { type: "run", icon: "🏃", desc: "Track 3×1600" },
-                        { type: "brick", icon: "🧱", desc: "Brick 10min" }
-                    ]},
-                    { day: "FRI", date: "Jun 12", workouts: [{ type: "swim", icon: "🏊", desc: "2200m speed" }] },
-                    { day: "SAT", date: "Jun 13", workouts: [{ type: "bike", icon: "🚴", desc: "3hr" }] },
-                    { day: "SUN", date: "Jun 14", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 2hr + Run 30min" }] }
-                ]
-            },
-            // WEEK 5
-            {
-                week: 5,
-                phase: "Engine Build",
-                phaseIcon: "🔵",
-                startDate: "2026-06-15",
-                totals: { swim: "7.0km", bike: "5hrs", run: "2.5hr" },
-                days: [
-                    { day: "MON", date: "Jun 15", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2200m" },
-                        { type: "strength", icon: "💪", desc: "Weights" }
-                    ]},
-                    { day: "TUE", date: "Jun 16", workouts: [{ type: "bike", icon: "🚴", desc: "2×20min SS" }] },
-                    { day: "WED", date: "Jun 17", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2800m" },
-                        { type: "run", icon: "🏃", desc: "60min" }
-                    ]},
-                    { day: "THU", date: "Jun 18", workouts: [
-                        { type: "run", icon: "🏃", desc: "Track 6×800" },
-                        { type: "bike", icon: "🚴", desc: "60min" }
-                    ]},
-                    { day: "FRI", date: "Jun 19", workouts: [{ type: "swim", icon: "🏊", desc: "2000m drills" }] },
-                    { day: "SAT", date: "Jun 20", workouts: [{ type: "bike", icon: "🚴", desc: "3hr steady" }] },
-                    { day: "SUN", date: "Jun 21", workouts: [{ type: "run", icon: "🏃", desc: "90min" }] }
-                ]
-            },
-            // WEEK 6 (Recovery)
-            {
-                week: 6,
-                phase: "Engine Build",
-                phaseIcon: "🔵",
-                startDate: "2026-06-22",
-                totals: { swim: "5.8km", bike: "3hrs", run: "1.9hr" },
-                days: [
-                    { day: "MON", date: "Jun 22", workouts: [
-                        { type: "swim", icon: "🏊", desc: "1800m" },
-                        { type: "strength", icon: "💪", desc: "Light weights" }
-                    ]},
-                    { day: "TUE", date: "Jun 23", workouts: [{ type: "bike", icon: "🚴", desc: "60min aerobic" }] },
-                    { day: "WED", date: "Jun 24", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2200m" },
-                        { type: "run", icon: "🏃", desc: "45min" }
-                    ]},
-                    { day: "THU", date: "Jun 25", workouts: [{ type: "run", icon: "🏃", desc: "Track 4×800 easy" }] },
-                    { day: "FRI", date: "Jun 26", workouts: [{ type: "swim", icon: "🏊", desc: "1800m" }] },
-                    { day: "SAT", date: "Jun 27", workouts: [{ type: "bike", icon: "🚴", desc: "2hr" }] },
-                    { day: "SUN", date: "Jun 28", workouts: [{ type: "run", icon: "🏃", desc: "70min" }] }
-                ]
-            },
-            // WEEK 7
-            {
-                week: 7,
-                phase: "Peak Build",
-                phaseIcon: "🟣",
-                startDate: "2026-06-29",
-                totals: { swim: "7.6km", bike: "5.5hrs", run: "1.9hr" },
-                days: [
-                    { day: "MON", date: "Jun 29", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2200m" },
-                        { type: "strength", icon: "💪", desc: "Heavy weights" }
-                    ]},
-                    { day: "TUE", date: "Jun 30", workouts: [
-                        { type: "run", icon: "🏃", desc: "30min" },
-                        { type: "bike", icon: "🚴", desc: "3×15min SS" }
-                    ]},
-                    { day: "WED", date: "Jul 1", workouts: [
-                        { type: "swim", icon: "🏊", desc: "3000m" },
-                        { type: "run", icon: "🏃", desc: "60min" }
-                    ]},
-                    { day: "THU", date: "Jul 2", workouts: [
-                        { type: "run", icon: "🏃", desc: "Track 4×1600" },
-                        { type: "brick", icon: "🧱", desc: "Brick 15min" }
-                    ]},
-                    { day: "FRI", date: "Jul 3", workouts: [{ type: "swim", icon: "🏊", desc: "2400m speed" }] },
-                    { day: "SAT", date: "Jul 4", workouts: [{ type: "bike", icon: "🚴", desc: "3.5hr" }] },
-                    { day: "SUN", date: "Jul 5", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 2hr + Run 35min" }] }
-                ]
-            },
-            // WEEK 8
-            {
-                week: 8,
-                phase: "Peak Build",
-                phaseIcon: "🟣",
-                startDate: "2026-07-06",
-                totals: { swim: "7.2km", bike: "6.5hrs", run: "2.5hr" },
-                days: [
-                    { day: "MON", date: "Jul 6", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2000m" },
-                        { type: "strength", icon: "💪", desc: "Weights" }
-                    ]},
-                    { day: "TUE", date: "Jul 7", workouts: [{ type: "bike", icon: "🚴", desc: "2×25min SS" }] },
-                    { day: "WED", date: "Jul 8", workouts: [
-                        { type: "swim", icon: "🏊", desc: "3200m" },
-                        { type: "run", icon: "🏃", desc: "65min" }
-                    ]},
-                    { day: "THU", date: "Jul 9", workouts: [
-                        { type: "run", icon: "🏃", desc: "Tempo 8km" },
-                        { type: "bike", icon: "🚴", desc: "45min" }
-                    ]},
-                    { day: "FRI", date: "Jul 10", workouts: [{ type: "swim", icon: "🏊", desc: "2000m drills" }] },
-                    { day: "SAT", date: "Jul 11", workouts: [{ type: "bike", icon: "🚴", desc: "3.5hr w/ 2×30min RP" }] },
-                    { day: "SUN", date: "Jul 12", workouts: [{ type: "run", icon: "🏃", desc: "1h45" }] }
-                ]
-            },
-            // WEEK 9
-            {
-                week: 9,
-                phase: "Peak Build",
-                phaseIcon: "🟣",
-                startDate: "2026-07-13",
-                totals: { swim: "7.6km", bike: "6.5hrs", run: "2.1hr" },
-                days: [
-                    { day: "MON", date: "Jul 13", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2200m" },
-                        { type: "strength", icon: "💪", desc: "Weights" }
-                    ]},
-                    { day: "TUE", date: "Jul 14", workouts: [
-                        { type: "run", icon: "🏃", desc: "25min" },
-                        { type: "bike", icon: "🚴", desc: "75min RP continuous" }
-                    ]},
-                    { day: "WED", date: "Jul 15", workouts: [
-                        { type: "swim", icon: "🏊", desc: "3000m" },
-                        { type: "run", icon: "🏃", desc: "60min" }
-                    ]},
-                    { day: "THU", date: "Jul 16", workouts: [
-                        { type: "run", icon: "🏃", desc: "Track 6×800" },
-                        { type: "brick", icon: "🧱", desc: "Brick 20min" }
-                    ]},
-                    { day: "FRI", date: "Jul 17", workouts: [{ type: "swim", icon: "🏊", desc: "2400m" }] },
-                    { day: "SAT", date: "Jul 18", workouts: [{ type: "bike", icon: "🚴", desc: "4hr" }] },
-                    { day: "SUN", date: "Jul 19", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 90min + Run 40min" }] }
-                ]
-            },
-            // WEEK 10 (Big Simulation)
-            {
-                week: 10,
-                phase: "Peak Build",
-                phaseIcon: "🟣",
-                startDate: "2026-07-20",
-                totals: { swim: "7.2km", bike: "4.5hrs", run: "3hr" },
-                days: [
-                    { day: "MON", date: "Jul 20", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2000m" },
-                        { type: "strength", icon: "💪", desc: "Weights" }
-                    ]},
-                    { day: "TUE", date: "Jul 21", workouts: [{ type: "bike", icon: "🚴", desc: "80min RP continuous" }] },
-                    { day: "WED", date: "Jul 22", workouts: [
-                        { type: "swim", icon: "🏊", desc: "3200m" },
-                        { type: "run", icon: "🏃", desc: "60min" }
-                    ]},
-                    { day: "THU", date: "Jul 23", workouts: [
-                        { type: "run", icon: "🏃", desc: "Tempo 10km" },
-                        { type: "bike", icon: "🚴", desc: "45min" }
-                    ]},
-                    { day: "FRI", date: "Jul 24", workouts: [{ type: "swim", icon: "🏊", desc: "2000m drills" }] },
-                    { day: "SAT", date: "Jul 25", workouts: [{ type: "brick", icon: "🧱", desc: "SIMULATION: Bike 60km RP + Run 12km" }] },
-                    { day: "SUN", date: "Jul 26", workouts: [{ type: "run", icon: "🏃", desc: "75min recovery" }] }
-                ]
-            },
-            // WEEK 11
-            {
-                week: 11,
-                phase: "Sharpen",
-                phaseIcon: "🟠",
-                startDate: "2026-07-27",
-                totals: { swim: "6.5km", bike: "5.5hrs", run: "2hr" },
-                days: [
-                    { day: "MON", date: "Jul 27", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2000m" },
-                        { type: "strength", icon: "💪", desc: "Moderate weights" }
-                    ]},
-                    { day: "TUE", date: "Jul 28", workouts: [{ type: "bike", icon: "🚴", desc: "3×12min RP" }] },
-                    { day: "WED", date: "Jul 29", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2500m" },
-                        { type: "run", icon: "🏃", desc: "50min" }
-                    ]},
-                    { day: "THU", date: "Jul 30", workouts: [{ type: "run", icon: "🏃", desc: "Track 5×800" }] },
-                    { day: "FRI", date: "Jul 31", workouts: [{ type: "swim", icon: "🏊", desc: "2000m speed" }] },
-                    { day: "SAT", date: "Aug 1", workouts: [{ type: "bike", icon: "🚴", desc: "3hr w/ race fueling" }] },
-                    { day: "SUN", date: "Aug 2", workouts: [{ type: "run", icon: "🏃", desc: "75min" }] }
-                ]
-            },
-            // WEEK 12
-            {
-                week: 12,
-                phase: "Sharpen",
-                phaseIcon: "🟠",
-                startDate: "2026-08-03",
-                totals: { swim: "5.5km", bike: "4hrs", run: "1.9hr" },
-                days: [
-                    { day: "MON", date: "Aug 3", workouts: [
-                        { type: "swim", icon: "🏊", desc: "1800m" },
-                        { type: "strength", icon: "💪", desc: "Light weights" }
-                    ]},
-                    { day: "TUE", date: "Aug 4", workouts: [{ type: "bike", icon: "🚴", desc: "60min RP" }] },
-                    { day: "WED", date: "Aug 5", workouts: [
-                        { type: "swim", icon: "🏊", desc: "2200m" },
-                        { type: "run", icon: "🏃", desc: "45min" }
-                    ]},
-                    { day: "THU", date: "Aug 6", workouts: [{ type: "run", icon: "🏃", desc: "Track 4×800 sharp" }] },
-                    { day: "FRI", date: "Aug 7", workouts: [{ type: "swim", icon: "🏊", desc: "1500m easy" }] },
-                    { day: "SAT", date: "Aug 8", workouts: [{ type: "brick", icon: "🧱", desc: "Bike 90min + Run 25min" }] },
-                    { day: "SUN", date: "Aug 9", workouts: [{ type: "run", icon: "🏃", desc: "60min easy" }] }
-                ]
-            },
-            // WEEK 13 (Race Week)
-            {
-                week: 13,
-                phase: "Race Week",
-                phaseIcon: "🔴",
-                startDate: "2026-08-10",
-                totals: { swim: "2.7km", bike: "1.5hrs", run: "1hr" },
-                days: [
-                    { day: "MON", date: "Aug 10", workouts: [{ type: "swim", icon: "🏊", desc: "1500m easy" }] },
-                    { day: "TUE", date: "Aug 11", workouts: [{ type: "bike", icon: "🚴", desc: "45min w/ 2×5min RP" }] },
-                    { day: "WED", date: "Aug 12", workouts: [{ type: "run", icon: "🏃", desc: "40min w/ 3×5min tempo" }] },
-                    { day: "THU", date: "Aug 13", workouts: [
-                        { type: "swim", icon: "🏊", desc: "1200m" },
-                        { type: "run", icon: "🏃", desc: "Strides" }
-                    ]},
-                    { day: "FRI", date: "Aug 14", workouts: [{ type: "rest", icon: "💤", desc: "OFF or 20min spin" }] },
-                    { day: "SAT", date: "Aug 15", workouts: [
-                        { type: "swim", icon: "🏊", desc: "15min" },
-                        { type: "bike", icon: "🚴", desc: "15min" },
-                        { type: "run", icon: "🏃", desc: "10min jog" }
-                    ]},
-                    { day: "SUN", date: "Aug 16", workouts: [{ type: "race", icon: "🏆", desc: "T100 RACE DAY!" }] }
-                ]
-            }
-        ];
+        // trainingData starts empty — loaded from Supabase → cached in localStorage
+        // To seed the database, run SEED-PLAN-DATA.sql in Supabase SQL Editor (one time only)
+        let trainingData = [];
 
         // Deep-clone the hardcoded data as the canonical seed.
         // Used to seed an empty/missing DB record on first load.
-        const SEED_TRAINING_DATA = JSON.parse(JSON.stringify(trainingData));
-
+        const SEED_TRAINING_DATA = null; // No hardcoded seed — data lives in DB only
+                totals: { swim: "7.2km", bike: "6.5hrs", run: "2.5hr" },
         // Initialize the plan
         function initializePlan() {
             const container = document.getElementById('training-plan');
@@ -1851,8 +1528,8 @@
 
         // =====================================================
         // SUPABASE AUTHENTICATION & DATA LOADING
-        // Cache-first: render from localStorage immediately,
-        // then sync from Supabase in the background.
+        // Phase 1: render from localStorage cache instantly
+        // Phase 2: sync from Supabase in background
         // =====================================================
         
         async function checkAuthAndLoadPlan() {
@@ -1868,7 +1545,7 @@
 
             // ── PHASE 2: Background cloud sync ────────────────────
             if (!supabaseClient) {
-                if (!cached) initializePlan(); // no cache, no Supabase → use hardcoded
+                if (!cached) showNoPlanMessage('Supabase not configured. Run SEED-PLAN-DATA.sql to load your plan.');
                 updateSyncBadge('offline');
                 return;
             }
@@ -1886,8 +1563,7 @@
 
                 currentUser = user;
 
-                // Find the best T100 plan for this user:
-                // prefer the one with the most actual workout data (not an empty seed)
+                // Fetch all T100 plans — prefer one with real workout data
                 const { data: records, error: dbError } = await supabaseClient
                     .from('training_plans')
                     .select('*')
@@ -1898,78 +1574,43 @@
                 if (dbError) {
                     console.error('DB fetch error:', dbError.message);
                     updateSyncBadge('error');
-                    if (!cached) initializePlan(); // render hardcoded if nothing was cached
+                    if (!cached) showNoPlanMessage('Database error: ' + dbError.message);
                     return;
                 }
 
                 // Pick the first record that has real data (non-empty array)
                 const planRecord = records?.find(r =>
                     Array.isArray(r.plan_data) && r.plan_data.length > 0
-                ) || records?.[0] || null;
+                ) || null;
 
                 if (planRecord) {
                     currentPlanId = planRecord.id;
-                    const dbData  = planRecord.plan_data;
-                    const hasData = Array.isArray(dbData) && dbData.length > 0;
+                    const dbData = planRecord.plan_data;
+                    normalizeTrainingData(dbData);
+                    trainingData = dbData;
+                    saveToCache(trainingData, currentPlanId);
+                    console.log('✅ Synced from Supabase, planId:', currentPlanId);
+                    initializePlan(); // re-render with fresh cloud data
 
-                    if (hasData) {
-                        // DB has real data — merge it in
-                        normalizeTrainingData(dbData);
-                        trainingData = dbData;
-                        saveToCache(trainingData, currentPlanId);
-                        console.log('✅ Synced from Supabase, planId:', currentPlanId);
-                        initializePlan(); // re-render with cloud data
-                    } else {
-                        // DB plan exists but is EMPTY — seed it with hardcoded data
-                        // (preserves any workout state that was cached locally)
-                        console.warn('⚠️ DB plan is empty. Seeding with hardcoded plan…');
-                        const seed = JSON.parse(JSON.stringify(SEED_TRAINING_DATA));
-                        normalizeTrainingData(seed);
-                        trainingData = seed;
-                        await _pushToSupabase(); // write seed to DB
-                        saveToCache(trainingData, currentPlanId);
-                        if (!cached) initializePlan();
-                    }
-
-                    // If there are duplicate plans, delete the extras quietly
-                    if (records && records.length > 1) {
-                        const idsToDelete = records
-                            .filter(r => r.id !== currentPlanId)
-                            .map(r => r.id);
-                        if (idsToDelete.length) {
-                            await supabaseClient
-                                .from('training_plans')
-                                .delete()
-                                .in('id', idsToDelete)
-                                .eq('user_id', user.id);
-                            console.log(`🧹 Removed ${idsToDelete.length} duplicate plan(s)`);
-                        }
+                    // Clean up any duplicate/empty plans silently
+                    const extras = records.filter(r => r.id !== currentPlanId).map(r => r.id);
+                    if (extras.length) {
+                        await supabaseClient
+                            .from('training_plans')
+                            .delete()
+                            .in('id', extras)
+                            .eq('user_id', user.id);
+                        console.log(`🧹 Removed ${extras.length} duplicate/empty plan(s)`);
                     }
 
                 } else {
-                    // No plan at all in DB — create one with hardcoded data
-                    console.log('No T100 plan in DB. Creating one…');
-                    const seed = JSON.parse(JSON.stringify(SEED_TRAINING_DATA));
-                    normalizeTrainingData(seed);
-                    trainingData = seed;
-
-                    const { data: newRecord, error: insertErr } = await supabaseClient
-                        .from('training_plans')
-                        .insert({
-                            user_id:   user.id,
-                            plan_type: 'T100',
-                            plan_name: 'T100 Race Plan - May to August 2026',
-                            plan_data: trainingData
-                        })
-                        .select()
-                        .single();
-
-                    if (!insertErr && newRecord) {
-                        currentPlanId = newRecord.id;
-                        saveToCache(trainingData, currentPlanId);
-                        console.log('✅ Created fresh T100 plan in DB, id:', currentPlanId);
+                    // No usable plan in DB at all
+                    console.warn('No T100 plan with data found in database.');
+                    if (!cached) {
+                        showNoPlanMessage('No training plan found in database. Please run SEED-PLAN-DATA.sql in Supabase SQL Editor to load your plan.');
                     }
-                    if (!cached) initializePlan();
+                    updateSyncBadge('error');
+                    return;
                 }
 
                 updateSyncBadge('synced');
@@ -1977,8 +1618,28 @@
             } catch (err) {
                 console.error('Auth/load error:', err);
                 updateSyncBadge('error');
-                if (!cached) initializePlan();
+                if (!cached) showNoPlanMessage('Failed to connect: ' + err.message);
             }
+        }
+
+        function showNoPlanMessage(reason) {
+            const container = document.getElementById('training-plan');
+            container.innerHTML = `
+                <div style="text-align:center; padding: 4rem 2rem; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                    <h2 style="font-family:'Orbitron',sans-serif; color: var(--accent-cyan); margin-bottom: 1rem;">No Training Plan Found</h2>
+                    <p style="color: var(--text-dim); margin-bottom: 2rem; max-width: 500px; margin-left:auto; margin-right:auto;">${reason}</p>
+                    <div style="background: rgba(6,182,212,0.1); border: 1px solid var(--accent-cyan); border-radius: 12px; padding: 1.5rem; text-align:left; max-width: 500px; margin: 0 auto;">
+                        <p style="font-family:'Orbitron',sans-serif; font-size:0.85rem; color:var(--accent-cyan); margin-bottom:0.75rem;">SETUP STEPS:</p>
+                        <ol style="color: var(--text-dim); font-size:0.9rem; padding-left: 1.5rem; line-height: 2;">
+                            <li>Open <strong style="color:white">Supabase SQL Editor</strong></li>
+                            <li>Run <code style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">FIX-DATABASE.sql</code></li>
+                            <li>Run <code style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">SEED-PLAN-DATA.sql</code></li>
+                            <li>Refresh this page</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
         }
         
         // =====================================================
@@ -2005,6 +1666,33 @@
             return 0;
         }
 
+        // Parse a workout description and return km (converts hours using avg speeds)
+        function parseAmountKm(str, type) {
+            if (!str) return 0;
+            str = str.toString().trim().toLowerCase();
+            // km explicitly in string — use directly
+            const kmMatch = str.match(/(\d+(?:\.\d+)?)\s*km/);
+            if (kmMatch) return parseFloat(kmMatch[1]);
+            // meters
+            const mMatch = str.match(/(\d+(?:\.\d+)?)\s*m\b/);
+            if (mMatch) return parseFloat(mMatch[1]) / 1000;
+            // hours — convert using average speed (bike: 30 km/h, run: 10 km/h)
+            const hrMatch = str.match(/(\d+(?:\.\d+)?)\s*hr/);
+            if (hrMatch) {
+                const hrs = parseFloat(hrMatch[1]);
+                return type === 'bike' ? hrs * 30 : hrs * 10;
+            }
+            const minMatch = str.match(/(\d+(?:\.\d+)?)\s*min/);
+            if (minMatch) {
+                const mins = parseFloat(minMatch[1]);
+                return type === 'bike' ? (mins / 60) * 30 : (mins / 60) * 10;
+            }
+            // plain number — treat as km
+            const numMatch = str.match(/(\d+(?:\.\d+)?)/);
+            if (numMatch) return parseFloat(numMatch[1]);
+            return 0;
+        }
+
         function formatAmount(val, unit) {
             if (val === 0) return `0 ${unit}`;
             if (unit === 'km') return `${Math.round(val * 10) / 10} km`;
@@ -2014,25 +1702,23 @@
         }
 
         function updateTotals() {
-            // Use stored weekData.totals strings for badges (accurate, from DB)
-            // Re-parse descriptions for the summary section aggregate totals
-            let planSwimKm = 0, planBikeHrs = 0, planRunHrs = 0;
+            // Re-parse descriptions for week badges and summary totals
+            let planSwimKm = 0, planBikeKm = 0, planRunKm = 0;
 
             trainingData.forEach(weekData => {
-                let weekSwimKm = 0, weekBikeHrs = 0, weekRunHrs = 0;
+                let weekSwimKm = 0, weekBikeKm = 0, weekRunKm = 0;
 
                 weekData.days?.forEach(day => {
                     day.workouts?.forEach(w => {
-                        const amt = parseAmount(w.desc);
-                        if (w.type === 'swim')     weekSwimKm  += amt;
-                        else if (w.type === 'bike') weekBikeHrs += amt;
-                        else if (w.type === 'run')  weekRunHrs  += amt;
+                        if (w.type === 'swim')      weekSwimKm  += parseAmount(w.desc);
+                        else if (w.type === 'bike') weekBikeKm  += parseAmountKm(w.desc, 'bike');
+                        else if (w.type === 'run')  weekRunKm   += parseAmountKm(w.desc, 'run');
                     });
                 });
 
-                planSwimKm  += weekSwimKm;
-                planBikeHrs += weekBikeHrs;
-                planRunHrs  += weekRunHrs;
+                planSwimKm += weekSwimKm;
+                planBikeKm += weekBikeKm;
+                planRunKm  += weekRunKm;
 
                 // Update week header badges — locate card by week number in title
                 document.querySelectorAll('.week-title').forEach(el => {
@@ -2043,8 +1729,8 @@
                         const bb = wc.querySelector('.bike-badge');
                         const rb = wc.querySelector('.run-badge');
                         if (sb) sb.textContent = '\uD83C\uDFC4 ' + formatAmount(weekSwimKm, 'km');
-                        if (bb) bb.textContent = '\uD83D\uDEB4 ' + formatAmount(weekBikeHrs, 'hrs');
-                        if (rb) rb.textContent = '\uD83C\uDFC3 ' + formatAmount(weekRunHrs, 'hrs');
+                        if (bb) bb.textContent = '\uD83D\uDEB4 ' + formatAmount(weekBikeKm, 'km');
+                        if (rb) rb.textContent = '\uD83C\uDFC3 ' + formatAmount(weekRunKm,  'km');
                     }
                 });
             });
@@ -2055,9 +1741,9 @@
             const re = document.getElementById('totalRun');
             const te = document.getElementById('totalTime');
             if (se) se.textContent = formatAmount(planSwimKm, 'km');
-            if (be) be.textContent = formatAmount(planBikeHrs, 'hrs');
-            if (re) re.textContent = formatAmount(planRunHrs, 'hrs');
-            if (te) te.textContent = '~' + Math.round(planBikeHrs + planRunHrs + planSwimKm / 2) + ' hrs';
+            if (be) be.textContent = formatAmount(planBikeKm,  'km');
+            if (re) re.textContent = formatAmount(planRunKm,   'km');
+            if (te) te.textContent = '~' + Math.round((planBikeKm / 30) + (planRunKm / 10) + planSwimKm / 2) + ' hrs';
         }
         
         async function toggleWorkoutState(weekIndex, dayIndex, workoutIndex, stateType) {
@@ -2293,18 +1979,45 @@
                 });
 
                 if (!editMode) {
-                    // Scrape edited descriptions back into trainingData
-                    document.querySelectorAll('.workout-description[data-workout-id]').forEach(descEl => {
-                        const idParts = descEl.dataset.workoutId?.match(/w(\d+)d(\d+)w(\d+)/);
-                        if (!idParts) return;
-                        const weekNum = parseInt(idParts[1]);
-                        const dayIdx = parseInt(idParts[2]);
-                        const wIdx = parseInt(idParts[3]);
+                    // Rebuild workouts from DOM — captures both edited AND newly added workouts
+                    const typeIcons = { swim:'🏊', bike:'🚴', run:'🏃', strength:'💪', rest:'😴', brick:'🧱' };
+                    document.querySelectorAll('.day-card[data-day-id]').forEach(dayCard => {
+                        const dayIdParts = dayCard.dataset.dayId?.match(/w(\d+)d(\d+)/);
+                        if (!dayIdParts) return;
+                        const weekNum = parseInt(dayIdParts[1]);
+                        const dayIdx  = parseInt(dayIdParts[2]);
                         const weekData = trainingData.find(w => w.week === weekNum);
-                        if (weekData?.days?.[dayIdx]?.workouts?.[wIdx]) {
-                            weekData.days[dayIdx].workouts[wIdx].desc = descEl.textContent.trim();
-                        }
+                        if (!weekData?.days?.[dayIdx]) return;
+
+                        const workoutItems = dayCard.querySelectorAll('.workout-item');
+                        const newWorkouts = [];
+                        workoutItems.forEach((item, wIdx) => {
+                            // Determine type from className
+                            let type = 'run';
+                            for (const t of ['swim','bike','run','strength','rest','brick']) {
+                                if (item.classList.contains(t)) { type = t; break; }
+                            }
+                            const descEl   = item.querySelector('.workout-description');
+                            const checkbox = item.querySelector('.checkbox');
+                            const missBtn  = item.querySelector('.miss-btn');
+
+                            // Preserve existing workout metadata (icon, time) if available
+                            const existId = descEl?.dataset.workoutId;
+                            const ep = existId?.match(/w(\d+)d(\d+)w(\d+)/);
+                            const existing = ep ? weekData.days[dayIdx].workouts[parseInt(ep[3])] : null;
+
+                            newWorkouts.push({
+                                type,
+                                icon: existing?.icon || typeIcons[type] || '🏃',
+                                desc: descEl?.textContent.trim() || '',
+                                time: existing?.time || '',
+                                completed: checkbox?.checked || false,
+                                missed: missBtn?.classList.contains('active') || false
+                            });
+                        });
+                        weekData.days[dayIdx].workouts = newWorkouts;
                     });
+
                     // Save updated trainingData to Supabase
                     await savePlanToDatabase();
                     updateTotals();
@@ -2384,6 +2097,41 @@
                         newWorkoutItem.remove();
                         refreshDayCardClasses(dayCard);
                     };
+
+                    // Add key/brick toggle buttons (same as existing workouts in edit mode)
+                    const newDesc = newWorkoutItem.querySelector('.workout-description');
+                    const newKeyBtn = document.createElement('button');
+                    newKeyBtn.className = 'key-toggle-btn';
+                    newKeyBtn.textContent = '+ 🗝️';
+                    newKeyBtn.style.cssText = 'margin-left: 8px; padding: 2px 8px; background: rgba(14, 165, 233, 0.2); border: 1px solid var(--tri-swim); border-radius: 4px; cursor: pointer; font-size: 0.85rem;';
+                    newKeyBtn.onclick = (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        if (newDesc.textContent.includes('🗝️')) {
+                            newDesc.textContent = newDesc.textContent.replace('🗝️','').trim();
+                            newKeyBtn.textContent = '+ 🗝️';
+                        } else {
+                            newDesc.textContent = '🗝️ ' + newDesc.textContent;
+                            newKeyBtn.textContent = '🗝️';
+                        }
+                        refreshDayCardClasses(dayCard);
+                    };
+                    const newBrickBtn = document.createElement('button');
+                    newBrickBtn.className = 'brick-toggle-btn';
+                    newBrickBtn.textContent = '+ 🧱';
+                    newBrickBtn.style.cssText = 'margin-left: 4px; padding: 2px 8px; background: rgba(139, 69, 19, 0.2); border: 1px solid #8B4513; border-radius: 4px; cursor: pointer; font-size: 0.85rem;';
+                    newBrickBtn.onclick = (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        if (newDesc.textContent.includes('🧱')) {
+                            newDesc.textContent = newDesc.textContent.replace('🧱','').trim();
+                            newBrickBtn.textContent = '+ 🧱';
+                        } else {
+                            newDesc.textContent = '🧱 ' + newDesc.textContent;
+                            newBrickBtn.textContent = '🧱';
+                        }
+                        refreshDayCardClasses(dayCard);
+                    };
+                    if (!newWorkoutItem.querySelector('.key-toggle-btn'))   newWorkoutItem.appendChild(newKeyBtn);
+                    if (!newWorkoutItem.querySelector('.brick-toggle-btn')) newWorkoutItem.appendChild(newBrickBtn);
 
                     // Focus the description for immediate editing
                     newWorkoutItem.querySelector('.workout-description').focus();
