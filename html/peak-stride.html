@@ -1344,7 +1344,14 @@
         /* ── COMPLETION STATES ── same hues as before ── */
         .day-row.completed  { background:linear-gradient(135deg,#10b981,#059669); color:white; box-shadow:0 4px 12px rgba(16,185,129,.4); }
         .day-row.missed     { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; box-shadow:0 4px 12px rgba(239,68,68,.4); }
-        .day-row.partial    { background:linear-gradient(135deg,#f59e0b,#d97706); color:white; box-shadow:0 4px 12px rgba(245,158,11,.4); }
+        /* partial = T100 style: left gold / right green split */
+        .day-row.partial    {
+            background: linear-gradient(90deg,
+                rgba(245,158,11,0.22) 0%, rgba(245,158,11,0.18) 50%,
+                rgba(16,185,129,0.18) 50%, rgba(16,185,129,0.22) 100%);
+            border-left: 4px solid #f59e0b;
+            border-right: 4px solid #10b981;
+        }
         .day-row.long-run.completed  { background:linear-gradient(135deg,#fbbf24,#f59e0b); }
         .day-row.long-run.missed     { background:linear-gradient(135deg,#5c2e1f,#3d1e14); }
         .day-row.long-run.partial    { background:linear-gradient(135deg,#c27803,#a35f1e); }
@@ -1357,13 +1364,11 @@
         .day-row.completed .workout-dist,.day-row.completed .miss-btn-wrap,.day-row.completed .check-wrap,
         .day-row.missed .day-name,.day-row.missed .day-date,.day-row.missed .workout-desc,
         .day-row.missed .workout-dist,.day-row.missed .miss-btn-wrap,.day-row.missed .check-wrap,
-        .day-row.partial .day-name,.day-row.partial .day-date,.day-row.partial .workout-desc,
-        .day-row.partial .workout-dist,.day-row.partial .miss-btn-wrap,.day-row.partial .check-wrap
-        { color:white !important; }
+        /* partial text stays dark (light background) */
 
         .day-row.completed .workout-item,
-        .day-row.missed    .workout-item,
-        .day-row.partial   .workout-item { background:rgba(255,255,255,0.15); border-left-color:rgba(255,255,255,0.4); }
+        .day-row.missed    .workout-item { background:rgba(255,255,255,0.15); border-left-color:rgba(255,255,255,0.4); }
+        .day-row.partial   .workout-item { background:rgba(255,255,255,0.55); }
 
         /* MISSED watermark */
         .day-row.missed { position:relative; overflow:hidden; }
@@ -1373,13 +1378,7 @@
             color:rgba(255,255,255,.25); font-size:2.5em;
             pointer-events:none; z-index:1; letter-spacing:4px;
         }
-        /* PARTIAL watermark */
-        .day-row.partial::after {
-            content:'PARTIAL'; position:absolute; top:50%; left:50%;
-            transform:translate(-50%,-50%); font-weight:bold;
-            color:rgba(255,255,255,.2); font-size:2em;
-            pointer-events:none; z-index:1; letter-spacing:3px;
-        }
+
         .day-row { position:relative; }
 
         /* ── EDIT MODE ── */
@@ -1480,8 +1479,9 @@
         </div>
       </div>
 
-      <div style="text-align:center;margin-top:2rem">
+      <div style="text-align:center;margin-top:2rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
         <button class="edit-mode-btn" id="editModeBtn">✏️ Edit Workouts</button>
+        <button class="edit-mode-btn" id="exportPlanBtn" style="background:transparent;border:2px solid var(--mountain-blue);color:var(--mountain-blue)">📥 Export Plan</button>
       </div>
     </div>
   </div>
@@ -1800,6 +1800,10 @@ if (editModeBtn) {
 
         if (editMode) {
             this.textContent = '💾 Save Changes';
+            // Expand ALL weeks and phases so add buttons are visible
+            document.querySelectorAll('.week-card.collapsed, .phase-section.collapsed').forEach(el => {
+                el.classList.remove('collapsed');
+            });
             allDescs.forEach(el => {
                 el.contentEditable = 'true';
                 el.style.cursor = 'text';
@@ -2086,12 +2090,13 @@ function updateSummaryStats() {
         const el = wc.querySelector('.week-total');
         const m  = el?.textContent.match(/([\d.]+)/);
         if (m) { const v=parseFloat(m[1]); if (v>peak) peak=v; }
+        // Skip the entire race phase — those are not training runs
+        if (wc.closest('.phase-section.race')) return;
         wc.querySelectorAll('.workout-item').forEach(item => {
             if (item.classList.contains('rest')||item.classList.contains('mobility')) return;
             const dist = item.querySelector('.workout-dist');
             const km   = parseKm(dist?.textContent);
-            // Exclude the race (42.2 km) from longest TRAINING run
-            if (km > longest && km < 42.2) longest = km;
+            if (km > longest) longest = km;
         });
     });
     const pe=document.getElementById('peakMileage');
@@ -2190,6 +2195,18 @@ document.getElementById('logoutBtn')?.addEventListener('click', async e => {
     e.preventDefault();
     if (supabaseClient) await supabaseClient.auth.signOut();
     window.location.href='login.html';
+});
+
+document.getElementById('exportPlanBtn')?.addEventListener('click', () => {
+    if (!trainingData) { alert('Plan not loaded yet.'); return; }
+    const blob = new Blob([JSON.stringify(trainingData, null, 2)], {type:'application/json'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = 'peak-stride-marathon-plan.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
 });
 
 if (document.readyState==='loading')

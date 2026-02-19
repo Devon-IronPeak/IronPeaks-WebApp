@@ -1032,8 +1032,9 @@
         </div>
 
         <!-- EDIT MODE BUTTON -->
-        <div style="text-align: center; margin: 2rem 0;">
+        <div style="text-align: center; margin: 2rem 0; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
             <button class="edit-mode-btn" id="editModeBtn">✏️ Edit Workouts</button>
+            <button class="edit-mode-btn" id="exportPlanBtn" style="background:transparent; border:2px solid var(--accent-cyan); color:var(--accent-cyan);">📥 Export Plan</button>
         </div>
     </div>
 
@@ -1198,6 +1199,16 @@
             const card = document.createElement('div');
             card.className = 'week-card collapsed';
             
+            // Compute badge totals live from descriptions (not stale seed strings)
+            let swimKm = 0, bikeKm = 0, runKm = 0;
+            weekData.days?.forEach(day => {
+                day.workouts?.forEach(w => {
+                    if (w.type === 'swim')      swimKm += parseAmount(w.desc);
+                    else if (w.type === 'bike') bikeKm += parseAmountKm(w.desc, 'bike');
+                    else if (w.type === 'run')  runKm  += parseAmountKm(w.desc, 'run');
+                });
+            });
+
             const header = document.createElement('div');
             header.className = 'week-header';
             header.innerHTML = `
@@ -1206,9 +1217,9 @@
                     <div class="week-compliance"></div>
                 </div>
                 <div class="week-totals">
-                    <span class="week-total-badge swim-badge">🏊 ${weekData.totals.swim}</span>
-                    <span class="week-total-badge bike-badge">🚴 ${weekData.totals.bike}</span>
-                    <span class="week-total-badge run-badge">🏃 ${weekData.totals.run}</span>
+                    <span class="week-total-badge swim-badge">🏊 ${formatAmount(swimKm,'km')}</span>
+                    <span class="week-total-badge bike-badge">🚴 ${formatAmount(bikeKm,'km')}</span>
+                    <span class="week-total-badge run-badge">🏃 ${formatAmount(runKm,'km')}</span>
                 </div>
                 <span class="collapse-indicator">▼</span>
             `;
@@ -1820,6 +1831,19 @@
         document.addEventListener('DOMContentLoaded', checkAuthAndLoadPlan);
         scheduleMidnightRefresh();
 
+        // Export Plan
+        document.getElementById('exportPlanBtn')?.addEventListener('click', () => {
+            if (!trainingData || !trainingData.length) { alert('Plan not loaded yet.'); return; }
+            const blob = new Blob([JSON.stringify(trainingData, null, 2)], {type:'application/json'});
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href = url;
+            a.download = 't100-triathlon-plan.json';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+        });
+
         // Edit Mode Functionality
         const editModeBtn = document.getElementById('editModeBtn');
         let editMode = false;
@@ -2073,13 +2097,14 @@
 
                     const newWorkoutItem = document.createElement('div');
                     newWorkoutItem.className = `workout-item ${chosenType}`;
+                    // Placeholder description with typical unit hint
+                    const distHint = chosenType === 'swim' ? 'e.g. 2km easy' : chosenType === 'bike' ? 'e.g. 40km Z2 ride' : chosenType === 'run' ? 'e.g. 10km easy' : chosenType === 'strength' ? 'e.g. 45min strength' : 'Rest';
                     newWorkoutItem.innerHTML = `
                         <span class="workout-icon">${icon}</span>
                         <div class="workout-details">
                             <div class="workout-type">${chosenType}</div>
-                            <div class="workout-description" contenteditable="true" style="cursor: text; border: 1px dashed var(--accent-cyan); padding: 4px; border-radius: 4px;">New ${types[chosenType].label} workout</div>
+                            <div class="workout-description" contenteditable="true" style="cursor: text; border: 1px dashed var(--accent-cyan); padding: 4px; border-radius: 4px;">${distHint}</div>
                         </div>
-                        <button class="delete-workout-btn" style="padding: 4px 8px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; font-size: 1rem;">🗑️</button>
                         <div class="miss-btn-wrapper">
                             <div class="miss-btn">✗</div>
                             <span class="miss-label">Miss</span>
@@ -2092,13 +2117,9 @@
 
                     workoutsContainer.insertBefore(newWorkoutItem, addBtn);
 
-                    newWorkoutItem.querySelector('.delete-workout-btn').onclick = () => {
-                        newWorkoutItem.remove();
-                        refreshDayCardClasses(dayCard);
-                    };
-
-                    // Add key/brick toggle buttons (same as existing workouts in edit mode)
+                    // Add buttons in order: 🗝️ Key, 🧱 Brick, 🗑️ Delete
                     const newDesc = newWorkoutItem.querySelector('.workout-description');
+
                     const newKeyBtn = document.createElement('button');
                     newKeyBtn.className = 'key-toggle-btn';
                     newKeyBtn.textContent = '+ 🗝️';
@@ -2114,6 +2135,7 @@
                         }
                         refreshDayCardClasses(dayCard);
                     };
+
                     const newBrickBtn = document.createElement('button');
                     newBrickBtn.className = 'brick-toggle-btn';
                     newBrickBtn.textContent = '+ 🧱';
@@ -2129,8 +2151,17 @@
                         }
                         refreshDayCardClasses(dayCard);
                     };
-                    if (!newWorkoutItem.querySelector('.key-toggle-btn'))   newWorkoutItem.appendChild(newKeyBtn);
-                    if (!newWorkoutItem.querySelector('.brick-toggle-btn')) newWorkoutItem.appendChild(newBrickBtn);
+
+                    const newDelBtn = document.createElement('button');
+                    newDelBtn.className = 'delete-workout-btn';
+                    newDelBtn.textContent = '🗑️';
+                    newDelBtn.style.cssText = 'padding: 4px 8px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; font-size: 1rem;';
+                    newDelBtn.onclick = () => { newWorkoutItem.remove(); refreshDayCardClasses(dayCard); };
+
+                    // Append in order: Key, Brick, Delete
+                    newWorkoutItem.appendChild(newKeyBtn);
+                    newWorkoutItem.appendChild(newBrickBtn);
+                    newWorkoutItem.appendChild(newDelBtn);
 
                     // Focus the description for immediate editing
                     newWorkoutItem.querySelector('.workout-description').focus();
