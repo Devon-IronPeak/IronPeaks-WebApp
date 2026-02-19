@@ -1537,11 +1537,16 @@
             const workoutsContainer = document.createElement('div');
             workoutsContainer.className = 'workouts-container';
             
+            // Find the week index in trainingData for handleWorkoutToggle
+            const weekIndex = trainingData.findIndex(w => w.week === weekNum);
+            
             dayData.workouts.forEach((workout, workoutIdx) => {
                 const workoutItem = document.createElement('div');
                 workoutItem.className = `workout-item ${workout.type}`;
                 
                 const timePrefix = workout.time ? `<span class="workout-time">${workout.time}:</span> ` : '';
+                const isChecked = workout.completed ? 'checked' : '';
+                const isMissedClass = workout.missed ? 'active' : '';
                 
                 workoutItem.innerHTML = `
                     <span class="workout-icon">${workout.icon}</span>
@@ -1550,11 +1555,11 @@
                         <div class="workout-description" data-workout-id="w${weekNum}d${dayIndex}w${workoutIdx}">${timePrefix}${workout.desc}</div>
                     </div>
                     <div class="miss-btn-wrapper">
-                        <div class="miss-btn" data-id="w${weekNum}d${dayIndex}w${workoutIdx}-miss">✗</div>
+                        <div class="miss-btn ${isMissedClass}" onclick="handleWorkoutToggle(${weekIndex}, ${dayIndex}, ${workoutIdx}, 'missed')">✗</div>
                         <span class="miss-label">Miss</span>
                     </div>
                     <div class="checkbox-wrapper">
-                        <input type="checkbox" class="checkbox" data-id="w${weekNum}d${dayIndex}w${workoutIdx}">
+                        <input type="checkbox" class="checkbox" ${isChecked} onchange="handleWorkoutToggle(${weekIndex}, ${dayIndex}, ${workoutIdx}, 'completed')">
                         <span class="checkbox-label">Done</span>
                     </div>
                 `;
@@ -1565,132 +1570,58 @@
             card.appendChild(header);
             card.appendChild(workoutsContainer);
             
-            // Add notes button
+            // Notes — sourced from dayData.notes (part of trainingData JSON)
+            const dayNote = dayData.notes || '';
+            const dayId = `w${weekNum}d${dayIndex}`;
+            
             const notesBtn = document.createElement('button');
             notesBtn.className = 'notes-btn';
             notesBtn.textContent = '📝 Notes';
+            if (dayNote) notesBtn.classList.add('has-note');
             
-            // Add note display area (for saved notes)
             const noteDisplay = document.createElement('div');
             noteDisplay.className = 'note-display';
-            const dayId = `w${weekNum}d${dayIndex}`;
-            const savedNote = localStorage.getItem(`tri-note-${dayId}`);
-            if (savedNote) {
-                noteDisplay.textContent = savedNote;
+            if (dayNote) {
+                noteDisplay.textContent = dayNote;
                 noteDisplay.classList.add('has-note');
             }
             
-            // Add notes section (for editing)
             const notesSection = document.createElement('div');
             notesSection.className = 'notes-section';
             notesSection.innerHTML = `
-                <textarea placeholder="Add notes about this day's training..."></textarea>
+                <textarea placeholder="Add notes about this day's training...">${dayNote}</textarea>
                 <button class="save-note-btn">💾 Save Note</button>
             `;
-            
-            const textarea = notesSection.querySelector('textarea');
-            if (savedNote) {
-                textarea.value = savedNote;
-            }
             
             notesBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 notesSection.classList.toggle('active');
             });
             
-            const saveBtn = notesSection.querySelector('.save-note-btn');
-            saveBtn.addEventListener('click', (e) => {
+            notesSection.querySelector('.save-note-btn').addEventListener('click', async (e) => {
                 e.stopPropagation();
-                const noteText = textarea.value.trim();
-                if (noteText) {
-                    localStorage.setItem(`tri-note-${dayId}`, noteText);
-                    noteDisplay.textContent = noteText;
-                    noteDisplay.classList.add('has-note');
-                } else {
-                    localStorage.removeItem(`tri-note-${dayId}`);
-                    noteDisplay.classList.remove('has-note');
+                const noteText = notesSection.querySelector('textarea').value.trim();
+                
+                // Update trainingData directly — single source of truth
+                const weekIdx = trainingData.findIndex(w => w.week === weekNum);
+                if (weekIdx !== -1 && trainingData[weekIdx].days[dayIndex]) {
+                    trainingData[weekIdx].days[dayIndex].notes = noteText;
                 }
                 
-                // Save to Supabase
-                saveDayNoteToDB(dayId, noteText);
-                
+                noteDisplay.textContent = noteText;
+                noteDisplay.classList.toggle('has-note', !!noteText);
+                notesBtn.classList.toggle('has-note', !!noteText);
                 notesSection.classList.remove('active');
+                
+                // Push full updated state to Supabase
+                await savePlanToDatabase();
             });
             
             card.appendChild(notesBtn);
             card.appendChild(noteDisplay);
             card.appendChild(notesSection);
             
-            // Setup checkboxes
-            const checkboxes = card.querySelectorAll('.checkbox');
-            checkboxes.forEach(cb => {
-                const saved = localStorage.getItem(`tri-${cb.dataset.id}`);
-                if (saved === 'true') {
-                    cb.checked = true;
-                }
-                
-                cb.addEventListener('change', function() {
-                    localStorage.setItem(`tri-${this.dataset.id}`, this.checked);
-                    
-                    // Save to Supabase
-                    const workoutId = this.dataset.id;
-                    const isMissed = localStorage.getItem(`tri-${workoutId}-miss`) === 'true';
-                    saveWorkoutProgressToDB(workoutId, this.checked, isMissed);
-                    
-                    // Uncheck miss button if completing
-                    if (this.checked) {
-                        const missBtn = this.closest('.workout-item').querySelector('.miss-btn');
-                        if (missBtn && missBtn.classList.contains('active')) {
-                            missBtn.classList.remove('active');
-                            localStorage.setItem(`tri-${missBtn.dataset.id}`, 'false');
-                            // Update Supabase
-                            saveWorkoutProgressToDB(workoutId, true, false);
-                        }
-                    }
-                    
-                    updateDayCompletion(card);
-                });
-            });
-            
-            // Setup miss buttons
-            const missButtons = card.querySelectorAll('.miss-btn');
-            missButtons.forEach(missBtn => {
-                const saved = localStorage.getItem(`tri-${missBtn.dataset.id}`);
-                if (saved === 'true') {
-                    missBtn.classList.add('active');
-                }
-                
-                missBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    
-                    const checkbox = this.closest('.workout-item').querySelector('.checkbox');
-                    const workoutId = this.dataset.id.replace('-miss', '');
-                    
-                    if (this.classList.contains('active')) {
-                        this.classList.remove('active');
-                        localStorage.setItem(`tri-${this.dataset.id}`, 'false');
-                        // Update Supabase
-                        const isCompleted = checkbox && checkbox.checked;
-                        saveWorkoutProgressToDB(workoutId, isCompleted, false);
-                    } else {
-                        this.classList.add('active');
-                        localStorage.setItem(`tri-${this.dataset.id}`, 'true');
-                        
-                        // Uncheck checkbox if marking as missed
-                        if (checkbox && checkbox.checked) {
-                            checkbox.checked = false;
-                            localStorage.setItem(`tri-${checkbox.dataset.id}`, 'false');
-                        }
-                        
-                        // Update Supabase
-                        saveWorkoutProgressToDB(workoutId, false, true);
-                    }
-                    
-                    updateDayCompletion(card);
-                });
-            });
-            
-            // Initial state update
+            // Initial visual state update
             updateDayCompletion(card);
             
             return card;
@@ -1907,19 +1838,21 @@
                 if (planRecord && planRecord.plan_data) {
                     currentPlanId = planRecord.id;
                     trainingData = planRecord.plan_data;
-                    console.log('Loaded training plan from database');
+                    // Ensure every workout has the required state fields
+                    trainingData.forEach(week => {
+                        week.days?.forEach(day => {
+                            if (!day.notes) day.notes = '';
+                            day.workouts?.forEach(w => {
+                                if (w.completed === undefined) w.completed = false;
+                                if (w.missed === undefined) w.missed = false;
+                                if (w.notes === undefined) w.notes = '';
+                            });
+                        });
+                    });
+                    console.log('Loaded training plan from database (state-driven)');
                 }
                 
-                // Load workout progress from database
-                await loadWorkoutProgressFromDB();
-                
-                // Load day notes from database
-                await loadDayNotesFromDB();
-                
-                // Load phase states from database
-                await loadPhaseStatesFromDB();
-                
-                // Initialize the plan with loaded data
+                // Initialize the plan with loaded data (state lives in trainingData)
                 initializePlan();
                 
             } catch (error) {
@@ -1930,166 +1863,42 @@
         }
         
         // =====================================================
+        // STATE-DRIVEN WORKOUT TOGGLE — Single Source of Truth
+        // =====================================================
+        
+        async function handleWorkoutToggle(weekIndex, dayIndex, workoutIndex, toggleType) {
+            // 1. Locate the workout in trainingData
+            const workout = trainingData[weekIndex]?.days[dayIndex]?.workouts[workoutIndex];
+            if (!workout) return;
+            
+            // 2. Update state (mutually exclusive)
+            if (toggleType === 'completed') {
+                workout.completed = !workout.completed;
+                if (workout.completed) workout.missed = false;
+            } else if (toggleType === 'missed') {
+                workout.missed = !workout.missed;
+                if (workout.missed) workout.completed = false;
+            }
+            
+            // 3. Re-render to reflect new state
+            const container = document.getElementById('training-plan');
+            if (container) {
+                container.innerHTML = '';
+                groupPhases();
+                initializePlan();
+            }
+            
+            // 4. Persist to Supabase
+            await savePlanToDatabase();
+        }
+
+        // =====================================================
         // DATABASE SYNC FUNCTIONS
         // =====================================================
         
-        async function loadWorkoutProgressFromDB() {
-            if (!supabaseClient || !currentUser || !currentPlanId) return;
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('workout_progress')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .eq('plan_id', currentPlanId);
-                
-                if (!error && data) {
-                    // Restore workout progress to localStorage
-                    data.forEach(record => {
-                        if (record.is_completed) {
-                            localStorage.setItem(`tri-${record.workout_id}`, 'true');
-                        }
-                        if (record.is_missed) {
-                            localStorage.setItem(`tri-${record.workout_id}-miss`, 'true');
-                        }
-                    });
-                    console.log(`Loaded ${data.length} workout progress records`);
-                }
-            } catch (error) {
-                console.error('Error loading workout progress:', error);
-            }
-        }
-        
-        async function loadDayNotesFromDB() {
-            if (!supabaseClient || !currentUser || !currentPlanId) return;
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('day_notes')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .eq('plan_id', currentPlanId);
-                
-                if (!error && data) {
-                    // Restore day notes to localStorage
-                    data.forEach(record => {
-                        if (record.note_text) {
-                            localStorage.setItem(`tri-note-${record.day_id}`, record.note_text);
-                        }
-                    });
-                    console.log(`Loaded ${data.length} day notes`);
-                }
-            } catch (error) {
-                console.error('Error loading day notes:', error);
-            }
-        }
-        
-        async function loadPhaseStatesFromDB() {
-            if (!supabaseClient || !currentUser || !currentPlanId) return;
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('phase_states')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .eq('plan_id', currentPlanId);
-                
-                if (!error && data) {
-                    // Restore phase collapse states to localStorage
-                    data.forEach(record => {
-                        localStorage.setItem(`tri-${record.phase_id}-collapsed`, String(record.is_collapsed));
-                    });
-                    console.log(`Loaded ${data.length} phase states`);
-                }
-            } catch (error) {
-                console.error('Error loading phase states:', error);
-            }
-        }
-        
-        async function saveWorkoutProgressToDB(workoutId, isCompleted, isMissed) {
-            if (!supabaseClient || !currentUser || !currentPlanId) return;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('workout_progress')
-                    .upsert({
-                        user_id: currentUser.id,
-                        plan_id: currentPlanId,
-                        workout_id: workoutId,
-                        is_completed: isCompleted,
-                        is_missed: isMissed,
-                        completed_at: isCompleted ? new Date().toISOString() : null
-                    }, {
-                        onConflict: 'user_id,plan_id,workout_id'
-                    });
-                
-                if (error) {
-                    console.error('Error saving workout progress:', error);
-                }
-            } catch (error) {
-                console.error('Error in saveWorkoutProgressToDB:', error);
-            }
-        }
-        
-        async function saveDayNoteToDB(dayId, noteText) {
-            if (!supabaseClient || !currentUser || !currentPlanId) return;
-            
-            try {
-                if (noteText && noteText.trim()) {
-                    const { error } = await supabaseClient
-                        .from('day_notes')
-                        .upsert({
-                            user_id: currentUser.id,
-                            plan_id: currentPlanId,
-                            day_id: dayId,
-                            note_text: noteText
-                        }, {
-                            onConflict: 'user_id,plan_id,day_id'
-                        });
-                    
-                    if (error) {
-                        console.error('Error saving day note:', error);
-                    }
-                } else {
-                    // Delete note if empty
-                    const { error } = await supabaseClient
-                        .from('day_notes')
-                        .delete()
-                        .eq('user_id', currentUser.id)
-                        .eq('plan_id', currentPlanId)
-                        .eq('day_id', dayId);
-                    
-                    if (error) {
-                        console.error('Error deleting day note:', error);
-                    }
-                }
-            } catch (error) {
-                console.error('Error in saveDayNoteToDB:', error);
-            }
-        }
-        
-        async function savePhaseStateToDB(phaseId, isCollapsed) {
-            if (!supabaseClient || !currentUser || !currentPlanId) return;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('phase_states')
-                    .upsert({
-                        user_id: currentUser.id,
-                        plan_id: currentPlanId,
-                        phase_id: phaseId,
-                        is_collapsed: isCollapsed
-                    }, {
-                        onConflict: 'user_id,plan_id,phase_id'
-                    });
-                
-                if (error) {
-                    console.error('Error saving phase state:', error);
-                }
-            } catch (error) {
-                console.error('Error in savePhaseStateToDB:', error);
-            }
-        }
+        // NOTE: Workout progress, notes, and state are now stored directly in
+        // plan_data JSON via trainingData — no separate tables needed.
+        // savePlanToDatabase() handles all persistence in one call.
         
         // Logout function
         async function handleLogout(event) {
@@ -2128,12 +1937,41 @@
         const editModeBtn = document.getElementById('editModeBtn');
         let editMode = false;
 
+        // =====================================================
+        // SAVE PLAN STRUCTURE TO SUPABASE (Edit Mode)
+        // =====================================================
+        
+        async function savePlanToDatabase() {
+            if (!supabaseClient || !currentUser || !currentPlanId) {
+                console.warn('Cannot save: not logged in or plan not loaded.');
+                return;
+            }
+
+            const { error: dbError } = await supabaseClient
+                .from('training_plans')
+                .update({ plan_data: trainingData })
+                .eq('id', currentPlanId)
+                .eq('user_id', currentUser.id);
+
+            if (dbError) {
+                console.error('Error saving plan:', dbError.message);
+                alert('⚠️ Failed to sync to cloud.');
+            } else {
+                console.log('Plan synced to cloud ☁️');
+            }
+        }
+
         if (editModeBtn) {
-            editModeBtn.addEventListener('click', () => {
+            editModeBtn.addEventListener('click', async () => {
                 editMode = !editMode;
                 editModeBtn.classList.toggle('active');
-                editModeBtn.textContent = editMode ? '✅ Editing Mode ON' : '✏️ Edit Workouts';
                 
+                if (!editMode) {
+                    // Turning OFF edit mode - save to Supabase
+                    editModeBtn.textContent = '⏳ Syncing...';
+                    editModeBtn.disabled = true;
+                }
+
                 // Toggle contenteditable on all workout descriptions
                 document.querySelectorAll('.workout-description').forEach(desc => {
                     if (editMode) {
@@ -2236,6 +2074,27 @@
                         dayCard.querySelectorAll('.delete-workout-btn').forEach(btn => btn.remove());
                     }
                 });
+
+                if (!editMode) {
+                    // Scrape edited descriptions back into trainingData
+                    document.querySelectorAll('.workout-description[data-workout-id]').forEach(descEl => {
+                        const idParts = descEl.dataset.workoutId?.match(/w(\d+)d(\d+)w(\d+)/);
+                        if (!idParts) return;
+                        const weekNum = parseInt(idParts[1]);
+                        const dayIdx = parseInt(idParts[2]);
+                        const wIdx = parseInt(idParts[3]);
+                        const weekData = trainingData.find(w => w.week === weekNum);
+                        if (weekData?.days?.[dayIdx]?.workouts?.[wIdx]) {
+                            weekData.days[dayIdx].workouts[wIdx].desc = descEl.textContent.trim();
+                        }
+                    });
+                    // Save updated trainingData to Supabase
+                    await savePlanToDatabase();
+                    editModeBtn.disabled = false;
+                    editModeBtn.textContent = '✏️ Edit Workouts';
+                } else {
+                    editModeBtn.textContent = '✅ Editing Mode ON';
+                }
             });
         }
         

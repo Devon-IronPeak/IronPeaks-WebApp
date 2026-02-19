@@ -3508,6 +3508,86 @@
         }
     }
     
+    // =====================================================
+    // SUPABASE SYNC: Single source of truth via plan_data JSON
+    // =====================================================
+    
+    let psCurrentUser = null;
+    let psCurrentPlanId = null;
+    let psWorkoutState = {}; // { [id]: { completed, missed } }
+    let psDayNotes = {};     // { [id]: noteText }
+    let psEditData = {};     // { [id]: { name, distance } }
+
+    async function psLoadFromSupabase() {
+        if (!supabaseClient) return;
+        try {
+            const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+            if (authError || !user) return;
+            psCurrentUser = user;
+
+            const { data: planRecord, error: dbError } = await supabaseClient
+                .from('training_plans')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('plan_type', 'Marathon')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (dbError || !planRecord) {
+                console.log('No Marathon plan found in DB, using localStorage fallback.');
+                return;
+            }
+
+            psCurrentPlanId = planRecord.id;
+            const pd = planRecord.plan_data || {};
+
+            // Merge plan_data into local state (overrides localStorage)
+            psWorkoutState = pd.workoutState || {};
+            psDayNotes     = pd.dayNotes || {};
+            psEditData     = pd.editData || {};
+
+            // Push into localStorage so existing code reads it seamlessly
+            Object.entries(psWorkoutState).forEach(([id, s]) => {
+                localStorage.setItem(`check-${id}`, s.completed ? 'true' : 'false');
+                localStorage.setItem(`miss-${id}`, s.missed ? 'true' : 'false');
+            });
+            Object.entries(psDayNotes).forEach(([id, text]) => {
+                if (text) localStorage.setItem(`note-${id}`, text);
+            });
+            Object.entries(psEditData).forEach(([id, e]) => {
+                if (e.name !== undefined) localStorage.setItem(`workout-name-${id}`, e.name);
+                if (e.distance !== undefined) localStorage.setItem(`workout-distance-${id}`, e.distance);
+            });
+
+            console.log('Peak Stride: loaded from Supabase plan_data ☁️');
+        } catch (e) {
+            console.error('Peak Stride load error:', e);
+        }
+    }
+
+    async function psSaveToSupabase() {
+        if (!supabaseClient || !psCurrentUser || !psCurrentPlanId) return;
+        
+        const planData = {
+            workoutState: psWorkoutState,
+            dayNotes:     psDayNotes,
+            editData:     psEditData
+        };
+
+        const { error } = await supabaseClient
+            .from('training_plans')
+            .update({ plan_data: planData })
+            .eq('id', psCurrentPlanId)
+            .eq('user_id', psCurrentUser.id);
+
+        if (error) {
+            console.error('Peak Stride save error:', error.message);
+        } else {
+            console.log('Peak Stride synced to cloud ☁️');
+        }
+    }
+
     // Save week state to Supabase
     async function saveWeekState(weekId, isCollapsed) {
         if (!supabaseClient) {
@@ -3567,6 +3647,39 @@
         }
     }
     
+    // =====================================================
+    // SUPABASE SYNC: WORKOUT PROGRESS (check/miss)
+    // =====================================================
+    
+    async function saveWorkoutStateToDB(id, isChecked, isMissed) {
+        // psSaveToSupabase handles everything via plan_data — individual table writes removed
+        await psSaveToSupabase();
+    }
+    
+    // NOTE: loadWorkoutStatesFromDB replaced by psLoadFromSupabase (unified plan_data)
+
+    // =====================================================
+    // SUPABASE SYNC: NOTES
+    // =====================================================
+    
+    async function saveNoteToDB(id, text) {
+        // psSaveToSupabase handles everything via plan_data
+        // (kept for API compatibility — psSaveToSupabase already called by caller)
+    }
+    
+    async function loadNotesFromDB() { /* handled by psLoadFromSupabase */ }
+
+    // =====================================================
+    // SUPABASE SYNC: EDIT MODE (workout names/distances)
+    // =====================================================
+    
+    async function saveEditDataToDB(id, name, distance) {
+        // psSaveToSupabase handles everything via plan_data
+        // (kept for API compatibility — psSaveToSupabase already called by caller)
+    }
+    
+    async function loadEditDataFromDB() { /* handled by psLoadFromSupabase */ }
+
     // Initialize tracker
     async function initializeTracker() {
         // Handle phase collapse/expand
@@ -3641,9 +3754,14 @@
                         missBtn.classList.remove('active');
                         localStorage.setItem(`miss-${id}`, 'false');
                     }
+                    psWorkoutState[id] = { completed: true, missed: false };
+                    saveWorkoutStateToDB(id, true, false);
                 } else {
                     day.classList.remove('completed');
                     localStorage.setItem(`check-${id}`, 'false');
+                    const isMissed = missBtn && missBtn.classList.contains('active');
+                    psWorkoutState[id] = { completed: false, missed: isMissed };
+                    saveWorkoutStateToDB(id, false, isMissed);
                 }
                 checkWeekCompliance();
             });
@@ -3666,12 +3784,13 @@
                 e.stopPropagation();
 
                 if (this.classList.contains('active')) {
-                    // Unmark as missed
                     this.classList.remove('active');
                     day.classList.remove('missed');
                     localStorage.setItem(`miss-${id}`, 'false');
+                    const isChecked = checkbox && checkbox.checked;
+                    psWorkoutState[id] = { completed: isChecked, missed: false };
+                    saveWorkoutStateToDB(id, isChecked, false);
                 } else {
-                    // Mark as missed
                     this.classList.add('active');
                     day.classList.add('missed');
                     day.classList.remove('completed');
@@ -3681,6 +3800,8 @@
                         checkbox.checked = false;
                         localStorage.setItem(`check-${id}`, 'false');
                     }
+                    psWorkoutState[id] = { completed: false, missed: true };
+                    saveWorkoutStateToDB(id, false, true);
                 }
                 checkWeekCompliance();
             });
@@ -3725,6 +3846,10 @@
                 const noteDisplay = document.querySelector(`[data-note-display="${id}"]`);
 
                 localStorage.setItem(`note-${id}`, text);
+                psDayNotes[id] = text;
+                // Save to Supabase
+                saveNoteToDB(id, text);
+                psSaveToSupabase();
 
                 if (text) {
                     if (notesBtn) {
@@ -4052,6 +4177,14 @@
                         // Restore the content with icon
                         el.innerHTML = newName + ' <span class="edit-icon">✏️</span>';
 
+                        // Save name to Supabase (distance will be saved below)
+                        const distEl2 = el.closest('.day-row') ? el.closest('.day-row').querySelector(`.workout-distance[data-id="${id}"]`) : null;
+                        const savedDist = localStorage.getItem(`workout-distance-${id}`) || '';
+                        if (!psEditData[id]) psEditData[id] = {};
+                        psEditData[id].name = newName;
+                        psEditData[id].distance = savedDist;
+                        saveEditDataToDB(id, newName, savedDist);
+
                         // Update key-workout class if workout name contains 🗝️
                         const dayRow = el.closest('.day-row');
                         if (dayRow) {
@@ -4071,6 +4204,14 @@
                         localStorage.setItem(`workout-distance-${id}`, newDistance);
                         // Restore the content with icon
                         el.innerHTML = newDistance + ' <span class="edit-icon">✏️</span>';
+
+                        // Save distance to Supabase
+                        const savedName2 = localStorage.getItem(`workout-name-${id}`) || '';
+                        if (!psEditData[id]) psEditData[id] = {};
+                        psEditData[id].name = savedName2;
+                        psEditData[id].distance = newDistance;
+                        saveEditDataToDB(id, savedName2, newDistance);
+                        psSaveToSupabase();
 
                         // Update workout status based on new distance
                         const dayRow = el.closest('.day-row');
@@ -4390,23 +4531,12 @@
         }
     }
 
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeTracker();
-            // Use setTimeout to ensure all DOM elements are rendered
-            setTimeout(function() {
-                calculateWeeksToRace();
-                updateWeeklyMileage();
-                updateUpcomingLongRun();
-                updateNextKeyWorkout();
-            }, 100);
-            // Update weeks to race and compliance daily
-            setInterval(calculateWeeksToRace, 1000 * 60 * 60 * 24);
-            setInterval(checkWeekCompliance, 1000 * 60 * 60 * 24);
-        });
-    } else {
-        initializeTracker();
+    // Load all data from Supabase then initialize
+    async function loadAndInit() {
+        // Load from Supabase plan_data (single source of truth)
+        await psLoadFromSupabase();
+        // Now initialize tracker which reads from localStorage (populated above)
+        await initializeTracker();
         // Use setTimeout to ensure all DOM elements are rendered
         setTimeout(function() {
             calculateWeeksToRace();
@@ -4417,6 +4547,13 @@
         // Update weeks to race and compliance daily
         setInterval(calculateWeeksToRace, 1000 * 60 * 60 * 24);
         setInterval(checkWeekCompliance, 1000 * 60 * 60 * 24);
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadAndInit);
+    } else {
+        loadAndInit();
     }
 </script>
 

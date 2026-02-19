@@ -528,9 +528,66 @@
         </div>
 
         <div class="training-plans-section" id="training-plans">
-            <h2>📋 Training Plans</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="margin: 0;">📋 Training Plans</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <button id="archivedPlansBtn" class="btn btn-secondary" style="font-size: 0.95rem;">📁 Archived Plans</button>
+                    <button id="openCreatorBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); border: none; font-size: 0.95rem;">➕ Create New Plan</button>
+                </div>
+            </div>
             <div id="plans-container">
                 <!-- Plans will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== PLAN CREATOR MODAL ===== -->
+<div id="planCreatorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 14, 39, 0.92); backdrop-filter: blur(6px); z-index: 2000; justify-content: center; align-items: center;">
+    <div style="background: rgba(26, 26, 46, 0.98); border: 2px solid #4a90e2; border-radius: 20px; padding: 2.5rem; width: 90%; max-width: 620px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); position: relative; max-height: 90vh; overflow-y: auto;">
+        
+        <button onclick="document.getElementById('planCreatorModal').style.display='none'" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 1.5rem; cursor: pointer; line-height: 1;">✕</button>
+        
+        <h2 style="font-size: 1.8rem; font-weight: bold; color: #4a90e2; margin-bottom: 0.5rem; text-align: center;">⚙️ Configure New Plan</h2>
+        <p style="text-align: center; opacity: 0.7; margin-bottom: 2rem; font-size: 0.95rem;">Your training data becomes the single source of truth in the cloud.</p>
+        
+        <div id="planCreatorForm" style="display: flex; flex-direction: column; gap: 1.2rem;">
+            
+            <div>
+                <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Plan Template</label>
+                <select id="planTemplate" style="width: 100%; padding: 0.9rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem;">
+                    <option value="T100">🏊‍♂️🚴🏃 Triathlon (Vancouver T100 / GWN)</option>
+                    <option value="Marathon">🏃 Marathon (Whitefish Peak Stride)</option>
+                    <option value="Custom">🎨 Custom Blank Canvas</option>
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Start Date</label>
+                    <input type="date" id="planStartDate" style="width: 100%; padding: 0.9rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem; color-scheme: dark;">
+                </div>
+                <div>
+                    <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Race / End Date</label>
+                    <input type="date" id="planEndDate" style="width: 100%; padding: 0.9rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem; color-scheme: dark;">
+                </div>
+            </div>
+
+            <div>
+                <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Primary Performance Goal</label>
+                <input type="text" id="perfGoal" placeholder="e.g., Sub-8:45 min/mi pace at HR &lt; 165bpm" style="width: 100%; padding: 0.9rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem;" />
+            </div>
+
+            <div>
+                <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Body Composition Goal</label>
+                <input type="text" id="compGoal" placeholder="e.g., Drop to 185 lbs for optimal power-to-weight" style="width: 100%; padding: 0.9rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem;" />
+            </div>
+
+            <div id="creatorError" style="display: none; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; border-radius: 8px; padding: 0.8rem 1rem; font-size: 0.9rem; color: #fca5a5;"></div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                <button onclick="document.getElementById('planCreatorModal').style.display='none'" class="btn btn-secondary" style="flex: 1; padding: 1rem;">Cancel</button>
+                <button id="generatePlanBtn" class="btn btn-primary" style="flex: 2; padding: 1rem; background: linear-gradient(135deg, #10b981, #059669); border: none; font-size: 1rem; font-weight: 700;">🚀 Generate Plan</button>
             </div>
         </div>
     </div>
@@ -774,11 +831,134 @@
         }
     }
 
-    // Create new plan (placeholder)
-    function createNewPlan() {
-        alert('Plan creation interface coming soon!\n\nYou can manually insert a plan into the database for now.');
-        // In future: Open modal/page to create new plan
-    }
+    // =====================================================
+    // PLAN CREATOR MODAL
+    // =====================================================
+
+    const modal = document.getElementById('planCreatorModal');
+    const openCreatorBtn = document.getElementById('openCreatorBtn');
+    const generatePlanBtn = document.getElementById('generatePlanBtn');
+    const creatorError = document.getElementById('creatorError');
+
+    openCreatorBtn?.addEventListener('click', () => {
+        if (userPlans.length >= 3) {
+            alert('Maximum of 3 active plans reached. Archive or delete a plan first.');
+            return;
+        }
+        modal.style.display = 'flex';
+    });
+
+    // Also wire old inline createNewPlan calls
+    window.createNewPlan = function() {
+        openCreatorBtn?.click();
+    };
+
+    document.getElementById('archivedPlansBtn')?.addEventListener('click', () => {
+        // Show archived plans (prefixed with [ARCHIVED])
+        const archived = userPlans.filter(p => p.plan_name.startsWith('[ARCHIVED]'));
+        if (archived.length === 0) {
+            alert('No archived plans found. Use the Archive button on a plan to archive it.');
+        } else {
+            alert(`Archived plans:\n\n${archived.map(p => `• ${p.plan_name}`).join('\n')}`);
+        }
+    });
+
+    generatePlanBtn?.addEventListener('click', async () => {
+        const template = document.getElementById('planTemplate').value;
+        const startDate = document.getElementById('planStartDate').value;
+        const endDate = document.getElementById('planEndDate').value;
+        const perfGoal = document.getElementById('perfGoal').value.trim();
+        const compGoal = document.getElementById('compGoal').value.trim();
+
+        // Validate
+        if (!startDate || !endDate) {
+            creatorError.textContent = '⚠️ Please set both a start date and a race/end date.';
+            creatorError.style.display = 'block';
+            return;
+        }
+        if (new Date(endDate) <= new Date(startDate)) {
+            creatorError.textContent = '⚠️ Race/end date must be after the start date.';
+            creatorError.style.display = 'block';
+            return;
+        }
+        creatorError.style.display = 'none';
+
+        generatePlanBtn.disabled = true;
+        generatePlanBtn.textContent = '⏳ Creating Plan...';
+
+        // Build the state-driven trainingData scaffold
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        const totalWeeks = Math.max(1, Math.ceil(totalDays / 7));
+
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const newTrainingData = [];
+
+        for (let w = 0; w < totalWeeks; w++) {
+            const weekDays = [];
+            for (let d = 0; d < 7; d++) {
+                const dayDate = new Date(start);
+                dayDate.setDate(start.getDate() + (w * 7) + d);
+                weekDays.push({
+                    day: days[d],
+                    date: dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    notes: '',
+                    workouts: [{
+                        type: 'rest',
+                        icon: '😴',
+                        desc: 'Rest & Recovery',
+                        completed: false,
+                        missed: false
+                    }]
+                });
+            }
+            newTrainingData.push({
+                week: w + 1,
+                phase: w < Math.floor(totalWeeks * 0.3) ? 'Base' :
+                       w < Math.floor(totalWeeks * 0.6) ? 'Build' :
+                       w < Math.floor(totalWeeks * 0.85) ? 'Peak' : 'Taper',
+                totals: { swim: '0m', bike: '0km', run: '0km' },
+                days: weekDays
+            });
+        }
+
+        try {
+            const planName = `${template} Plan — ${new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+            const { error } = await supabaseClient
+                .from('training_plans')
+                .insert({
+                    user_id: currentUser.id,
+                    plan_type: template,
+                    plan_name: planName,
+                    plan_data: newTrainingData,
+                    metadata: { startDate, endDate, perfGoal, compGoal }
+                });
+
+            if (error) throw error;
+
+            modal.style.display = 'none';
+            // Reset form
+            document.getElementById('planStartDate').value = '';
+            document.getElementById('planEndDate').value = '';
+            document.getElementById('perfGoal').value = '';
+            document.getElementById('compGoal').value = '';
+
+            await loadUserPlans();
+        } catch (err) {
+            console.error('Error creating plan:', err);
+            creatorError.textContent = '⚠️ Failed to create plan: ' + err.message;
+            creatorError.style.display = 'block';
+        } finally {
+            generatePlanBtn.disabled = false;
+            generatePlanBtn.textContent = '🚀 Generate Plan';
+        }
+    });
+
+    // Close modal on backdrop click
+    modal?.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    });
 
     // Logout function
     logoutBtn.addEventListener('click', async () => {
