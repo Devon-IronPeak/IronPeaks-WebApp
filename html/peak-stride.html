@@ -1283,89 +1283,141 @@
             }
         }
     
-        /* ===== PARTIAL COMPLETION STATE ===== */
-        .day-row.partial {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-        }
-        .day-row.partial::after {
-            content: 'PARTIAL';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-weight: bold;
-            color: rgba(255, 255, 255, 0.25);
-            font-size: 2.5em;
-            pointer-events: none;
-            z-index: 1;
-            letter-spacing: 4px;
-        }
-        .day-row.partial .day-name,
-        .day-row.partial .day-date,
-        .day-row.partial .workout-name,
-        .day-row.partial .workout-distance { color: white; }
-        .day-row.partial .checkbox-label,
-        .day-row.partial .miss-btn-label,
-        .day-row.partial .partial-btn-label { color: white; }
-        .day-row.long-run.partial {
-            background: linear-gradient(135deg, #c2782e 0%, #a35f1e 100%);
-        }
-        .day-row.key-workout.partial {
-            background: linear-gradient(135deg, #0e7490 0%, #0c5f7a 100%);
-        }
-        /* Partial button */
-        .partial-btn-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            color: #6b7280;
-            font-weight: 600;
-            z-index: 2;
-        }
-        .partial-btn {
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            background: white;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            color: transparent;
-            font-size: 1rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        .partial-btn:hover { border-color: #f59e0b; background: #fffbeb; }
-        .partial-btn.active { background: #f59e0b; border-color: #f59e0b; color: white; }
-        /* Day grid now has 7 columns for partial btn */
+        /* ── MULTI-WORKOUT DAY CARDS ── */
         .day-row {
-            grid-template-columns: 70px 90px 90px minmax(120px, 1fr) 70px 70px 100px !important;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem 0.75rem;
+            gap: 0;
         }
-        /* No plan message */
-        .no-plan-msg {
-            text-align: center; padding: 4rem 2rem;
-            background: white; border-radius: 16px;
-            border: 1px solid var(--border); margin: 2rem 0;
+        .day-header-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
         }
-        /* Loading state */
-        .loading-spinner {
-            text-align: center; padding: 4rem;
-            font-family: "Space Mono", monospace;
-            color: var(--text-light);
-        }
-        /* Edit mode tag on workout name */
-        .workout-name[contenteditable="true"],
-        .workout-distance[contenteditable="true"] {
-            min-width: 40px;
-            display: inline-block;
-        }
-    </style>
+        .day-name  { font-family:'Space Mono',monospace; font-weight:700; font-size:0.9rem; color:var(--primary); min-width:40px; }
+        .day-date  { font-weight:600; color:var(--text-light); font-size:0.9rem; min-width:55px; }
+        /* override inherited grid layout */
+        .day-row { grid-template-columns:none !important; }
 
+        /* ── WORKOUT ITEMS inside a day ── */
+        .workout-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.45rem 0.5rem;
+            border-radius: 8px;
+            margin-bottom: 0.3rem;
+            background: rgba(255,255,255,0.6);
+            border-left: 3px solid #ccc;
+            transition: all 0.25s ease;
+        }
+        .workout-item.run      { border-left-color: var(--mountain-blue); }
+        .workout-item.bike     { border-left-color: var(--peak-gold); }
+        .workout-item.swim     { border-left-color: var(--success); }
+        .workout-item.rest,
+        .workout-item.mobility { border-left-color: #a78bfa; }
+        .workout-item.key-item { border-left-color: #0284c7; background: rgba(14,165,233,0.08); }
+
+        .workout-icon   { font-size: 1.1rem; min-width: 22px; text-align:center; }
+        .workout-desc   { flex: 1; font-size: 0.9rem; font-weight:600; color:var(--text); }
+        .workout-dist   { font-size: 0.85rem; font-weight:700; color:var(--accent); min-width:50px; text-align:right; }
+
+        .miss-btn-wrap, .check-wrap {
+            display: flex; align-items:center; gap:0.35rem;
+            font-size:0.75rem; color:#6b7280; font-weight:600;
+        }
+        .miss-btn {
+            width:26px; height:26px; cursor:pointer;
+            background:white; border:2px solid #ccc; border-radius:5px;
+            color:transparent; font-size:1rem; font-weight:bold;
+            display:flex; align-items:center; justify-content:center;
+            transition:all 0.2s;
+        }
+        .miss-btn:hover   { border-color:#ef4444; background:#fee; }
+        .miss-btn.active  { background:#ef4444; border-color:#ef4444; color:white; }
+
+        /* override inherited checkbox */
+        .day-row .checkbox { width:22px; height:22px; cursor:pointer; }
+
+        /* ── COMPLETION STATES ── same hues as before ── */
+        .day-row.completed  { background:linear-gradient(135deg,#10b981,#059669); color:white; box-shadow:0 4px 12px rgba(16,185,129,.4); }
+        .day-row.missed     { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; box-shadow:0 4px 12px rgba(239,68,68,.4); }
+        .day-row.partial    { background:linear-gradient(135deg,#f59e0b,#d97706); color:white; box-shadow:0 4px 12px rgba(245,158,11,.4); }
+        .day-row.long-run.completed  { background:linear-gradient(135deg,#fbbf24,#f59e0b); }
+        .day-row.long-run.missed     { background:linear-gradient(135deg,#5c2e1f,#3d1e14); }
+        .day-row.long-run.partial    { background:linear-gradient(135deg,#c27803,#a35f1e); }
+        .day-row.key-workout.completed { background:linear-gradient(135deg,#0ea5e9,#0284c7); }
+        .day-row.key-workout.missed    { background:linear-gradient(135deg,#1e3a5c,#14293d); }
+        .day-row.key-workout.partial   { background:linear-gradient(135deg,#0e7490,#0c5f7a); }
+
+        /* white text in completion states */
+        .day-row.completed .day-name,.day-row.completed .day-date,.day-row.completed .workout-desc,
+        .day-row.completed .workout-dist,.day-row.completed .miss-btn-wrap,.day-row.completed .check-wrap,
+        .day-row.missed .day-name,.day-row.missed .day-date,.day-row.missed .workout-desc,
+        .day-row.missed .workout-dist,.day-row.missed .miss-btn-wrap,.day-row.missed .check-wrap,
+        .day-row.partial .day-name,.day-row.partial .day-date,.day-row.partial .workout-desc,
+        .day-row.partial .workout-dist,.day-row.partial .miss-btn-wrap,.day-row.partial .check-wrap
+        { color:white !important; }
+
+        .day-row.completed .workout-item,
+        .day-row.missed    .workout-item,
+        .day-row.partial   .workout-item { background:rgba(255,255,255,0.15); border-left-color:rgba(255,255,255,0.4); }
+
+        /* MISSED watermark */
+        .day-row.missed { position:relative; overflow:hidden; }
+        .day-row.missed::after {
+            content:'MISSED'; position:absolute; top:50%; left:50%;
+            transform:translate(-50%,-50%); font-weight:bold;
+            color:rgba(255,255,255,.25); font-size:2.5em;
+            pointer-events:none; z-index:1; letter-spacing:4px;
+        }
+        /* PARTIAL watermark */
+        .day-row.partial::after {
+            content:'PARTIAL'; position:absolute; top:50%; left:50%;
+            transform:translate(-50%,-50%); font-weight:bold;
+            color:rgba(255,255,255,.2); font-size:2em;
+            pointer-events:none; z-index:1; letter-spacing:3px;
+        }
+        .day-row { position:relative; }
+
+        /* ── EDIT MODE ── */
+        .workout-desc[contenteditable="true"],
+        .workout-dist[contenteditable="true"] {
+            background:linear-gradient(135deg,#fff3cd,#ffe8a1);
+            border:2px solid #f59e0b; border-radius:4px;
+            padding:2px 6px; cursor:text;
+            -webkit-user-select:text; user-select:text;
+        }
+        .add-workout-btn {
+            margin-top:0.4rem; padding:0.4rem 1rem;
+            background:var(--success); color:white; border:none;
+            border-radius:6px; cursor:pointer; font-size:0.85rem;
+            font-family:'Space Mono',monospace;
+        }
+        .delete-workout-btn {
+            padding:2px 6px; background:rgba(239,68,68,.15);
+            border:1px solid #ef4444; border-radius:4px; cursor:pointer; font-size:0.9rem;
+        }
+        .key-toggle-btn {
+            padding:2px 7px; background:rgba(14,165,233,.15);
+            border:1px solid #0284c7; border-radius:4px; cursor:pointer; font-size:0.8rem;
+        }
+        .workout-type-selector {
+            display:flex; flex-direction:column; gap:0.4rem;
+            padding:0.65rem; background:rgba(74,144,226,.08);
+            border:1px dashed var(--mountain-blue); border-radius:8px; margin-bottom:0.35rem;
+        }
+        .workout-type-selector button {
+            padding:0.35rem 0.75rem; background:rgba(255,255,255,.7);
+            border:1px solid rgba(0,0,0,.15); border-radius:5px;
+            cursor:pointer; font-size:0.9rem; transition:all 0.2s;
+        }
+        .workout-type-selector button:hover { background:rgba(74,144,226,.2); border-color:var(--mountain-blue); }
+        .cancel-add-btn { align-self:flex-start; padding:0.25rem 0.65rem; background:transparent; border:1px solid rgba(239,68,68,.4); border-radius:5px; color:#ef4444; cursor:pointer; font-size:0.8rem; }
+
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -1381,233 +1433,215 @@
 </nav>
 
 <div class="container">
-    <div class="content-wrapper">
-        <div class="header">
-            <div class="header-content">
-                <img src="logo.png" alt="Iron Peak Logo" class="header-logo">
-                <h1>Peak Stride</h1>
-                <div class="goal" id="planGoal">🎯 Marathon Training Plan | Sub-3:35</div>
-                <div class="dates" id="planDates">📅 Jan 26 – May 16, 2026 | 🏃 Whitefish Marathon</div>
-            </div>
-        </div>
-
-        <div class="content">
-            <!-- Training Overview -->
-            <div class="training-overview-new">
-                <h2>⛰️ Training Overview</h2>
-                <div class="overview-grid">
-                    <div class="overview-card">
-                        <div class="overview-label">Weekly Mileage</div>
-                        <div class="overview-value">
-                            <span id="weeklyMileage">0</span>
-                            <span class="overview-unit">km</span>
-                        </div>
-                    </div>
-                    <div class="overview-card">
-                        <div class="overview-label">Upcoming Long Run</div>
-                        <div class="overview-value">
-                            <span id="upcomingLongRun">0</span>
-                            <span class="overview-unit">km</span>
-                        </div>
-                    </div>
-                    <div class="overview-card">
-                        <div class="overview-label">Next Key Workout</div>
-                        <div class="overview-value" style="font-size: 1rem; line-height: 1.4;">
-                            <span id="nextKeyWorkout">TBD</span>
-                        </div>
-                    </div>
-                    <div class="overview-card">
-                        <div class="overview-label">Weeks to Race</div>
-                        <div class="overview-value">
-                            <span id="weeksToRace">--</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dynamic plan renders here -->
-            <div id="training-plan">
-                <div class="loading-spinner">⏳ Loading your training plan...</div>
-            </div>
-
-            <!-- Training Summary -->
-            <div class="training-summary" id="training-summary" style="display:none;">
-                <h2>📊 Training Summary</h2>
-                <div class="summary-grid">
-                    <div class="summary-card">
-                        <div class="summary-label">Peak Weekly Volume</div>
-                        <div class="summary-value" id="peakMileage">--</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-label">Longest Training Run</div>
-                        <div class="summary-value" id="longestRun">--</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-label">Total Weeks</div>
-                        <div class="summary-value" id="totalWeeks">--</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-label">Race Day</div>
-                        <div class="summary-value" id="raceDay">May 16</div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin-top: 2rem;">
-                <button class="edit-mode-btn" id="editModeBtn">✏️ Edit Workouts</button>
-            </div>
-        </div>
+  <div class="content-wrapper">
+    <div class="header">
+      <div class="header-content">
+        <img src="logo.png" alt="Iron Peak Logo" class="header-logo">
+        <h1>Peak Stride</h1>
+        <div class="goal">🎯 Marathon Training Plan | Sub-3:35</div>
+        <div class="dates">📅 Jan 26 – May 16, 2026 | 🏃 Whitefish Marathon</div>
+      </div>
     </div>
+
+    <div class="content">
+      <div class="training-overview-new">
+        <h2>⛰️ Training Overview</h2>
+        <div class="overview-grid">
+          <div class="overview-card">
+            <div class="overview-label">Weekly Mileage</div>
+            <div class="overview-value"><span id="weeklyMileage">--</span><span class="overview-unit">km</span></div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-label">Upcoming Long Run</div>
+            <div class="overview-value"><span id="upcomingLongRun">--</span><span class="overview-unit">km</span></div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-label">Next Key Workout</div>
+            <div class="overview-value" style="font-size:1rem;line-height:1.4"><span id="nextKeyWorkout">TBD</span></div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-label">Weeks to Race</div>
+            <div class="overview-value"><span id="weeksToRace">--</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="training-plan">
+        <div style="text-align:center;padding:4rem;font-family:'Space Mono',monospace;color:var(--text-light)">⏳ Loading your training plan…</div>
+      </div>
+
+      <div class="training-summary" id="training-summary" style="display:none">
+        <h2>📊 Training Summary</h2>
+        <div class="summary-grid">
+          <div class="summary-card"><div class="summary-label">Peak Weekly Volume</div><div class="summary-value" id="peakMileage">--</div></div>
+          <div class="summary-card"><div class="summary-label">Longest Training Run</div><div class="summary-value" id="longestRun">--</div></div>
+          <div class="summary-card"><div class="summary-label">Total Weeks</div><div class="summary-value" id="totalWeeks">16</div></div>
+          <div class="summary-card"><div class="summary-label">Race Day</div><div class="summary-value" id="raceDay">May 16</div></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:2rem">
+        <button class="edit-mode-btn" id="editModeBtn">✏️ Edit Workouts</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<footer>
-    © 2026 Iron Peak. All rights reserved. | 🏔️ Reach Your Peak
-</footer>
+<footer>© 2026 Iron Peak. All rights reserved. | 🏔️ Reach Your Peak</footer>
 
 <script>
 // =====================================================
-// PEAK STRIDE — DATABASE-FIRST ARCHITECTURE
-// Single source of truth: Supabase training_plans table
-// Cache-first render: localStorage → Supabase sync
+// PEAK STRIDE — Database-first, multi-workout per day
 // =====================================================
 
-const SUPABASE_URL = 'https://yecqupxvbazsgzqgmzmc.supabase.co';
+const SUPABASE_URL      = 'https://yecqupxvbazsgzqgmzmc.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3F1cHh2YmF6c2d6cWdtem1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MzU4NDcsImV4cCI6MjA4NjAxMTg0N30._8MxQKOgs-IeezPUTumvHPaFDj1n4R-TYOFv-eXuBZk';
-const CACHE_KEY   = 'ps-plan-cache-v2';
-const CACHE_ID    = 'ps-plan-id-v2';
+const CACHE_KEY = 'ps-plan-v3';
+const CACHE_ID  = 'ps-plan-id-v3';
 
-// ── Supabase client ───────────────────────────────────
 let supabaseClient = null;
 try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
-catch(e) { console.warn('Supabase init failed:', e); }
+catch(e) { console.warn('Supabase init:', e); }
 
-// ── State ─────────────────────────────────────────────
-let trainingData = null;   // {phases: [...]}
+let trainingData = null;
 let currentPlanId = null;
-let currentUser = null;
-let editMode = false;
+let currentUser   = null;
+let editMode      = false;
 
-// ── Default plan data (seed for DB if empty) ──────────
-const DEFAULT_PLAN_DATA = {"phases":[{"id":"phase1","title":"Phase 1: Base & Durability","icon":"💪","cssClass":"phase1","weeks":[{"weekNum":1,"title":"Week 1 | Jan 26 – Feb 1","totalKm":"47 km","focus":"Build leg strength + aerobic base. Easy effort, focusing on consistency.","days":[{"id":"w1d1","date":"2026-01-26","dayName":"MON","dayDate":"Jan 26","cssClasses":["rest-day"],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w1d2","date":"2026-01-27","dayName":"TUE","dayDate":"Jan 27","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w1d3","date":"2026-01-28","dayName":"WED","dayDate":"Jan 28","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w1d4","date":"2026-01-29","dayName":"THU","dayDate":"Jan 29","cssClasses":["workout-day"],"workoutName":"Steady (Aerobic) 💨","distance":"10 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w1d5","date":"2026-01-30","dayName":"FRI","dayDate":"Jan 30","cssClasses":[],"workoutName":"Easy 🌿","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w1d6","date":"2026-01-31","dayName":"SAT","dayDate":"Jan 31","cssClasses":["rest-day"],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w1d7","date":"2026-02-01","dayName":"SUN","dayDate":"Feb 1","cssClasses":["long-run"],"workoutName":"Long Easy 🏃","distance":"16 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":2,"title":"Week 2 | Feb 2 – Feb 8","totalKm":"49 km","focus":"Continue building base. Extend long run by 2 km.","days":[{"id":"w2d1","date":"2026-02-02","dayName":"MON","dayDate":"Feb 2","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w2d2","date":"2026-02-03","dayName":"TUE","dayDate":"Feb 3","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w2d3","date":"2026-02-04","dayName":"WED","dayDate":"Feb 4","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w2d4","date":"2026-02-05","dayName":"THU","dayDate":"Feb 5","cssClasses":["workout-day"],"workoutName":"Steady (Aerobic) 💨","distance":"10 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w2d5","date":"2026-02-06","dayName":"FRI","dayDate":"Feb 6","cssClasses":[],"workoutName":"Easy 🌿","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w2d6","date":"2026-02-07","dayName":"SAT","dayDate":"Feb 7","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w2d7","date":"2026-02-08","dayName":"SUN","dayDate":"Feb 8","cssClasses":["long-run"],"workoutName":"Long Easy 🏃","distance":"18 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":3,"title":"Week 3 | Feb 9 – Feb 15","totalKm":"53 km","focus":"First speed session! 400m repeats build leg turnover. Long run to 20km.","days":[{"id":"w3d1","date":"2026-02-09","dayName":"MON","dayDate":"Feb 9","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w3d2","date":"2026-02-10","dayName":"TUE","dayDate":"Feb 10","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w3d3","date":"2026-02-11","dayName":"WED","dayDate":"Feb 11","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w3d4","date":"2026-02-12","dayName":"THU","dayDate":"Feb 12","cssClasses":["workout-day","key-workout"],"workoutName":"Speed: 2km WU, 8-10 × 400m @ 10K, 200m jog 🔥 🗝️","distance":"12 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w3d5","date":"2026-02-13","dayName":"FRI","dayDate":"Feb 13","cssClasses":[],"workoutName":"Easy 🌿","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w3d6","date":"2026-02-14","dayName":"SAT","dayDate":"Feb 14","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w3d7","date":"2026-02-15","dayName":"SUN","dayDate":"Feb 15","cssClasses":["long-run"],"workoutName":"Long Easy 🏃","distance":"20 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":4,"title":"Week 4 | Feb 16 – Feb 22","totalKm":"55 km","focus":"Final week of Phase 1. Building to 22km long run. Focus on consistency.","days":[{"id":"w4d1","date":"2026-02-16","dayName":"MON","dayDate":"Feb 16","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w4d2","date":"2026-02-17","dayName":"TUE","dayDate":"Feb 17","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w4d3","date":"2026-02-18","dayName":"WED","dayDate":"Feb 18","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w4d4","date":"2026-02-19","dayName":"THU","dayDate":"Feb 19","cssClasses":["workout-day"],"workoutName":"Steady (Aerobic) 💨","distance":"12 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w4d5","date":"2026-02-20","dayName":"FRI","dayDate":"Feb 20","cssClasses":[],"workoutName":"Easy 🌿","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w4d6","date":"2026-02-21","dayName":"SAT","dayDate":"Feb 21","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w4d7","date":"2026-02-22","dayName":"SUN","dayDate":"Feb 22","cssClasses":["long-run"],"workoutName":"Long Easy 🏃","distance":"22 km","completed":false,"missed":false,"partial":false,"note":""}]}]},{"id":"phase2","title":"Phase 2: Marathon Build","icon":"🎯","cssClass":"phase2","weeks":[{"weekNum":5,"title":"Week 5 | Feb 23 – Mar 1","totalKm":"52 km","focus":"Start of Phase 2! First marathon pace work - 3 × 4km @ MP.","days":[{"id":"w5d1","date":"2026-02-23","dayName":"MON","dayDate":"Feb 23","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w5d2","date":"2026-02-24","dayName":"TUE","dayDate":"Feb 24","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w5d3","date":"2026-02-25","dayName":"WED","dayDate":"Feb 25","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w5d4","date":"2026-02-26","dayName":"THU","dayDate":"Feb 26","cssClasses":["workout-day","key-workout"],"workoutName":"3 × 4km @ MP 🎯 🗝️","distance":"12 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w5d5","date":"2026-02-27","dayName":"FRI","dayDate":"Feb 27","cssClasses":[],"workoutName":"Easy 🌿","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w5d6","date":"2026-02-28","dayName":"SAT","dayDate":"Feb 28","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w5d7","date":"2026-03-01","dayName":"SUN","dayDate":"Mar 1","cssClasses":["long-run"],"workoutName":"Long Easy 🏃","distance":"22 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":6,"title":"Week 6 | Mar 2 – Mar 8","totalKm":"50-52 km","focus":"BIG week! 26km progression run with MP work. Threshold + MP combo midweek.","days":[{"id":"w6d1","date":"2026-03-02","dayName":"MON","dayDate":"Mar 2","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w6d2","date":"2026-03-03","dayName":"TUE","dayDate":"Mar 3","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w6d3","date":"2026-03-04","dayName":"WED","dayDate":"Mar 4","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w6d4","date":"2026-03-05","dayName":"THU","dayDate":"Mar 5","cssClasses":["workout-day","key-workout"],"workoutName":"Threshold Combo: 2km WU, 20min @ Threshold, 5min jog, 5min @ MP, CD 🔥 🗝️","distance":"10-12 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w6d5","date":"2026-03-06","dayName":"FRI","dayDate":"Mar 6","cssClasses":[],"workoutName":"Easy 🌿","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w6d6","date":"2026-03-07","dayName":"SAT","dayDate":"Mar 7","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w6d7","date":"2026-03-08","dayName":"SUN","dayDate":"Mar 8","cssClasses":[],"workoutName":"26km PROGRESSION: ~10km easy, ~8-10km steady, 6-8km @ MP 🔥","distance":"26 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":7,"title":"Week 7 | Mar 9 – Mar 15","totalKm":"58-59 km","focus":"Peak mileage week! 28km long run. 800m repeats for speed endurance.","days":[{"id":"w7d1","date":"2026-03-09","dayName":"MON","dayDate":"Mar 9","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w7d2","date":"2026-03-10","dayName":"TUE","dayDate":"Mar 10","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w7d3","date":"2026-03-11","dayName":"WED","dayDate":"Mar 11","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w7d4","date":"2026-03-12","dayName":"THU","dayDate":"Mar 12","cssClasses":["workout-day","key-workout"],"workoutName":"Speed: 2km WU, 6-8 × 800m @ HM, 400m jog 🔥 🗝️","distance":"12-13 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w7d5","date":"2026-03-13","dayName":"FRI","dayDate":"Mar 13","cssClasses":[],"workoutName":"Easy 🌿","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w7d6","date":"2026-03-14","dayName":"SAT","dayDate":"Mar 14","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w7d7","date":"2026-03-15","dayName":"SUN","dayDate":"Mar 15","cssClasses":["long-run"],"workoutName":"Long Easy 🏃","distance":"28 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":8,"title":"Week 8 | Mar 16 – Mar 22","totalKm":"58 km","focus":"Recovery week. Absorb the training load. Feel fresh again.","days":[{"id":"w8d1","date":"2026-03-16","dayName":"MON","dayDate":"Mar 16","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w8d2","date":"2026-03-17","dayName":"TUE","dayDate":"Mar 17","cssClasses":[],"workoutName":"Easy + Strides 🏃‍♂️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w8d3","date":"2026-03-18","dayName":"WED","dayDate":"Mar 18","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w8d4","date":"2026-03-19","dayName":"THU","dayDate":"Mar 19","cssClasses":["workout-day","key-workout"],"workoutName":"Intervals (VO2max) 🔥 🗝️","distance":"12 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w8d5","date":"2026-03-20","dayName":"FRI","dayDate":"Mar 20","cssClasses":[],"workoutName":"Easy 🌿","distance":"10 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w8d6","date":"2026-03-21","dayName":"SAT","dayDate":"Mar 21","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w8d7","date":"2026-03-22","dayName":"SUN","dayDate":"Mar 22","cssClasses":["long-run"],"workoutName":"Long Easy 🏃","distance":"20 km","completed":false,"missed":false,"partial":false,"note":""}]}]},{"id":"phase3","title":"Phase 3: Peak Like A Freak","icon":"⚡","cssClass":"phase3","weeks":[{"weekNum":10,"title":"Week 10 | Mar 30 – Apr 5","totalKm":"56 km","focus":"Solid MP work. 10km continuous at marathon pace. 28km long run with MP finish.","days":[{"id":"w10d1","date":"2026-03-30","dayName":"MON","dayDate":"Mar 30","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w10d2","date":"2026-03-31","dayName":"TUE","dayDate":"Mar 31","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w10d3","date":"2026-04-01","dayName":"WED","dayDate":"Apr 1","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w10d4","date":"2026-04-02","dayName":"THU","dayDate":"Apr 2","cssClasses":["key-workout"],"workoutName":"10km Continuous @ MP 🎯 🗝️","distance":"10 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w10d5","date":"2026-04-03","dayName":"FRI","dayDate":"Apr 3","cssClasses":[],"workoutName":"Easy 🌿","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w10d6","date":"2026-04-04","dayName":"SAT","dayDate":"Apr 4","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w10d7","date":"2026-04-05","dayName":"SUN","dayDate":"Apr 5","cssClasses":[],"workoutName":"28km (Last 6-8km @ MP) 🔥","distance":"28 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":11,"title":"Week 11 | Apr 6 – Apr 12","totalKm":"60-62 km","focus":"ABSOLUTE PEAK! 30-32km progression peak run. This is your biggest week!","days":[{"id":"w11d1","date":"2026-04-06","dayName":"MON","dayDate":"Apr 6","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w11d2","date":"2026-04-07","dayName":"TUE","dayDate":"Apr 7","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w11d3","date":"2026-04-08","dayName":"WED","dayDate":"Apr 8","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w11d4","date":"2026-04-09","dayName":"THU","dayDate":"Apr 9","cssClasses":["key-workout"],"workoutName":"12km Total (6-8km @ MP) 🎯 🗝️","distance":"12 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w11d5","date":"2026-04-10","dayName":"FRI","dayDate":"Apr 10","cssClasses":[],"workoutName":"Easy 🌿","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w11d6","date":"2026-04-11","dayName":"SAT","dayDate":"Apr 11","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w11d7","date":"2026-04-12","dayName":"SUN","dayDate":"Apr 12","cssClasses":["long-run"],"workoutName":"30-32km PROGRESSION PEAK: ~12-14km easy, ~8-10km steady, 8-10km build to MP 🔥🔥","distance":"30-32 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":12,"title":"Week 12 | Apr 13 – Apr 19","totalKm":"54-58 km","focus":"Recovery week. Threshold combo workout. Long easy run without MP work.","days":[{"id":"w12d1","date":"2026-04-13","dayName":"MON","dayDate":"Apr 13","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w12d2","date":"2026-04-14","dayName":"TUE","dayDate":"Apr 14","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w12d3","date":"2026-04-15","dayName":"WED","dayDate":"Apr 15","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w12d4","date":"2026-04-16","dayName":"THU","dayDate":"Apr 16","cssClasses":["key-workout"],"workoutName":"Threshold Combo: 2km WU, 20min @ Threshold, 5min jog, 5min @ MP, 3-4km CD 🔥 🗝️","distance":"10-12 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w12d5","date":"2026-04-17","dayName":"FRI","dayDate":"Apr 17","cssClasses":[],"workoutName":"Easy 🌿","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w12d6","date":"2026-04-18","dayName":"SAT","dayDate":"Apr 18","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w12d7","date":"2026-04-19","dayName":"SUN","dayDate":"Apr 19","cssClasses":["long-run"],"workoutName":"Long Easy (No MP) 🏃","distance":"26-28 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":13,"title":"Week 13 | Apr 20 – Apr 26","totalKm":"60 km","focus":"Final quality week! Half marathon race as key workout. Build confidence.","days":[{"id":"w13d1","date":"2026-04-20","dayName":"MON","dayDate":"Apr 20","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w13d2","date":"2026-04-21","dayName":"TUE","dayDate":"Apr 21","cssClasses":[],"workoutName":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w13d3","date":"2026-04-22","dayName":"WED","dayDate":"Apr 22","cssClasses":[],"workoutName":"Easy 🌤️","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w13d4","date":"2026-04-23","dayName":"THU","dayDate":"Apr 23","cssClasses":[],"workoutName":"2 × 8km @ MP 🎯","distance":"16 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w13d5","date":"2026-04-24","dayName":"FRI","dayDate":"Apr 24","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w13d6","date":"2026-04-25","dayName":"SAT","dayDate":"Apr 25","cssClasses":[],"workoutName":"Half Marathon (Controlled Effort) 🏁 🗝️","distance":"21.1 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w13d7","date":"2026-04-26","dayName":"SUN","dayDate":"Apr 26","cssClasses":["rest-day"],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""}]}]},{"id":"taper","title":"Taper","icon":"🏁","cssClass":"taper","weeks":[{"weekNum":14,"title":"Week 14 | Apr 27 – May 3","totalKm":"43-50 km","focus":"Taper begins! Reduce volume, maintain intensity. Stay fresh.","days":[{"id":"w14d1","date":"2026-04-27","dayName":"MON","dayDate":"Apr 27","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w14d2","date":"2026-04-28","dayName":"TUE","dayDate":"Apr 28","cssClasses":[],"workoutName":"Easy + Strides ⚡","distance":"5-7 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w14d3","date":"2026-04-29","dayName":"WED","dayDate":"Apr 29","cssClasses":[],"workoutName":"10km (Last 5km @ MP) 🎯","distance":"10 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w14d4","date":"2026-04-30","dayName":"THU","dayDate":"Apr 30","cssClasses":[],"workoutName":"Easy 🌤️","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w14d5","date":"2026-05-01","dayName":"FRI","dayDate":"May 1","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w14d6","date":"2026-05-02","dayName":"SAT","dayDate":"May 2","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w14d7","date":"2026-05-03","dayName":"SUN","dayDate":"May 3","cssClasses":["long-run"],"workoutName":"18-20km ALTERNATING MP (LITE): Easy, 2 × 3-4km @ MP, easy between 🔥","distance":"18-20 km","completed":false,"missed":false,"partial":false,"note":""}]},{"weekNum":15,"title":"Week 15 | May 4 – May 10","totalKm":"30-35 km","focus":"Final taper week. Short MP touches. Rest and prepare mentally.","days":[{"id":"w15d1","date":"2026-05-04","dayName":"MON","dayDate":"May 4","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w15d2","date":"2026-05-05","dayName":"TUE","dayDate":"May 5","cssClasses":[],"workoutName":"Easy + Strides ⚡","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w15d3","date":"2026-05-06","dayName":"WED","dayDate":"May 6","cssClasses":[],"workoutName":"Easy 🌤️","distance":"5-7 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w15d4","date":"2026-05-07","dayName":"THU","dayDate":"May 7","cssClasses":[],"workoutName":"8km (2 × 3km @ MP) 🎯","distance":"8 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w15d5","date":"2026-05-08","dayName":"FRI","dayDate":"May 8","cssClasses":[],"workoutName":"Easy Recovery 🌿","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w15d6","date":"2026-05-09","dayName":"SAT","dayDate":"May 9","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w15d7","date":"2026-05-10","dayName":"SUN","dayDate":"May 10","cssClasses":[],"workoutName":"Easy 🏃","distance":"12-14 km","completed":false,"missed":false,"partial":false,"note":""}]}]},{"id":"race","title":"Race Week","icon":"⭐","cssClass":"race","weeks":[{"weekNum":16,"title":"Week 16 | May 11 – May 17","totalKm":"58.2 km","focus":"🏁 RACE WEEK! Stay calm, trust your training, race smart. YOU GOT THIS!","days":[{"id":"w16d1","date":"2026-05-11","dayName":"MON","dayDate":"May 11","cssClasses":[],"workoutName":"Easy Recovery 🌿","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w16d2","date":"2026-05-12","dayName":"TUE","dayDate":"May 12","cssClasses":[],"workoutName":"Easy 🌤️","distance":"5 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w16d3","date":"2026-05-13","dayName":"WED","dayDate":"May 13","cssClasses":[],"workoutName":"6km Shakeout (2km @ MP) 🎯","distance":"6 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w16d4","date":"2026-05-14","dayName":"THU","dayDate":"May 14","cssClasses":[],"workoutName":"Rest or 2-4km Super Easy 😌","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w16d5","date":"2026-05-15","dayName":"FRI","dayDate":"May 15","cssClasses":[],"workoutName":"Rest 💤","distance":"","completed":false,"missed":false,"partial":false,"note":""},{"id":"w16d6","date":"2026-05-16","dayName":"SAT","dayDate":"May 16","cssClasses":["long-run","key-workout"],"workoutName":"🏁 RACE DAY - MARATHON 🏁","distance":"42.2 km","completed":false,"missed":false,"partial":false,"note":""},{"id":"w16d7","date":"2026-05-17","dayName":"SUN","dayDate":"May 17","cssClasses":[],"workoutName":"🎊 CELEBRATION DAY! 🥳🏆✨","distance":"You did it! 🌟","completed":false,"missed":false,"partial":false,"note":""}]}]}]};
+// Default seed — 5 phases, 105 days, workouts[] per day
+const DEFAULT_PLAN_DATA = {"phases":[{"id":"phase1","title":"Phase 1: Base & Durability","icon":"💪","cssClass":"phase1","weeks":[{"weekNum":1,"title":"Week 1 | Jan 26 – Feb 1","totalKm":"47 km","focus":"Build leg strength + aerobic base. Easy effort, focusing on consistency.","days":[{"id":"w1d1","date":"2026-01-26","dayName":"MON","dayDate":"Jan 26","cssClasses":["rest-day"],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w1d2","date":"2026-01-27","dayName":"TUE","dayDate":"Jan 27","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w1d3","date":"2026-01-28","dayName":"WED","dayDate":"Jan 28","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w1d4","date":"2026-01-29","dayName":"THU","dayDate":"Jan 29","cssClasses":["workout-day"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Steady (Aerobic) 💨","distance":"10 km","completed":false,"missed":false}]},{"id":"w1d5","date":"2026-01-30","dayName":"FRI","dayDate":"Jan 30","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"8 km","completed":false,"missed":false}]},{"id":"w1d6","date":"2026-01-31","dayName":"SAT","dayDate":"Jan 31","cssClasses":["rest-day"],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w1d7","date":"2026-02-01","dayName":"SUN","dayDate":"Feb 1","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Long Easy 🏃","distance":"16 km","completed":false,"missed":false}]}]},{"weekNum":2,"title":"Week 2 | Feb 2 – Feb 8","totalKm":"49 km","focus":"Continue building base. Extend long run by 2 km.","days":[{"id":"w2d1","date":"2026-02-02","dayName":"MON","dayDate":"Feb 2","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w2d2","date":"2026-02-03","dayName":"TUE","dayDate":"Feb 3","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w2d3","date":"2026-02-04","dayName":"WED","dayDate":"Feb 4","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w2d4","date":"2026-02-05","dayName":"THU","dayDate":"Feb 5","cssClasses":["workout-day"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Steady (Aerobic) 💨","distance":"10 km","completed":false,"missed":false}]},{"id":"w2d5","date":"2026-02-06","dayName":"FRI","dayDate":"Feb 6","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"8 km","completed":false,"missed":false}]},{"id":"w2d6","date":"2026-02-07","dayName":"SAT","dayDate":"Feb 7","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w2d7","date":"2026-02-08","dayName":"SUN","dayDate":"Feb 8","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Long Easy 🏃","distance":"18 km","completed":false,"missed":false}]}]},{"weekNum":3,"title":"Week 3 | Feb 9 – Feb 15","totalKm":"53 km","focus":"First speed session! 400m repeats build leg turnover. Long run to 20km.","days":[{"id":"w3d1","date":"2026-02-09","dayName":"MON","dayDate":"Feb 9","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w3d2","date":"2026-02-10","dayName":"TUE","dayDate":"Feb 10","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w3d3","date":"2026-02-11","dayName":"WED","dayDate":"Feb 11","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w3d4","date":"2026-02-12","dayName":"THU","dayDate":"Feb 12","cssClasses":["workout-day","key-workout"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Speed: 2km WU, 8-10 × 400m @ 10K, 200m jog 🔥 🗝️","distance":"12 km","completed":false,"missed":false}]},{"id":"w3d5","date":"2026-02-13","dayName":"FRI","dayDate":"Feb 13","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"8 km","completed":false,"missed":false}]},{"id":"w3d6","date":"2026-02-14","dayName":"SAT","dayDate":"Feb 14","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w3d7","date":"2026-02-15","dayName":"SUN","dayDate":"Feb 15","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Long Easy 🏃","distance":"20 km","completed":false,"missed":false}]}]},{"weekNum":4,"title":"Week 4 | Feb 16 – Feb 22","totalKm":"55 km","focus":"Final week of Phase 1. Building to 22km long run. Focus on consistency.","days":[{"id":"w4d1","date":"2026-02-16","dayName":"MON","dayDate":"Feb 16","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w4d2","date":"2026-02-17","dayName":"TUE","dayDate":"Feb 17","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w4d3","date":"2026-02-18","dayName":"WED","dayDate":"Feb 18","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w4d4","date":"2026-02-19","dayName":"THU","dayDate":"Feb 19","cssClasses":["workout-day"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Steady (Aerobic) 💨","distance":"12 km","completed":false,"missed":false}]},{"id":"w4d5","date":"2026-02-20","dayName":"FRI","dayDate":"Feb 20","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"8 km","completed":false,"missed":false}]},{"id":"w4d6","date":"2026-02-21","dayName":"SAT","dayDate":"Feb 21","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w4d7","date":"2026-02-22","dayName":"SUN","dayDate":"Feb 22","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Long Easy 🏃","distance":"22 km","completed":false,"missed":false}]}]}]},{"id":"phase2","title":"Phase 2: Marathon Build","icon":"🎯","cssClass":"phase2","weeks":[{"weekNum":5,"title":"Week 5 | Feb 23 – Mar 1","totalKm":"52 km","focus":"Start of Phase 2! First marathon pace work - 3 × 4km @ MP.","days":[{"id":"w5d1","date":"2026-02-23","dayName":"MON","dayDate":"Feb 23","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w5d2","date":"2026-02-24","dayName":"TUE","dayDate":"Feb 24","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w5d3","date":"2026-02-25","dayName":"WED","dayDate":"Feb 25","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w5d4","date":"2026-02-26","dayName":"THU","dayDate":"Feb 26","cssClasses":["workout-day","key-workout"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"3 × 4km @ MP 🎯 🗝️","distance":"12 km","completed":false,"missed":false}]},{"id":"w5d5","date":"2026-02-27","dayName":"FRI","dayDate":"Feb 27","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"5 km","completed":false,"missed":false}]},{"id":"w5d6","date":"2026-02-28","dayName":"SAT","dayDate":"Feb 28","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w5d7","date":"2026-03-01","dayName":"SUN","dayDate":"Mar 1","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Long Easy 🏃","distance":"22 km","completed":false,"missed":false}]}]},{"weekNum":6,"title":"Week 6 | Mar 2 – Mar 8","totalKm":"50-52 km","focus":"BIG week! 26km progression run with MP work. Threshold + MP combo midweek.","days":[{"id":"w6d1","date":"2026-03-02","dayName":"MON","dayDate":"Mar 2","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w6d2","date":"2026-03-03","dayName":"TUE","dayDate":"Mar 3","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w6d3","date":"2026-03-04","dayName":"WED","dayDate":"Mar 4","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w6d4","date":"2026-03-05","dayName":"THU","dayDate":"Mar 5","cssClasses":["workout-day","key-workout"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Threshold Combo: 2km WU, 20min @ Threshold, 5min jog, 5min @ MP, CD 🔥 🗝️","distance":"10-12 km","completed":false,"missed":false}]},{"id":"w6d5","date":"2026-03-06","dayName":"FRI","dayDate":"Mar 6","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"5 km","completed":false,"missed":false}]},{"id":"w6d6","date":"2026-03-07","dayName":"SAT","dayDate":"Mar 7","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w6d7","date":"2026-03-08","dayName":"SUN","dayDate":"Mar 8","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"26km PROGRESSION: ~10km easy, ~8-10km steady, 6-8km @ MP 🔥","distance":"26 km","completed":false,"missed":false}]}]},{"weekNum":7,"title":"Week 7 | Mar 9 – Mar 15","totalKm":"58-59 km","focus":"Peak mileage week! 28km long run. 800m repeats for speed endurance.","days":[{"id":"w7d1","date":"2026-03-09","dayName":"MON","dayDate":"Mar 9","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w7d2","date":"2026-03-10","dayName":"TUE","dayDate":"Mar 10","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w7d3","date":"2026-03-11","dayName":"WED","dayDate":"Mar 11","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w7d4","date":"2026-03-12","dayName":"THU","dayDate":"Mar 12","cssClasses":["workout-day","key-workout"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Speed: 2km WU, 6-8 × 800m @ HM, 400m jog 🔥 🗝️","distance":"12-13 km","completed":false,"missed":false}]},{"id":"w7d5","date":"2026-03-13","dayName":"FRI","dayDate":"Mar 13","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"5 km","completed":false,"missed":false}]},{"id":"w7d6","date":"2026-03-14","dayName":"SAT","dayDate":"Mar 14","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w7d7","date":"2026-03-15","dayName":"SUN","dayDate":"Mar 15","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Long Easy 🏃","distance":"28 km","completed":false,"missed":false}]}]},{"weekNum":8,"title":"Week 8 | Mar 16 – Mar 22","totalKm":"58 km","focus":"Recovery week. Absorb the training load. Feel fresh again.","days":[{"id":"w8d1","date":"2026-03-16","dayName":"MON","dayDate":"Mar 16","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w8d2","date":"2026-03-17","dayName":"TUE","dayDate":"Mar 17","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy + Strides 🏃‍♂️","distance":"8 km","completed":false,"missed":false}]},{"id":"w8d3","date":"2026-03-18","dayName":"WED","dayDate":"Mar 18","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w8d4","date":"2026-03-19","dayName":"THU","dayDate":"Mar 19","cssClasses":["workout-day","key-workout"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Intervals (VO2max) 🔥 🗝️","distance":"12 km","completed":false,"missed":false}]},{"id":"w8d5","date":"2026-03-20","dayName":"FRI","dayDate":"Mar 20","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"10 km","completed":false,"missed":false}]},{"id":"w8d6","date":"2026-03-21","dayName":"SAT","dayDate":"Mar 21","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w8d7","date":"2026-03-22","dayName":"SUN","dayDate":"Mar 22","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Long Easy 🏃","distance":"20 km","completed":false,"missed":false}]}]}]},{"id":"phase3","title":"Phase 3: Peak Like A Freak","icon":"⚡","cssClass":"phase3","weeks":[{"weekNum":10,"title":"Week 10 | Mar 30 – Apr 5","totalKm":"56 km","focus":"Solid MP work. 10km continuous at marathon pace. 28km long run with MP finish.","days":[{"id":"w10d1","date":"2026-03-30","dayName":"MON","dayDate":"Mar 30","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w10d2","date":"2026-03-31","dayName":"TUE","dayDate":"Mar 31","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w10d3","date":"2026-04-01","dayName":"WED","dayDate":"Apr 1","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w10d4","date":"2026-04-02","dayName":"THU","dayDate":"Apr 2","cssClasses":["key-workout"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"10km Continuous @ MP 🎯 🗝️","distance":"10 km","completed":false,"missed":false}]},{"id":"w10d5","date":"2026-04-03","dayName":"FRI","dayDate":"Apr 3","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"5 km","completed":false,"missed":false}]},{"id":"w10d6","date":"2026-04-04","dayName":"SAT","dayDate":"Apr 4","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w10d7","date":"2026-04-05","dayName":"SUN","dayDate":"Apr 5","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"28km (Last 6-8km @ MP) 🔥","distance":"28 km","completed":false,"missed":false}]}]},{"weekNum":11,"title":"Week 11 | Apr 6 – Apr 12","totalKm":"60-62 km","focus":"ABSOLUTE PEAK! 30-32km progression peak run. This is your biggest week!","days":[{"id":"w11d1","date":"2026-04-06","dayName":"MON","dayDate":"Apr 6","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w11d2","date":"2026-04-07","dayName":"TUE","dayDate":"Apr 7","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w11d3","date":"2026-04-08","dayName":"WED","dayDate":"Apr 8","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w11d4","date":"2026-04-09","dayName":"THU","dayDate":"Apr 9","cssClasses":["key-workout"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"12km Total (6-8km @ MP) 🎯 🗝️","distance":"12 km","completed":false,"missed":false}]},{"id":"w11d5","date":"2026-04-10","dayName":"FRI","dayDate":"Apr 10","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"5 km","completed":false,"missed":false}]},{"id":"w11d6","date":"2026-04-11","dayName":"SAT","dayDate":"Apr 11","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w11d7","date":"2026-04-12","dayName":"SUN","dayDate":"Apr 12","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"30-32km PROGRESSION PEAK: ~12-14km easy, ~8-10km steady, 8-10km build to MP 🔥🔥","distance":"30-32 km","completed":false,"missed":false}]}]},{"weekNum":12,"title":"Week 12 | Apr 13 – Apr 19","totalKm":"54-58 km","focus":"Recovery week. Threshold combo workout. Long easy run without MP work.","days":[{"id":"w12d1","date":"2026-04-13","dayName":"MON","dayDate":"Apr 13","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w12d2","date":"2026-04-14","dayName":"TUE","dayDate":"Apr 14","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w12d3","date":"2026-04-15","dayName":"WED","dayDate":"Apr 15","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w12d4","date":"2026-04-16","dayName":"THU","dayDate":"Apr 16","cssClasses":["key-workout"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Threshold Combo: 2km WU, 20min @ Threshold, 5min jog, 5min @ MP, 3-4km CD 🔥 🗝️","distance":"10-12 km","completed":false,"missed":false}]},{"id":"w12d5","date":"2026-04-17","dayName":"FRI","dayDate":"Apr 17","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌿","distance":"5 km","completed":false,"missed":false}]},{"id":"w12d6","date":"2026-04-18","dayName":"SAT","dayDate":"Apr 18","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w12d7","date":"2026-04-19","dayName":"SUN","dayDate":"Apr 19","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Long Easy (No MP) 🏃","distance":"26-28 km","completed":false,"missed":false}]}]},{"weekNum":13,"title":"Week 13 | Apr 20 – Apr 26","totalKm":"60 km","focus":"Final quality week! Half marathon race as key workout. Build confidence.","days":[{"id":"w13d1","date":"2026-04-20","dayName":"MON","dayDate":"Apr 20","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w13d2","date":"2026-04-21","dayName":"TUE","dayDate":"Apr 21","cssClasses":[],"note":"","workouts":[{"type":"bike","icon":"🚴","desc":"Easy + Bike 🚴","distance":"5 km","completed":false,"missed":false}]},{"id":"w13d3","date":"2026-04-22","dayName":"WED","dayDate":"Apr 22","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"8 km","completed":false,"missed":false}]},{"id":"w13d4","date":"2026-04-23","dayName":"THU","dayDate":"Apr 23","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"2 × 8km @ MP 🎯","distance":"16 km","completed":false,"missed":false}]},{"id":"w13d5","date":"2026-04-24","dayName":"FRI","dayDate":"Apr 24","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w13d6","date":"2026-04-25","dayName":"SAT","dayDate":"Apr 25","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Half Marathon (Controlled Effort) 🏁 🗝️","distance":"21.1 km","completed":false,"missed":false}]},{"id":"w13d7","date":"2026-04-26","dayName":"SUN","dayDate":"Apr 26","cssClasses":["rest-day"],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]}]}]},{"id":"taper","title":"Taper","icon":"🏁","cssClass":"taper","weeks":[{"weekNum":14,"title":"Week 14 | Apr 27 – May 3","totalKm":"43-50 km","focus":"Taper begins! Reduce volume, maintain intensity. Stay fresh.","days":[{"id":"w14d1","date":"2026-04-27","dayName":"MON","dayDate":"Apr 27","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w14d2","date":"2026-04-28","dayName":"TUE","dayDate":"Apr 28","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy + Strides ⚡","distance":"5-7 km","completed":false,"missed":false}]},{"id":"w14d3","date":"2026-04-29","dayName":"WED","dayDate":"Apr 29","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"10km (Last 5km @ MP) 🎯","distance":"10 km","completed":false,"missed":false}]},{"id":"w14d4","date":"2026-04-30","dayName":"THU","dayDate":"Apr 30","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"5 km","completed":false,"missed":false}]},{"id":"w14d5","date":"2026-05-01","dayName":"FRI","dayDate":"May 1","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w14d6","date":"2026-05-02","dayName":"SAT","dayDate":"May 2","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w14d7","date":"2026-05-03","dayName":"SUN","dayDate":"May 3","cssClasses":["long-run"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"18-20km ALTERNATING MP (LITE): Easy, 2 × 3-4km @ MP, easy between 🔥","distance":"18-20 km","completed":false,"missed":false}]}]},{"weekNum":15,"title":"Week 15 | May 4 – May 10","totalKm":"30-35 km","focus":"Final taper week. Short MP touches. Rest and prepare mentally.","days":[{"id":"w15d1","date":"2026-05-04","dayName":"MON","dayDate":"May 4","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w15d2","date":"2026-05-05","dayName":"TUE","dayDate":"May 5","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy + Strides ⚡","distance":"5 km","completed":false,"missed":false}]},{"id":"w15d3","date":"2026-05-06","dayName":"WED","dayDate":"May 6","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"5-7 km","completed":false,"missed":false}]},{"id":"w15d4","date":"2026-05-07","dayName":"THU","dayDate":"May 7","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"8km (2 × 3km @ MP) 🎯","distance":"8 km","completed":false,"missed":false}]},{"id":"w15d5","date":"2026-05-08","dayName":"FRI","dayDate":"May 8","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy Recovery 🌿","distance":"5 km","completed":false,"missed":false}]},{"id":"w15d6","date":"2026-05-09","dayName":"SAT","dayDate":"May 9","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w15d7","date":"2026-05-10","dayName":"SUN","dayDate":"May 10","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🏃","distance":"12-14 km","completed":false,"missed":false}]}]}]},{"id":"race","title":"Race Week","icon":"⭐","cssClass":"race","weeks":[{"weekNum":16,"title":"Week 16 | May 11 – May 17","totalKm":"58.2 km","focus":"🏁 RACE WEEK! Stay calm, trust your training, race smart. YOU GOT THIS!","days":[{"id":"w16d1","date":"2026-05-11","dayName":"MON","dayDate":"May 11","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy Recovery 🌿","distance":"5 km","completed":false,"missed":false}]},{"id":"w16d2","date":"2026-05-12","dayName":"TUE","dayDate":"May 12","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Easy 🌤️","distance":"5 km","completed":false,"missed":false}]},{"id":"w16d3","date":"2026-05-13","dayName":"WED","dayDate":"May 13","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"6km Shakeout (2km @ MP) 🎯","distance":"6 km","completed":false,"missed":false}]},{"id":"w16d4","date":"2026-05-14","dayName":"THU","dayDate":"May 14","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"Rest or 2-4km Super Easy 😌","distance":"","completed":false,"missed":false}]},{"id":"w16d5","date":"2026-05-15","dayName":"FRI","dayDate":"May 15","cssClasses":[],"note":"","workouts":[{"type":"rest","icon":"😴","desc":"Rest 💤","distance":"","completed":false,"missed":false}]},{"id":"w16d6","date":"2026-05-16","dayName":"SAT","dayDate":"May 16","cssClasses":["long-run","key-workout"],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"🏁 RACE DAY - MARATHON 🏁","distance":"42.2 km","completed":false,"missed":false}]},{"id":"w16d7","date":"2026-05-17","dayName":"SUN","dayDate":"May 17","cssClasses":[],"note":"","workouts":[{"type":"run","icon":"🏃","desc":"🎊 CELEBRATION DAY! 🥳🏆✨","distance":"You did it! 🌟","completed":false,"missed":false}]}]}]}]};
 
-// =====================================================
-// CACHE FUNCTIONS
-// =====================================================
-function saveToCache(data, planId) {
+// ── Cache ─────────────────────────────────────────────
+function saveToCache(data, id) {
     try {
         localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-        if (planId) localStorage.setItem(CACHE_ID, planId);
-    } catch(e) { console.warn('Cache write failed:', e); }
+        if (id) localStorage.setItem(CACHE_ID, id);
+    } catch(e) {}
 }
 function loadFromCache() {
-    try {
-        const raw = localStorage.getItem(CACHE_KEY);
-        return raw ? JSON.parse(raw) : null;
-    } catch(e) { return null; }
+    try { const r = localStorage.getItem(CACHE_KEY); return r ? JSON.parse(r) : null; }
+    catch(e) { return null; }
+}
+
+// ── Collapse state (localStorage only) ───────────────
+function saveCollapse(id, collapsed) { localStorage.setItem('ps-cl-'+id, collapsed?'1':'0'); }
+function loadCollapse(id) { return localStorage.getItem('ps-cl-'+id); }
+
+// ── Utilities ─────────────────────────────────────────
+function parseKm(str) {
+    if (!str) return 0;
+    str = String(str).replace(/[✏️🗝️]/g,'').trim();
+    if (!str || str==='—') return 0;
+    const m = str.match(/([\d.]+)/);
+    return m ? parseFloat(m[1]) : 0;
+}
+
+function findDay(dayId) {
+    for (const phase of trainingData.phases)
+        for (const week of phase.weeks)
+            for (const day of week.days)
+                if (day.id === dayId) return day;
+    return null;
+}
+
+// ── Day completion state ──────────────────────────────
+function updateDayCompletion(dayRow) {
+    const checkboxes = dayRow.querySelectorAll('.checkbox');
+    const missBtns   = dayRow.querySelectorAll('.miss-btn');
+    const total     = checkboxes.length;
+    const completed = Array.from(checkboxes).filter(c=>c.checked).length;
+    const missed    = Array.from(missBtns).filter(m=>m.classList.contains('active')).length;
+
+    dayRow.classList.remove('completed','missed','partial');
+    if (total === 0) return;
+    if (completed === total)             dayRow.classList.add('completed');
+    else if (missed > 0 && completed>0) dayRow.classList.add('partial');
+    else if (missed > 0 && completed===0) dayRow.classList.add('missed');
+    // else neutral
+
+    checkWeekCompliance();
 }
 
 // =====================================================
-// COLLAPSE STATE — localStorage only (zero network calls)
-// =====================================================
-function saveCollapseState(id, collapsed) {
-    localStorage.setItem('ps-cl-' + id, collapsed ? '1' : '0');
-}
-function loadCollapseState(id) {
-    return localStorage.getItem('ps-cl-' + id);
-}
-
-// =====================================================
-// PLAN RENDERING
+// RENDER
 // =====================================================
 function initializePlan() {
     if (!trainingData?.phases?.length) return;
     const container = document.getElementById('training-plan');
     container.innerHTML = '';
-
-    trainingData.phases.forEach((phase, phaseIdx) => {
-        container.appendChild(renderPhase(phase, phaseIdx));
-    });
-
+    trainingData.phases.forEach((phase, pi) => container.appendChild(renderPhase(phase, pi)));
     document.getElementById('training-summary').style.display = '';
-    updateOverviewStats();
     highlightToday();
     checkWeekCompliance();
+    updateOverviewStats();
     updateSummaryStats();
     scheduleMidnightRefresh();
 }
 
-function renderPhase(phase, phaseIdx) {
-    const section = document.createElement('div');
-    section.className = 'phase-section ' + phase.cssClass + ' collapsed';
-    section.id = 'ps-phase-' + phaseIdx;
+function renderPhase(phase, pi) {
+    const sec = document.createElement('div');
+    sec.className = 'phase-section ' + phase.cssClass + ' collapsed';
 
-    const header = document.createElement('div');
-    header.className = 'phase-header';
-    header.innerHTML = `
+    // restore saved collapse
+    if (loadCollapse('ph'+pi) === '0') sec.classList.remove('collapsed');
+
+    const hdr = document.createElement('div');
+    hdr.className = 'phase-header';
+    hdr.innerHTML = `
         <div class="phase-content">
             <div class="phase-icon">${phase.icon}</div>
-            <div class="phase-info">
-                <h2 class="phase-title">${phase.title}</h2>
-            </div>
+            <div class="phase-info"><h2 class="phase-title">${phase.title}</h2></div>
         </div>`;
-
-    // Restore saved collapse state
-    const savedState = loadCollapseState('phase-' + phaseIdx);
-    if (savedState === '0') section.classList.remove('collapsed');
-
-    header.addEventListener('click', () => {
-        section.classList.toggle('collapsed');
-        saveCollapseState('phase-' + phaseIdx, section.classList.contains('collapsed'));
+    hdr.addEventListener('click', () => {
+        sec.classList.toggle('collapsed');
+        saveCollapse('ph'+pi, sec.classList.contains('collapsed'));
     });
-
-    section.appendChild(header);
-    phase.weeks.forEach((week, weekIdx) => {
-        section.appendChild(renderWeek(week, phase.cssClass, phaseIdx, weekIdx));
-    });
-    return section;
+    sec.appendChild(hdr);
+    phase.weeks.forEach((week, wi) => sec.appendChild(renderWeek(week, pi, wi)));
+    return sec;
 }
 
-function renderWeek(week, phaseClass, phaseIdx, weekIdx) {
-    const uniqueId = 'ph' + phaseIdx + 'wk' + weekIdx;
+function renderWeek(week, pi, wi) {
+    const uid  = 'ph'+pi+'wk'+wi;
     const card = document.createElement('div');
     card.className = 'week-card collapsed';
-    card.id = 'wcard-' + uniqueId;
+    if (loadCollapse(uid) === '0') card.classList.remove('collapsed');
 
-    const header = document.createElement('div');
-    header.className = 'week-header';
-    header.innerHTML = `
+    // calc total km for week header
+    let totalKm = 0;
+    week.days.forEach(d => d.workouts?.forEach(w => { totalKm += parseKm(w.distance); }));
+    const kmText = totalKm > 0 ? totalKm + ' km' : week.totalKm;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'week-header';
+    hdr.innerHTML = `
         <div class="week-title-wrapper">
             <div class="week-title">${week.title}</div>
             <div class="week-compliance"></div>
         </div>
-        <div class="week-total">${week.totalKm}</div>
+        <div class="week-total" id="wktotal-${uid}">${kmText}</div>
         <span class="collapse-indicator">▼</span>`;
-
-    const savedState = loadCollapseState(uniqueId);
-    if (savedState === '0') card.classList.remove('collapsed');
-
-    header.addEventListener('click', () => {
+    hdr.addEventListener('click', () => {
         card.classList.toggle('collapsed');
-        saveCollapseState(uniqueId, card.classList.contains('collapsed'));
+        saveCollapse(uid, card.classList.contains('collapsed'));
     });
 
     const grid = document.createElement('div');
     grid.className = 'days-grid';
-    week.days.forEach(day => grid.appendChild(renderDay(day)));
+    week.days.forEach(day => {
+        const nodes = renderDay(day);
+        nodes.forEach(n => grid.appendChild(n));
+    });
 
-    // Week focus
+    card.appendChild(hdr);
+    card.appendChild(grid);
+
     if (week.focus) {
         const focus = document.createElement('div');
         focus.className = 'week-focus';
         focus.innerHTML = `<div class="focus-label">💡 Focus</div><div class="focus-text">${week.focus}</div>`;
-        card.appendChild(header);
-        card.appendChild(grid);
         card.appendChild(focus);
-    } else {
-        card.appendChild(header);
-        card.appendChild(grid);
     }
-
     return card;
 }
 
@@ -1617,182 +1651,139 @@ function renderDay(day) {
     row.setAttribute('data-date', day.date);
     row.setAttribute('data-day-id', day.id);
 
-    // Apply type classes
+    // CSS type classes (rest-day, long-run, etc from original)
     (day.cssClasses || []).forEach(c => row.classList.add(c));
 
-    // Apply saved state
-    if (day.completed) row.classList.add('completed');
-    else if (day.missed) row.classList.add('missed');
-    else if (day.partial) row.classList.add('partial');
+    // Day header
+    const dayHdr = document.createElement('div');
+    dayHdr.className = 'day-header-row';
+    dayHdr.innerHTML = `<div class="day-name">${day.dayName}</div><div class="day-date">${day.dayDate}</div>`;
+    row.appendChild(dayHdr);
 
-    // Determine if no-workout (rest with no distance)
-    const hasNoWorkout = !day.distance || day.distance === '' || day.distance === '—';
-    if (hasNoWorkout) row.classList.add('no-workout');
+    // Workouts container
+    const wc = document.createElement('div');
+    wc.className = 'workouts-container';
 
-    // Check for key workout (🗝️ emoji)
-    if (day.workoutName && day.workoutName.includes('🗝️')) row.classList.add('key-workout');
+    (day.workouts || []).forEach((w, wi) => {
+        const item = createWorkoutItem(day, w, wi);
+        wc.appendChild(item);
+    });
+    row.appendChild(wc);
 
-    row.innerHTML = `
-        <div class="day-name">${day.dayName}</div>
-        <div class="day-date">${day.dayDate}</div>
-        <div class="checkbox-label">
-            <input type="checkbox" class="checkbox" data-id="${day.id}" ${day.completed ? 'checked' : ''}>
-            Done
-        </div>
-        <div class="workout-name" data-id="${day.id}">${day.workoutName || '—'}<span class="edit-icon">✏️</span></div>
-        <div class="miss-btn-label">
-            <div class="miss-btn ${day.missed ? 'active' : ''}" data-id="${day.id}">✗</div>
-            Miss
-        </div>
-        <div class="partial-btn-label">
-            <div class="partial-btn ${day.partial ? 'active' : ''}" data-id="${day.id}">⚡</div>
-            Partial
-        </div>
-        <div class="workout-distance" data-id="${day.id}">${day.distance || ''}<span class="edit-icon">✏️</span></div>
-    `;
+    // Restore day-level completion state
+    updateDayCompletionFromData(row, day);
 
-    // Notes button + section
+    // key-workout class from workouts
+    const hasKey = (day.workouts||[]).some(w => w.desc && w.desc.includes('🗝️'));
+    if (hasKey) row.classList.add('key-workout');
+
+    // Notes
     const notesBtn = document.createElement('button');
     notesBtn.className = 'notes-btn' + (day.note ? ' has-note' : '');
-    notesBtn.dataset.id = day.id;
     notesBtn.textContent = '📝 Notes';
-    notesBtn.style.gridColumn = '1 / -1';
+    notesBtn.dataset.id = day.id;
+    notesBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        document.querySelectorAll('.notes-section.active').forEach(s => {
+            if (s.dataset.id !== day.id) s.classList.remove('active');
+        });
+        notesSection.classList.toggle('active');
+        if (notesSection.classList.contains('active'))
+            setTimeout(()=>notesSection.querySelector('textarea').focus(), 150);
+    });
 
     const notesSection = document.createElement('div');
     notesSection.className = 'notes-section';
     notesSection.dataset.id = day.id;
-    notesSection.innerHTML = `
-        <textarea placeholder="Add your training notes...">${day.note || ''}</textarea>
-        <input type="button" class="save-btn" value="💾 Save Note" data-id="${day.id}">`;
+    notesSection.innerHTML = `<textarea placeholder="Add training notes...">${day.note||''}</textarea><input type="button" class="save-btn" value="💾 Save Note" data-id="${day.id}">`;
+    notesSection.querySelector('.save-btn').addEventListener('click', function() {
+        const text = notesSection.querySelector('textarea').value.trim();
+        const fd = findDay(day.id);
+        if (fd) fd.note = text;
+        notesSection.classList.remove('active');
+        notesBtn.classList.toggle('has-note', !!text);
+        noteDisplay.textContent = text ? '💬 '+text : '';
+        noteDisplay.classList.toggle('visible', !!text);
+        savePlanToDatabase();
+        const ov = this.value; this.value='✓ Saved!'; this.style.background='#059669';
+        setTimeout(()=>{this.value=ov;this.style.background=''},1400);
+    });
 
     const noteDisplay = document.createElement('div');
     noteDisplay.className = 'note-display' + (day.note ? ' visible' : '');
     noteDisplay.dataset.noteDisplay = day.id;
-    if (day.note) noteDisplay.textContent = '💬 ' + day.note;
+    if (day.note) noteDisplay.textContent = '💬 '+day.note;
 
     row.appendChild(notesBtn);
-    row.appendChild(document.createElement('div')); // spacer
-    
-    // Attach event listeners
-    attachDayEvents(row, notesBtn, notesSection);
-
-    // Return wrapper with notes
-    const wrapper = document.createDocumentFragment();
-    wrapper.appendChild(row);
-    wrapper.appendChild(notesSection);
-    wrapper.appendChild(noteDisplay);
-    return wrapper;
+    return [row, notesSection, noteDisplay];
 }
 
-// =====================================================
-// EVENT HANDLERS
-// =====================================================
-function attachDayEvents(row, notesBtn, notesSection) {
-    const id = row.getAttribute('data-day-id');
+function createWorkoutItem(day, workout, wi) {
+    const item = document.createElement('div');
+    item.className = 'workout-item ' + workout.type + (workout.desc&&workout.desc.includes('🗝️')?' key-item':'');
+    item.dataset.workoutIdx = wi;
 
-    // Checkbox
-    const checkbox = row.querySelector('.checkbox');
-    checkbox?.addEventListener('change', function() {
-        updateDayState(id, this.checked ? 'completed' : null);
-    });
+    const missActive = workout.missed ? 'active' : '';
+    const checked    = workout.completed ? 'checked' : '';
 
-    // Miss button
-    const missBtn = row.querySelector('.miss-btn');
-    missBtn?.addEventListener('click', function(e) {
+    item.innerHTML = `
+        <span class="workout-icon">${workout.icon||'🏃'}</span>
+        <div class="workout-desc" data-id="${day.id}" data-wi="${wi}">${workout.desc||''}</div>
+        <div class="workout-dist" data-id="${day.id}" data-wi="${wi}">${workout.distance||''}</div>
+        <div class="miss-btn-wrap">
+            <div class="miss-btn ${missActive}" data-id="${day.id}" data-wi="${wi}">✗</div>
+            Miss
+        </div>
+        <div class="check-wrap">
+            <input type="checkbox" class="checkbox" data-id="${day.id}" data-wi="${wi}" ${checked}>
+            Done
+        </div>`;
+
+    // Miss handler
+    item.querySelector('.miss-btn').addEventListener('click', function(e) {
         e.stopPropagation();
-        updateDayState(id, this.classList.contains('active') ? null : 'missed');
+        const isActive = this.classList.toggle('active');
+        const cb = item.querySelector('.checkbox');
+        if (isActive && cb.checked) { cb.checked = false; }
+        syncWorkoutState(day.id, wi);
     });
 
-    // Partial button
-    const partialBtn = row.querySelector('.partial-btn');
-    partialBtn?.addEventListener('click', function(e) {
-        e.stopPropagation();
-        updateDayState(id, this.classList.contains('active') ? null : 'partial');
+    // Checkbox handler
+    item.querySelector('.checkbox').addEventListener('change', function() {
+        const mb = item.querySelector('.miss-btn');
+        if (this.checked && mb.classList.contains('active')) mb.classList.remove('active');
+        syncWorkoutState(day.id, wi);
     });
 
-    // Notes button
-    notesBtn?.addEventListener('click', function(e) {
-        e.stopPropagation();
-        document.querySelectorAll('.notes-section.active').forEach(s => {
-            if (s.dataset.id !== notesSection.dataset.id) s.classList.remove('active');
-        });
-        notesSection.classList.toggle('active');
-        if (notesSection.classList.contains('active')) {
-            setTimeout(() => notesSection.querySelector('textarea')?.focus(), 200);
-        }
-    });
-
-    // Save note
-    notesSection?.querySelector('.save-btn')?.addEventListener('click', function() {
-        const textarea = notesSection.querySelector('textarea');
-        const text = textarea.value.trim();
-        saveNoteForDay(id, text);
-        notesSection.classList.remove('active');
-        // Flash confirmation
-        const orig = this.value;
-        this.value = '✓ Saved!';
-        this.style.background = '#059669';
-        setTimeout(() => { this.value = orig; this.style.background = ''; }, 1500);
-    });
+    return item;
 }
 
-// =====================================================
-// DAY STATE MANAGEMENT
-// =====================================================
-function findDay(dayId) {
-    for (const phase of trainingData.phases) {
-        for (const week of phase.weeks) {
-            for (const day of week.days) {
-                if (day.id === dayId) return day;
-            }
-        }
+function syncWorkoutState(dayId, wi) {
+    const fd = findDay(dayId);
+    const row = document.querySelector('.day-row[data-day-id="'+dayId+'"]');
+    if (!fd || !row) return;
+    const item = row.querySelectorAll('.workout-item')[wi];
+    if (!item) return;
+    const cb = item.querySelector('.checkbox');
+    const mb = item.querySelector('.miss-btn');
+    if (fd.workouts[wi]) {
+        fd.workouts[wi].completed = cb ? cb.checked : false;
+        fd.workouts[wi].missed    = mb ? mb.classList.contains('active') : false;
     }
-    return null;
-}
-
-function updateDayState(dayId, newState) {
-    // newState: 'completed' | 'missed' | 'partial' | null
-    const day = findDay(dayId);
-    if (!day) return;
-
-    // Update data model
-    day.completed = newState === 'completed';
-    day.missed = newState === 'missed';
-    day.partial = newState === 'partial';
-
-    // Update DOM
-    const row = document.querySelector(`.day-row[data-day-id="${dayId}"]`);
-    if (row) {
-        row.classList.remove('completed', 'missed', 'partial');
-        if (newState) row.classList.add(newState);
-
-        const cb = row.querySelector('.checkbox');
-        const mb = row.querySelector('.miss-btn');
-        const pb = row.querySelector('.partial-btn');
-        if (cb) cb.checked = day.completed;
-        if (mb) mb.classList.toggle('active', day.missed);
-        if (pb) pb.classList.toggle('active', day.partial);
-    }
-
-    checkWeekCompliance();
+    updateDayCompletion(row);
     savePlanToDatabase();
 }
 
-function saveNoteForDay(dayId, text) {
-    const day = findDay(dayId);
-    if (!day) return;
-    day.note = text;
-
-    // Update DOM note display
-    const noteDisplay = document.querySelector(`[data-note-display="${dayId}"]`);
-    const notesBtn = document.querySelector(`.notes-btn[data-id="${dayId}"]`);
-    if (noteDisplay) {
-        noteDisplay.textContent = text ? '💬 ' + text : '';
-        noteDisplay.classList.toggle('visible', !!text);
-    }
-    if (notesBtn) notesBtn.classList.toggle('has-note', !!text);
-
-    savePlanToDatabase();
+function updateDayCompletionFromData(row, day) {
+    const workouts = day.workouts || [];
+    const total     = workouts.length;
+    const completed = workouts.filter(w=>w.completed).length;
+    const missed    = workouts.filter(w=>w.missed).length;
+    row.classList.remove('completed','missed','partial');
+    if (total===0) return;
+    if (completed===total)               row.classList.add('completed');
+    else if (missed>0 && completed>0)    row.classList.add('partial');
+    else if (missed>0 && completed===0)  row.classList.add('missed');
 }
 
 // =====================================================
@@ -1800,47 +1791,181 @@ function saveNoteForDay(dayId, text) {
 // =====================================================
 const editModeBtn = document.getElementById('editModeBtn');
 if (editModeBtn) {
-    editModeBtn.addEventListener('click', function() {
+    editModeBtn.addEventListener('click', async function() {
         editMode = !editMode;
         this.classList.toggle('active');
-        document.querySelectorAll('.workout-name, .workout-distance').forEach(el => {
-            el.contentEditable = editMode ? 'true' : 'false';
-            el.style.cursor = editMode ? 'text' : 'default';
-        });
+
+        const allDescs  = document.querySelectorAll('.workout-desc');
+        const allDists  = document.querySelectorAll('.workout-dist');
 
         if (editMode) {
             this.textContent = '💾 Save Changes';
+            allDescs.forEach(el => {
+                el.contentEditable = 'true';
+                el.style.cursor = 'text';
+            });
+            allDists.forEach(el => {
+                el.contentEditable = 'true';
+                el.style.cursor = 'text';
+            });
+
+            // Add key toggle + delete buttons to every workout item
+            document.querySelectorAll('.workout-item').forEach(item => {
+                if (!item.querySelector('.key-toggle-btn')) {
+                    const desc = item.querySelector('.workout-desc');
+                    const btn = document.createElement('button');
+                    btn.className = 'key-toggle-btn';
+                    btn.textContent = desc&&desc.textContent.includes('🗝️') ? '🗝️' : '+ 🗝️';
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        if (!desc) return;
+                        if (desc.textContent.includes('🗝️')) {
+                            desc.textContent = desc.textContent.replace('🗝️','').trim();
+                            btn.textContent = '+ 🗝️';
+                            item.classList.remove('key-item');
+                        } else {
+                            desc.textContent = '🗝️ '+desc.textContent;
+                            btn.textContent = '🗝️';
+                            item.classList.add('key-item');
+                        }
+                        const row = item.closest('.day-row');
+                        if (row) {
+                            const hasKey = Array.from(row.querySelectorAll('.workout-desc')).some(d=>d.textContent.includes('🗝️'));
+                            row.classList.toggle('key-workout', hasKey);
+                        }
+                    });
+                    item.appendChild(btn);
+                }
+                if (!item.querySelector('.delete-workout-btn')) {
+                    const del = document.createElement('button');
+                    del.className = 'delete-workout-btn';
+                    del.textContent = '🗑️';
+                    del.addEventListener('click', e => {
+                        e.stopPropagation();
+                        item.remove();
+                    });
+                    item.appendChild(del);
+                }
+            });
+
+            // Add "Add Workout" button per day
+            document.querySelectorAll('.day-row').forEach(row => {
+                const wc = row.querySelector('.workouts-container');
+                if (wc && !wc.querySelector('.add-workout-btn')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'add-workout-btn';
+                    btn.textContent = '➕ Add Workout';
+                    btn.addEventListener('click', () => addWorkout(row));
+                    wc.appendChild(btn);
+                }
+            });
+
         } else {
-            this.textContent = '✏️ Edit Workouts';
-            // Scrape edited values back into trainingData
-            document.querySelectorAll('.workout-name[data-id]').forEach(el => {
-                const id = el.dataset.id;
-                const day = findDay(id);
-                if (!day) return;
-                let newName = el.textContent.replace('✏️', '').trim();
-                day.workoutName = newName;
-                el.innerHTML = newName + '<span class="edit-icon">✏️</span>';
-                // Update key-workout class
-                const row = el.closest('.day-row');
-                if (row) row.classList.toggle('key-workout', newName.includes('🗝️'));
+            // ── SAVE: scrape DOM back into trainingData ──────────
+            this.textContent = '⏳ Saving…';
+            this.disabled = true;
+
+            const typeIcons = {run:'🏃',bike:'🚴',swim:'🏊',rest:'😴',mobility:'🧘'};
+
+            document.querySelectorAll('.day-row[data-day-id]').forEach(row => {
+                const dayId = row.getAttribute('data-day-id');
+                const fd = findDay(dayId);
+                if (!fd) return;
+                const items = row.querySelectorAll('.workout-item');
+                const newWorkouts = [];
+                items.forEach(item => {
+                    let type = 'run';
+                    for (const t of ['run','bike','swim','rest','mobility']) {
+                        if (item.classList.contains(t)) { type=t; break; }
+                    }
+                    const desc = item.querySelector('.workout-desc');
+                    const dist = item.querySelector('.workout-dist');
+                    const cb   = item.querySelector('.checkbox');
+                    const mb   = item.querySelector('.miss-btn');
+                    newWorkouts.push({
+                        type,
+                        icon: typeIcons[type]||'🏃',
+                        desc: desc ? desc.textContent.replace(/[✏️]/g,'').trim() : '',
+                        distance: dist ? dist.textContent.replace(/[✏️]/g,'').trim() : '',
+                        completed: cb ? cb.checked : false,
+                        missed: mb ? mb.classList.contains('active') : false
+                    });
+                });
+                fd.workouts = newWorkouts;
+
+                // update key-workout class
+                const hasKey = newWorkouts.some(w=>w.desc&&w.desc.includes('🗝️'));
+                row.classList.toggle('key-workout', hasKey);
             });
-            document.querySelectorAll('.workout-distance[data-id]').forEach(el => {
-                const id = el.dataset.id;
-                const day = findDay(id);
-                if (!day) return;
-                let newDist = el.textContent.replace('✏️', '').trim();
-                day.distance = newDist;
-                el.innerHTML = newDist + '<span class="edit-icon">✏️</span>';
-                const row = el.closest('.day-row');
-                if (row) row.classList.toggle('no-workout', !newDist || newDist === '—');
-            });
-            // Recalculate totals
+
+            // Strip edit UI
+            allDescs.forEach(el=>{ el.contentEditable='false'; el.style.cursor='default'; });
+            allDists.forEach(el=>{ el.contentEditable='false'; el.style.cursor='default'; });
+            document.querySelectorAll('.key-toggle-btn,.delete-workout-btn,.add-workout-btn').forEach(b=>b.remove());
+
             updateWeekTotals();
             updateOverviewStats();
             updateSummaryStats();
-            // Save everything
-            savePlanToDatabase();
+            await savePlanToDatabase();
+            this.disabled = false;
+            this.textContent = '✏️ Edit Workouts';
         }
+    });
+}
+
+function addWorkout(dayRow) {
+    const wc = dayRow.querySelector('.workouts-container');
+    const addBtn = wc.querySelector('.add-workout-btn');
+    const types = {
+        run:      { icon:'🏃', label:'Run' },
+        bike:     { icon:'🚴', label:'Bike' },
+        swim:     { icon:'🏊', label:'Swim' },
+        rest:     { icon:'😴', label:'Rest/Mobility' },
+    };
+
+    const sel = document.createElement('div');
+    sel.className = 'workout-type-selector';
+    const btnRow = Object.entries(types).map(([key,t]) =>
+        `<button data-type="${key}">${t.icon} ${t.label}</button>`
+    ).join('');
+    sel.innerHTML = `<div style="font-size:0.8rem;color:var(--text-light);font-weight:700;margin-bottom:0.2rem">Choose type:</div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap">${btnRow}</div>
+        <button class="cancel-add-btn">✕ Cancel</button>`;
+
+    wc.insertBefore(sel, addBtn);
+    sel.querySelector('.cancel-add-btn').onclick = () => sel.remove();
+
+    sel.querySelectorAll('[data-type]').forEach(btn => {
+        btn.onclick = () => {
+            const t = btn.dataset.type;
+            sel.remove();
+
+            // Create a stub workout object
+            const dayId = dayRow.getAttribute('data-day-id');
+            const fd = findDay(dayId);
+            const stubWorkout = { type:t, icon:types[t].icon, desc:'New '+types[t].label+' workout', distance:'', completed:false, missed:false };
+
+            const item = createWorkoutItem({id:dayId, workouts:fd?fd.workouts:[]} , stubWorkout, (fd?fd.workouts.length:0));
+            item.querySelector('.workout-desc').contentEditable='true';
+            item.querySelector('.workout-dist').contentEditable='true';
+            // Add key toggle + delete immediately (already in edit mode)
+            const keyBtn = document.createElement('button');
+            keyBtn.className='key-toggle-btn'; keyBtn.textContent='+ 🗝️';
+            keyBtn.addEventListener('click', e=>{
+                e.stopPropagation();
+                const desc=item.querySelector('.workout-desc');
+                if (desc.textContent.includes('🗝️')) { desc.textContent=desc.textContent.replace('🗝️','').trim(); keyBtn.textContent='+ 🗝️'; item.classList.remove('key-item'); }
+                else { desc.textContent='🗝️ '+desc.textContent; keyBtn.textContent='🗝️'; item.classList.add('key-item'); }
+            });
+            const delBtn = document.createElement('button');
+            delBtn.className='delete-workout-btn'; delBtn.textContent='🗑️';
+            delBtn.addEventListener('click', e=>{ e.stopPropagation(); item.remove(); });
+            item.appendChild(keyBtn);
+            item.appendChild(delBtn);
+
+            wc.insertBefore(item, addBtn);
+            item.querySelector('.workout-desc').focus();
+        };
     });
 }
 
@@ -1850,146 +1975,129 @@ if (editModeBtn) {
 function checkWeekCompliance() {
     if (!trainingData) return;
     const today = new Date();
-    const todayStr = today.getFullYear() + '-' +
-        String(today.getMonth()+1).padStart(2,'0') + '-' +
-        String(today.getDate()).padStart(2,'0');
-
-    document.querySelectorAll('.week-card').forEach(weekCard => {
-        const dayRows = weekCard.querySelectorAll('.day-row');
-        let total = 0, completed = 0;
-        dayRows.forEach(row => {
-            const dateAttr = row.getAttribute('data-date');
-            if (!dateAttr || dateAttr > todayStr) return;
-            const nameEl = row.querySelector('.workout-name');
-            const distEl = row.querySelector('.workout-distance');
-            const isRest = nameEl?.textContent.toLowerCase().includes('rest') &&
-                           parseDistKm(distEl?.textContent) === 0;
-            if (isRest) return;
-            total++;
-            if (row.classList.contains('completed')) completed++;
+    const todayStr = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    document.querySelectorAll('.week-card').forEach(wc => {
+        const rows = wc.querySelectorAll('.day-row');
+        let total=0, done=0;
+        rows.forEach(row => {
+            const d = row.getAttribute('data-date');
+            if (!d || d > todayStr) return;
+            const cbs = row.querySelectorAll('.checkbox');
+            cbs.forEach(cb => {
+                // skip rest days (no checkbox activity expected)
+                const item = cb.closest('.workout-item');
+                if (item&&(item.classList.contains('rest')||item.classList.contains('mobility'))) return;
+                total++;
+                if (cb.checked) done++;
+            });
         });
-        const comp = weekCard.querySelector('.week-compliance');
+        const comp = wc.querySelector('.week-compliance');
         if (!comp) return;
         if (total > 0) {
-            const pct = Math.round(completed / total * 100);
-            comp.textContent = `Week Compliance: ${pct}% (${completed}/${total} completed)`;
-            comp.className = 'week-compliance ' + (pct >= 80 ? 'good' : pct >= 60 ? 'average' : 'poor');
+            const pct = Math.round(done/total*100);
+            comp.textContent = `Week Compliance: ${pct}% (${done}/${total} completed)`;
+            comp.className = 'week-compliance ' + (pct>=80?'good':pct>=60?'average':'poor');
         } else {
-            comp.textContent = '';
-            comp.className = 'week-compliance';
+            comp.textContent=''; comp.className='week-compliance';
         }
     });
 }
 
 // =====================================================
-// OVERVIEW STATS
+// OVERVIEW + SUMMARY STATS
 // =====================================================
-function parseDistKm(str) {
-    if (!str) return 0;
-    str = str.replace('✏️','').trim();
-    if (!str || str === '—') return 0;
-    const m = str.match(/([\d.]+)/);
-    return m ? parseFloat(m[1]) : 0;
+function calculateWeeksToRace() {
+    const race = new Date('2026-05-16');
+    const now  = new Date();
+    const diff = Math.ceil((race - now)/(7*86400000));
+    const el = document.getElementById('weeksToRace');
+    if (!el) return;
+    if (diff <= 0 && now <= race) { el.innerHTML='Race<br>Week!'; el.style.fontSize='2rem'; }
+    else { el.textContent = Math.max(0,diff); el.style.fontSize='2.5rem'; }
 }
 
 function updateWeekTotals() {
-    document.querySelectorAll('.week-card').forEach(weekCard => {
-        const totEl = weekCard.querySelector('.week-total');
-        if (!totEl) return;
-        let total = 0;
-        weekCard.querySelectorAll('.workout-distance').forEach(el => {
-            total += parseDistKm(el.textContent);
-        });
-        if (total > 0) totEl.textContent = total + ' km';
+    document.querySelectorAll('.week-card').forEach((wc,i) => {
+        const el = wc.querySelector('.week-total');
+        if (!el) return;
+        let km=0;
+        wc.querySelectorAll('.workout-dist').forEach(d => { km += parseKm(d.textContent); });
+        if (km > 0) el.textContent = km+' km';
     });
 }
 
 function updateOverviewStats() {
     calculateWeeksToRace();
+    const today   = new Date();
+    const todayStr= today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    const start   = new Date('2026-01-26');
+    const diffDays= Math.floor((today-start)/86400000);
+    const weekNum = Math.max(1, Math.floor(diffDays/7)+1);
 
-    const today = new Date();
-    const todayStr = today.getFullYear() + '-' +
-        String(today.getMonth()+1).padStart(2,'0') + '-' +
-        String(today.getDate()).padStart(2,'0');
-    const planStart = new Date('2026-01-26');
-    const diffDays = Math.floor((today - planStart) / 86400000);
-    const weekNum = Math.max(1, Math.floor(diffDays / 7) + 1);
-
-    // Weekly mileage — current week card
-    const weekCards = document.querySelectorAll('.week-card');
-    let currentWeekKm = 0;
-    if (weekNum >= 1 && weekNum <= weekCards.length) {
-        const wc = weekCards[weekNum - 1];
-        const totEl = wc?.querySelector('.week-total');
-        const m = totEl?.textContent.match(/([\d.]+)/);
-        if (m) currentWeekKm = parseFloat(m[1]);
+    // Current week km
+    const wcards = document.querySelectorAll('.week-card');
+    let curKm = 0;
+    if (weekNum>=1 && weekNum<=wcards.length) {
+        const el = wcards[weekNum-1].querySelector('.week-total');
+        const m  = el?.textContent.match(/([\d.]+)/);
+        if (m) curKm = parseFloat(m[1]);
     }
     const wme = document.getElementById('weeklyMileage');
-    if (wme) wme.textContent = currentWeekKm;
+    if (wme) wme.textContent = curKm;
 
-    // Upcoming long run (max distance in current week)
-    let upcomingLR = 0;
-    if (weekNum >= 1 && weekNum <= weekCards.length) {
-        weekCards[weekNum-1]?.querySelectorAll('.workout-distance').forEach(el => {
-            const km = parseDistKm(el.textContent);
-            if (km > upcomingLR) upcomingLR = km;
+    // Upcoming long run (max run distance in current week, excluding race)
+    let longRun = 0;
+    if (weekNum>=1 && weekNum<=wcards.length) {
+        wcards[weekNum-1].querySelectorAll('.workout-item').forEach(item => {
+            if (item.classList.contains('rest')||item.classList.contains('mobility')) return;
+            const dist = item.querySelector('.workout-dist');
+            const km   = parseKm(dist?.textContent);
+            if (km < 42.2 && km > longRun) longRun = km;
         });
     }
-    const ulre = document.getElementById('upcomingLongRun');
-    if (ulre) ulre.textContent = upcomingLR;
+    const ulr = document.getElementById('upcomingLongRun');
+    if (ulr) ulr.textContent = longRun || '--';
 
     // Next key workout
     let nextKey = 'TBD';
-    const allRows = document.querySelectorAll('.day-row');
-    for (const row of allRows) {
-        const dateAttr = row.getAttribute('data-date');
-        if (!dateAttr || dateAttr <= todayStr) continue;
-        const nameEl = row.querySelector('.workout-name');
-        if (nameEl?.textContent.includes('🗝️')) {
-            const dayName = row.querySelector('.day-name')?.textContent || '';
-            const dayDate = row.querySelector('.day-date')?.textContent || '';
-            let name = nameEl.textContent.replace('✏️','').replace('🗝️','').trim();
-            if (name.length > 45) name = name.substring(0,42) + '...';
-            nextKey = dayName + ' ' + dayDate + ': ' + name;
-            break;
+    for (const row of document.querySelectorAll('.day-row')) {
+        const d = row.getAttribute('data-date');
+        if (!d || d <= todayStr) continue;
+        const descs = row.querySelectorAll('.workout-desc');
+        for (const desc of descs) {
+            if (desc.textContent.includes('🗝️')) {
+                const dayName = row.querySelector('.day-name')?.textContent||'';
+                const dayDate = row.querySelector('.day-date')?.textContent||'';
+                let name = desc.textContent.replace(/[✏️🗝️]/g,'').trim();
+                if (name.length>45) name=name.slice(0,42)+'...';
+                nextKey = dayName+' '+dayDate+': '+name;
+                break;
+            }
         }
+        if (nextKey!=='TBD') break;
     }
-    const nke = document.getElementById('nextKeyWorkout');
-    if (nke) nke.textContent = nextKey;
-}
-
-function calculateWeeksToRace() {
-    const raceDate = new Date('2026-05-16');
-    const today = new Date();
-    const diffWeeks = Math.ceil((raceDate - today) / (7 * 86400000));
-    const el = document.getElementById('weeksToRace');
-    if (!el) return;
-    if (diffWeeks <= 0 && today <= raceDate) {
-        el.innerHTML = 'Race<br>Week!';
-        el.style.fontSize = '2rem';
-    } else {
-        el.textContent = Math.max(0, diffWeeks);
-        el.style.fontSize = '2.5rem';
-    }
+    const nk = document.getElementById('nextKeyWorkout');
+    if (nk) nk.textContent = nextKey;
 }
 
 function updateSummaryStats() {
-    let peak = 0, longest = 0;
+    let peak=0, longest=0;
     document.querySelectorAll('.week-card').forEach(wc => {
-        const totEl = wc.querySelector('.week-total');
-        const m = totEl?.textContent.match(/([\d.]+)/);
-        if (m) { const v = parseFloat(m[1]); if (v > peak) peak = v; }
-        wc.querySelectorAll('.workout-distance').forEach(el => {
-            const km = parseDistKm(el.textContent);
-            if (km > longest) longest = km;
+        const el = wc.querySelector('.week-total');
+        const m  = el?.textContent.match(/([\d.]+)/);
+        if (m) { const v=parseFloat(m[1]); if (v>peak) peak=v; }
+        wc.querySelectorAll('.workout-item').forEach(item => {
+            if (item.classList.contains('rest')||item.classList.contains('mobility')) return;
+            const dist = item.querySelector('.workout-dist');
+            const km   = parseKm(dist?.textContent);
+            // Exclude the race (42.2 km) from longest TRAINING run
+            if (km > longest && km < 42.2) longest = km;
         });
     });
-    const pe = document.getElementById('peakMileage');
-    const le = document.getElementById('longestRun');
-    const te = document.getElementById('totalWeeks');
-    if (pe) pe.textContent = peak > 0 ? peak + ' km' : '--';
-    if (le) le.textContent = longest > 0 ? longest + ' km' : '--';
-    if (te) te.textContent = '16 weeks';
+    const pe=document.getElementById('peakMileage');
+    const le=document.getElementById('longestRun');
+    if (pe) pe.textContent = peak>0 ? peak+' km' : '--';
+    if (le) le.textContent = longest>0 ? longest+' km' : '--';
 }
 
 // =====================================================
@@ -1997,33 +2105,26 @@ function updateSummaryStats() {
 // =====================================================
 function highlightToday() {
     const today = new Date();
-    const localDate = today.getFullYear() + '-' +
-        String(today.getMonth()+1).padStart(2,'0') + '-' +
-        String(today.getDate()).padStart(2,'0');
-    document.querySelectorAll('[data-date]').forEach(el => {
-        el.classList.toggle('today-highlight', el.dataset.date === localDate);
-    });
+    const s = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    document.querySelectorAll('[data-date]').forEach(el => el.classList.toggle('today-highlight', el.dataset.date===s));
 }
-
 function scheduleMidnightRefresh() {
-    const now = new Date();
-    const midnight = new Date();
-    midnight.setHours(24,0,0,0);
-    setTimeout(() => location.reload(), midnight.getTime() - now.getTime());
+    const now=new Date(), mid=new Date(); mid.setHours(24,0,0,0);
+    setTimeout(()=>location.reload(), mid-now);
 }
 
 // =====================================================
-// SUPABASE SYNC
+// SUPABASE
 // =====================================================
 function showNoPlanMessage(reason) {
-    document.getElementById('training-plan').innerHTML = `
-        <div class="no-plan-msg">
+    document.getElementById('training-plan').innerHTML=`
+        <div style="text-align:center;padding:4rem 2rem;background:white;border-radius:16px;border:1px solid var(--border);margin:2rem 0">
             <div style="font-size:3rem;margin-bottom:1rem">📭</div>
             <h2 style="font-family:'Space Mono',monospace;color:var(--mountain-blue);margin-bottom:1rem">No Training Plan Found</h2>
-            <p style="color:var(--text-light);margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">${reason}</p>
-            <div style="background:rgba(74,144,226,0.1);border:1px solid var(--mountain-blue);border-radius:12px;padding:1.5rem;text-align:left;max-width:500px;margin:0 auto">
-                <p style="font-family:'Space Mono',monospace;font-size:0.85rem;color:var(--mountain-blue);margin-bottom:0.75rem">SETUP STEPS:</p>
-                <ol style="color:var(--text-light);font-size:0.9rem;padding-left:1.5rem;line-height:2">
+            <p style="color:var(--text-light);margin-bottom:2rem;max-width:500px;margin:0 auto 2rem">${reason}</p>
+            <div style="background:rgba(74,144,226,.1);border:1px solid var(--mountain-blue);border-radius:12px;padding:1.5rem;text-align:left;max-width:500px;margin:0 auto">
+                <p style="font-family:'Space Mono',monospace;font-size:.85rem;color:var(--mountain-blue);margin-bottom:.75rem">SETUP STEPS:</p>
+                <ol style="color:var(--text-light);font-size:.9rem;padding-left:1.5rem;line-height:2">
                     <li>Open <strong>Supabase SQL Editor</strong></li>
                     <li>Run <code>FIX-DATABASE.sql</code></li>
                     <li>Run <code>SEED-PEAK-STRIDE.sql</code></li>
@@ -2034,95 +2135,67 @@ function showNoPlanMessage(reason) {
 }
 
 async function savePlanToDatabase() {
-    // Always save to cache first
     saveToCache(trainingData, currentPlanId);
-    if (!supabaseClient || !currentUser || !currentPlanId) return;
-    const { error } = await supabaseClient
-        .from('training_plans')
-        .update({ plan_data: trainingData })
-        .eq('id', currentPlanId)
-        .eq('user_id', currentUser.id);
-    if (error) console.error('PS save error:', error.message);
-    else console.log('Peak Stride synced ☁️');
+    if (!supabaseClient||!currentUser||!currentPlanId) return;
+    const {error} = await supabaseClient.from('training_plans')
+        .update({plan_data:trainingData}).eq('id',currentPlanId).eq('user_id',currentUser.id);
+    if (error) console.error('PS save error:',error.message);
 }
 
 async function checkAuthAndLoadPlan() {
-    // Phase 1: instant render from cache
+    // Phase 1: instant from cache
     const cached = loadFromCache();
     if (cached?.phases?.length) {
         trainingData = cached;
-        currentPlanId = localStorage.getItem(CACHE_ID) || null;
-        console.log('⚡ PS: rendered from cache');
+        currentPlanId = localStorage.getItem(CACHE_ID)||null;
         initializePlan();
     }
 
-    // Phase 2: Supabase sync
     if (!supabaseClient) {
-        if (!cached) showNoPlanMessage('Supabase not configured. Run SEED-PEAK-STRIDE.sql to load your plan.');
+        if (!cached) showNoPlanMessage('Supabase not configured.');
         return;
     }
-
     try {
-        const { data: { user }, error: authErr } = await supabaseClient.auth.getUser();
-        if (authErr || !user) {
-            if (!cached) showNoPlanMessage('Please log in to load your training plan.');
-            return;
-        }
+        const {data:{user},error} = await supabaseClient.auth.getUser();
+        if (error||!user) { if (!cached) showNoPlanMessage('Please log in.'); return; }
         currentUser = user;
 
-        const { data: plan, error: dbErr } = await supabaseClient
-            .from('training_plans')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('plan_type', 'Marathon')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
+        const {data:plan,error:dbErr} = await supabaseClient
+            .from('training_plans').select('*')
+            .eq('user_id',user.id).eq('plan_type','Marathon')
+            .order('created_at',{ascending:false}).limit(1).single();
 
-        if (dbErr || !plan) {
-            if (!cached) showNoPlanMessage('No Marathon plan found. Run SEED-PEAK-STRIDE.sql in Supabase.');
+        if (dbErr||!plan) {
+            if (!cached) showNoPlanMessage('No Marathon plan found. Run SEED-PEAK-STRIDE.sql.');
             return;
         }
-
         currentPlanId = plan.id;
-        const dbData = plan.plan_data;
-
-        // Use DB data if it has content; otherwise seed from default
+        const dbData  = plan.plan_data;
         if (dbData?.phases?.length) {
             trainingData = dbData;
             saveToCache(trainingData, currentPlanId);
-            console.log('☁️ PS: loaded from Supabase');
             initializePlan();
         } else if (!cached) {
-            // Seed DB with default plan data
-            console.log('🌱 PS: seeding default plan to DB');
             trainingData = JSON.parse(JSON.stringify(DEFAULT_PLAN_DATA));
             await savePlanToDatabase();
             initializePlan();
         }
     } catch(e) {
-        console.error('PS load error:', e);
-        if (!cached) showNoPlanMessage('Error loading plan: ' + e.message);
+        console.error('PS load error:',e);
+        if (!cached) showNoPlanMessage('Error: '+e.message);
     }
 }
 
-// =====================================================
-// LOGOUT
-// =====================================================
-document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+document.getElementById('logoutBtn')?.addEventListener('click', async e => {
     e.preventDefault();
     if (supabaseClient) await supabaseClient.auth.signOut();
-    window.location.href = 'login.html';
+    window.location.href='login.html';
 });
 
-// =====================================================
-// INIT
-// =====================================================
-if (document.readyState === 'loading') {
+if (document.readyState==='loading')
     document.addEventListener('DOMContentLoaded', checkAuthAndLoadPlan);
-} else {
+else
     checkAuthAndLoadPlan();
-}
 </script>
 </body>
 </html>
