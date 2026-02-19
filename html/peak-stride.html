@@ -3425,9 +3425,8 @@
     //    - SUPABASE_URL: Found in Project Settings > API > Project URL
     //    - SUPABASE_ANON_KEY: Found in Project Settings > API > Project API keys > anon public
     // 
-    // TODO: Replace these with your actual Supabase credentials
-    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://yecqupxvbazsgzqgmzmc.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3F1cHh2YmF6c2d6cWdtem1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MzU4NDcsImV4cCI6MjA4NjAxMTg0N30._8MxQKOgs-IeezPUTumvHPaFDj1n4R-TYOFv-eXuBZk';
     
     // Initialize Supabase client
     let supabaseClient = null;
@@ -3567,7 +3566,9 @@
     }
 
     async function psSaveToSupabase() {
-        if (!supabaseClient || !psCurrentUser || !psCurrentPlanId) return;
+        if (!supabaseClient) { console.warn('psSaveToSupabase: no supabaseClient'); return; }
+        if (!psCurrentUser) { console.warn('psSaveToSupabase: no user — load not complete yet'); return; }
+        if (!psCurrentPlanId) { console.warn('psSaveToSupabase: no planId — no Marathon plan in DB?'); return; }
         
         const planData = {
             workoutState: psWorkoutState,
@@ -3583,8 +3584,9 @@
 
         if (error) {
             console.error('Peak Stride save error:', error.message);
+            alert('⚠️ Failed to sync to cloud: ' + error.message);
         } else {
-            console.log('Peak Stride synced to cloud ☁️');
+            console.log('Peak Stride synced to cloud ☁️', planData);
         }
     }
 
@@ -4166,24 +4168,18 @@
                     });
                 } else {
                     this.textContent = '✏️ Edit Workouts';
-                    // Save and lock workout names and distances
+                    // Save and lock workout names
                     workoutNames.forEach(el => {
                         const id = el.dataset.id;
                         el.setAttribute('contenteditable', 'false');
                         el.style.cursor = 'default';
-                        // Get text without icon
                         let newName = el.textContent.replace('✏️', '').trim();
                         localStorage.setItem(`workout-name-${id}`, newName);
-                        // Restore the content with icon
                         el.innerHTML = newName + ' <span class="edit-icon">✏️</span>';
 
-                        // Save name to Supabase (distance will be saved below)
-                        const distEl2 = el.closest('.day-row') ? el.closest('.day-row').querySelector(`.workout-distance[data-id="${id}"]`) : null;
-                        const savedDist = localStorage.getItem(`workout-distance-${id}`) || '';
+                        // Write into psEditData (psSaveToSupabase called once below)
                         if (!psEditData[id]) psEditData[id] = {};
                         psEditData[id].name = newName;
-                        psEditData[id].distance = savedDist;
-                        saveEditDataToDB(id, newName, savedDist);
 
                         // Update key-workout class if workout name contains 🗝️
                         const dayRow = el.closest('.day-row');
@@ -4195,23 +4191,22 @@
                             }
                         }
                     });
+                    // Save and lock workout distances
                     workoutDistances.forEach(el => {
                         const id = el.dataset.id;
                         el.setAttribute('contenteditable', 'false');
                         el.style.cursor = 'default';
-                        // Get text without icon
                         let newDistance = el.textContent.replace('✏️', '').trim();
                         localStorage.setItem(`workout-distance-${id}`, newDistance);
-                        // Restore the content with icon
                         el.innerHTML = newDistance + ' <span class="edit-icon">✏️</span>';
 
-                        // Save distance to Supabase
-                        const savedName2 = localStorage.getItem(`workout-name-${id}`) || '';
+                        // Write into psEditData (psSaveToSupabase called once below)
                         if (!psEditData[id]) psEditData[id] = {};
-                        psEditData[id].name = savedName2;
                         psEditData[id].distance = newDistance;
-                        saveEditDataToDB(id, savedName2, newDistance);
-                        psSaveToSupabase();
+                        // Sync name from localStorage in case it wasn't in the names loop
+                        if (!psEditData[id].name) {
+                            psEditData[id].name = localStorage.getItem(`workout-name-${id}`) || '';
+                        }
 
                         // Update workout status based on new distance
                         const dayRow = el.closest('.day-row');
@@ -4219,11 +4214,15 @@
                             updateWorkoutStatus(dayRow);
                         }
                     });
+
+                    // Single save call for ALL name + distance edits
+                    psSaveToSupabase();
+
                     checkWeekCompliance();
-                    updateSummaryStats(); // Update weekly mileage, peak mileage, and longest run
-                    updateWeeklyTotals(); // Recalculate weekly totals
-                    autoStyleLongRuns(); // Re-apply long-run styling
-                    autoStyleRestDays(); // Re-apply rest-day styling
+                    updateSummaryStats();
+                    updateWeeklyTotals();
+                    autoStyleLongRuns();
+                    autoStyleRestDays();
                 }
             });
 

@@ -1942,10 +1942,9 @@
         // =====================================================
         
         async function savePlanToDatabase() {
-            if (!supabaseClient || !currentUser || !currentPlanId) {
-                console.warn('Cannot save: not logged in or plan not loaded.');
-                return;
-            }
+            if (!supabaseClient) { console.warn('savePlanToDatabase: no supabaseClient'); return; }
+            if (!currentUser) { console.warn('savePlanToDatabase: not logged in'); return; }
+            if (!currentPlanId) { console.warn('savePlanToDatabase: no currentPlanId'); return; }
 
             const { error: dbError } = await supabaseClient
                 .from('training_plans')
@@ -1954,10 +1953,10 @@
                 .eq('user_id', currentUser.id);
 
             if (dbError) {
-                console.error('Error saving plan:', dbError.message);
-                alert('⚠️ Failed to sync to cloud.');
+                console.error('T100 save error:', dbError.message);
+                alert('⚠️ Failed to sync to cloud: ' + dbError.message);
             } else {
-                console.log('Plan synced to cloud ☁️');
+                console.log('T100 plan synced to cloud ☁️');
             }
         }
 
