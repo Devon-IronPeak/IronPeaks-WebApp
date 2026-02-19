@@ -543,51 +543,134 @@
 </div>
 
 <!-- ===== PLAN CREATOR MODAL ===== -->
+<style>
+    .upload-zone {
+        border: 2px dashed rgba(74,144,226,0.6);
+        border-radius: 14px;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        background: rgba(74,144,226,0.06);
+        position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+        border-color: #4a90e2;
+        background: rgba(74,144,226,0.14);
+        transform: translateY(-2px);
+    }
+    .upload-zone input[type="file"] {
+        position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-zone .upload-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .upload-zone .upload-label { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .upload-zone .upload-sub { font-size: 0.85rem; opacity: 0.6; }
+
+    .json-preview {
+        display: none;
+        background: rgba(16,185,129,0.1);
+        border: 1px solid #10b981;
+        border-radius: 10px;
+        padding: 1rem 1.2rem;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    .json-preview.visible { display: flex; align-items: center; gap: 0.8rem; }
+    .json-preview .check { font-size: 1.4rem; }
+    .json-preview .file-info { flex: 1; }
+    .json-preview .file-name { font-weight: 700; color: #34d399; }
+    .json-preview .file-meta { opacity: 0.7; font-size: 0.8rem; margin-top: 2px; }
+    .json-preview .clear-btn {
+        background: none; border: none; color: rgba(255,255,255,0.4);
+        font-size: 1.2rem; cursor: pointer; padding: 0 4px; line-height: 1;
+    }
+    .json-preview .clear-btn:hover { color: #ef4444; }
+
+    .plan-type-pill {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.6rem 1.1rem; border-radius: 25px; cursor: pointer;
+        border: 2px solid rgba(255,255,255,0.15); font-weight: 600; font-size: 0.95rem;
+        transition: all 0.2s; background: rgba(255,255,255,0.06);
+    }
+    .plan-type-pill:hover { background: rgba(255,255,255,0.12); }
+    .plan-type-pill.selected { border-color: #4a90e2; background: rgba(74,144,226,0.22); }
+    .plan-type-pills { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    .json-schema-hint {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 0.9rem 1.1rem;
+        font-size: 0.8rem;
+        opacity: 0.7;
+        font-family: monospace;
+        line-height: 1.6;
+    }
+</style>
+
 <div id="planCreatorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 14, 39, 0.92); backdrop-filter: blur(6px); z-index: 2000; justify-content: center; align-items: center;">
-    <div style="background: rgba(26, 26, 46, 0.98); border: 2px solid #4a90e2; border-radius: 20px; padding: 2.5rem; width: 90%; max-width: 620px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); position: relative; max-height: 90vh; overflow-y: auto;">
-        
-        <button onclick="document.getElementById('planCreatorModal').style.display='none'" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 1.5rem; cursor: pointer; line-height: 1;">✕</button>
-        
-        <h2 style="font-size: 1.8rem; font-weight: bold; color: #4a90e2; margin-bottom: 0.5rem; text-align: center;">⚙️ Configure New Plan</h2>
-        <p style="text-align: center; opacity: 0.7; margin-bottom: 2rem; font-size: 0.95rem;">Your training data becomes the single source of truth in the cloud.</p>
-        
-        <div id="planCreatorForm" style="display: flex; flex-direction: column; gap: 1.2rem;">
-            
-            <div>
-                <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Plan Template</label>
-                <select id="planTemplate" style="width: 100%; padding: 0.9rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem;">
-                    <option value="T100">🏊‍♂️🚴🏃 Triathlon (Vancouver T100 / GWN)</option>
-                    <option value="Marathon">🏃 Marathon (Whitefish Peak Stride)</option>
-                    <option value="Custom">🎨 Custom Blank Canvas</option>
-                </select>
-            </div>
+    <div style="background: rgba(26, 26, 46, 0.98); border: 2px solid #4a90e2; border-radius: 20px; padding: 2.5rem; width: 90%; max-width: 580px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); position: relative; max-height: 92vh; overflow-y: auto;">
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div>
-                    <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Start Date</label>
-                    <input type="date" id="planStartDate" style="width: 100%; padding: 0.9rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem; color-scheme: dark;">
-                </div>
-                <div>
-                    <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Race / End Date</label>
-                    <input type="date" id="planEndDate" style="width: 100%; padding: 0.9rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem; color-scheme: dark;">
+        <button onclick="closeCreatorModal()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1.5rem; cursor: pointer; line-height: 1; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">✕</button>
+
+        <h2 style="font-size: 1.7rem; font-weight: bold; color: #4a90e2; margin-bottom: 0.3rem; text-align: center;">📂 Upload Training Plan</h2>
+        <p style="text-align: center; opacity: 0.6; margin-bottom: 2rem; font-size: 0.9rem;">Upload a JSON file to load it into the Peak Stride framework</p>
+
+        <div style="display: flex; flex-direction: column; gap: 1.4rem;">
+
+            <!-- Plan Type -->
+            <div>
+                <label style="display: block; color: rgba(255,255,255,0.6); font-size: 0.8rem; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Plan Type</label>
+                <div class="plan-type-pills">
+                    <div class="plan-type-pill selected" data-type="Marathon" onclick="selectPlanType(this)">🏃 Marathon</div>
+                    <div class="plan-type-pill" data-type="T100" onclick="selectPlanType(this)">🏊🚴🏃 Triathlon T100</div>
+                    <div class="plan-type-pill" data-type="Custom" onclick="selectPlanType(this)">🎨 Custom</div>
                 </div>
             </div>
 
+            <!-- Plan Name -->
             <div>
-                <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Primary Performance Goal</label>
-                <input type="text" id="perfGoal" placeholder="e.g., Sub-8:45 min/mi pace at HR &lt; 165bpm" style="width: 100%; padding: 0.9rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem;" />
+                <label style="display: block; color: rgba(255,255,255,0.6); font-size: 0.8rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Plan Name</label>
+                <input type="text" id="uploadPlanName" placeholder="e.g., Whitefish Marathon 2026" style="width: 100%; padding: 0.85rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.07); color: white; border: 1px solid rgba(255,255,255,0.18); font-size: 1rem; outline: none; transition: border 0.2s;" onfocus="this.style.borderColor='#4a90e2'" onblur="this.style.borderColor='rgba(255,255,255,0.18)'" />
             </div>
 
+            <!-- Upload Zone -->
             <div>
-                <label style="display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px;">Body Composition Goal</label>
-                <input type="text" id="compGoal" placeholder="e.g., Drop to 185 lbs for optimal power-to-weight" style="width: 100%; padding: 0.9rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 1rem;" />
+                <label style="display: block; color: rgba(255,255,255,0.6); font-size: 0.8rem; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Plan JSON File</label>
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="jsonFileInput" accept=".json,application/json" />
+                    <div class="upload-icon">📄</div>
+                    <div class="upload-label">Drop your JSON file here</div>
+                    <div class="upload-sub">or click to browse — .json files only</div>
+                </div>
+                <div class="json-preview" id="jsonPreview">
+                    <span class="check">✅</span>
+                    <div class="file-info">
+                        <div class="file-name" id="previewFileName"></div>
+                        <div class="file-meta" id="previewFileMeta"></div>
+                    </div>
+                    <button class="clear-btn" onclick="clearJsonFile()" title="Remove file">✕</button>
+                </div>
             </div>
 
-            <div id="creatorError" style="display: none; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; border-radius: 8px; padding: 0.8rem 1rem; font-size: 0.9rem; color: #fca5a5;"></div>
+            <!-- Schema hint -->
+            <div class="json-schema-hint" id="schemaHint">
+                <strong style="opacity:1; color: rgba(255,255,255,0.8);">Expected JSON structure (Marathon / Peak Stride):</strong><br>
+                { "phases": [ { "id", "title", "icon", "cssClass",<br>
+                &nbsp;&nbsp;"weeks": [ { "weekNum", "title", "totalKm", "focus",<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"days": [ { "id", "date", "dayName", "dayDate",<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"cssClasses", "note", "workouts": [...] } ] } ] } ] }
+            </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                <button onclick="document.getElementById('planCreatorModal').style.display='none'" class="btn btn-secondary" style="flex: 1; padding: 1rem;">Cancel</button>
-                <button id="generatePlanBtn" class="btn btn-primary" style="flex: 2; padding: 1rem; background: linear-gradient(135deg, #10b981, #059669); border: none; font-size: 1rem; font-weight: 700;">🚀 Generate Plan</button>
+            <!-- Error -->
+            <div id="uploadCreatorError" style="display: none; background: rgba(239,68,68,0.15); border: 1px solid #ef4444; border-radius: 8px; padding: 0.8rem 1rem; font-size: 0.9rem; color: #fca5a5;"></div>
+
+            <!-- Buttons -->
+            <div style="display: flex; gap: 1rem; margin-top: 0.25rem;">
+                <button onclick="closeCreatorModal()" class="btn btn-secondary" style="flex: 1; padding: 1rem;">Cancel</button>
+                <button id="uploadPlanBtn" class="btn btn-primary" style="flex: 2; padding: 1rem; background: linear-gradient(135deg, #4a90e2, #7c3aed); border: none; font-size: 1rem; font-weight: 700;" onclick="uploadPlan()">
+                    🚀 Upload &amp; Save Plan
+                </button>
             </div>
         </div>
     </div>
@@ -835,17 +918,14 @@
     // PLAN CREATOR MODAL
     // =====================================================
 
-    const modal = document.getElementById('planCreatorModal');
     const openCreatorBtn = document.getElementById('openCreatorBtn');
-    const generatePlanBtn = document.getElementById('generatePlanBtn');
-    const creatorError = document.getElementById('creatorError');
 
     openCreatorBtn?.addEventListener('click', () => {
         if (userPlans.length >= 3) {
             alert('Maximum of 3 active plans reached. Archive or delete a plan first.');
             return;
         }
-        modal.style.display = 'flex';
+        document.getElementById('planCreatorModal').style.display = 'flex';
     });
 
     // Also wire old inline createNewPlan calls
@@ -863,101 +943,174 @@
         }
     });
 
-    generatePlanBtn?.addEventListener('click', async () => {
-        const template = document.getElementById('planTemplate').value;
-        const startDate = document.getElementById('planStartDate').value;
-        const endDate = document.getElementById('planEndDate').value;
-        const perfGoal = document.getElementById('perfGoal').value.trim();
-        const compGoal = document.getElementById('compGoal').value.trim();
+    // ── JSON Upload Plan Logic ────────────────────────────
+    let parsedPlanData = null;
+    let selectedPlanType = 'Marathon';
 
-        // Validate
-        if (!startDate || !endDate) {
-            creatorError.textContent = '⚠️ Please set both a start date and a race/end date.';
-            creatorError.style.display = 'block';
+    function selectPlanType(pill) {
+        document.querySelectorAll('.plan-type-pill').forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+        selectedPlanType = pill.dataset.type;
+
+        // Update schema hint
+        const hint = document.getElementById('schemaHint');
+        if (selectedPlanType === 'T100') {
+            hint.innerHTML = `<strong style="opacity:1;color:rgba(255,255,255,0.8);">Expected JSON structure (T100 / Triathlon):</strong><br>
+            [ { "week", "phase", "days": [ { "date",<br>
+            &nbsp;&nbsp;"workouts": [ { "type", "icon", "time", "desc", "distance",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"completed", "missed" } ] } ] } ]`;
+        } else {
+            hint.innerHTML = `<strong style="opacity:1;color:rgba(255,255,255,0.8);">Expected JSON structure (Marathon / Peak Stride):</strong><br>
+            { "phases": [ { "id", "title", "icon", "cssClass",<br>
+            &nbsp;&nbsp;"weeks": [ { "weekNum", "title", "totalKm", "focus",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"days": [ { "id", "date", "dayName", "dayDate",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"cssClasses", "note", "workouts": [...] } ] } ] } ] }`;
+        }
+    }
+
+    function clearJsonFile() {
+        parsedPlanData = null;
+        document.getElementById('jsonFileInput').value = '';
+        document.getElementById('jsonPreview').classList.remove('visible');
+        document.getElementById('uploadZone').style.display = 'block';
+    }
+
+    function closeCreatorModal() {
+        document.getElementById('planCreatorModal').style.display = 'none';
+        clearJsonFile();
+        document.getElementById('uploadPlanName').value = '';
+        document.getElementById('uploadCreatorError').style.display = 'none';
+    }
+
+    // Drag & drop
+    const uploadZone = document.getElementById('uploadZone');
+    uploadZone?.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+    uploadZone?.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+    uploadZone?.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) handleJsonFile(file);
+    });
+
+    document.getElementById('jsonFileInput')?.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) handleJsonFile(file);
+    });
+
+    function handleJsonFile(file) {
+        const errorEl = document.getElementById('uploadCreatorError');
+        errorEl.style.display = 'none';
+
+        if (!file.name.endsWith('.json') && file.type !== 'application/json') {
+            errorEl.textContent = '⚠️ Please upload a .json file.';
+            errorEl.style.display = 'block';
             return;
         }
-        if (new Date(endDate) <= new Date(startDate)) {
-            creatorError.textContent = '⚠️ Race/end date must be after the start date.';
-            creatorError.style.display = 'block';
-            return;
-        }
-        creatorError.style.display = 'none';
 
-        generatePlanBtn.disabled = true;
-        generatePlanBtn.textContent = '⏳ Creating Plan...';
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const data = JSON.parse(e.target.result);
 
-        // Build the state-driven trainingData scaffold
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-        const totalWeeks = Math.max(1, Math.ceil(totalDays / 7));
+                // Basic validation
+                const isMarathon = data?.phases && Array.isArray(data.phases);
+                const isT100 = Array.isArray(data) && data[0]?.week !== undefined;
+                if (!isMarathon && !isT100) {
+                    errorEl.textContent = '⚠️ JSON structure not recognised. Check the schema hint below.';
+                    errorEl.style.display = 'block';
+                    return;
+                }
 
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const newTrainingData = [];
+                parsedPlanData = data;
 
-        for (let w = 0; w < totalWeeks; w++) {
-            const weekDays = [];
-            for (let d = 0; d < 7; d++) {
-                const dayDate = new Date(start);
-                dayDate.setDate(start.getDate() + (w * 7) + d);
-                weekDays.push({
-                    day: days[d],
-                    date: dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                    notes: '',
-                    workouts: [{
-                        type: 'rest',
-                        icon: '😴',
-                        desc: 'Rest & Recovery',
-                        completed: false,
-                        missed: false
-                    }]
-                });
+                // Auto-select plan type if detectable
+                if (isT100 && selectedPlanType === 'Marathon') {
+                    document.querySelector('.plan-type-pill[data-type="T100"]')?.click();
+                } else if (isMarathon && selectedPlanType === 'T100') {
+                    document.querySelector('.plan-type-pill[data-type="Marathon"]')?.click();
+                }
+
+                // Count weeks for meta
+                let weekCount = 0;
+                if (isMarathon) weekCount = data.phases.reduce((a, p) => a + (p.weeks?.length || 0), 0);
+                if (isT100) weekCount = data.length;
+
+                // Show preview
+                document.getElementById('previewFileName').textContent = file.name;
+                document.getElementById('previewFileMeta').textContent =
+                    `${weekCount} week${weekCount !== 1 ? 's' : ''} · ${(file.size / 1024).toFixed(1)} KB · valid JSON`;
+                document.getElementById('jsonPreview').classList.add('visible');
+                document.getElementById('uploadZone').style.display = 'none';
+
+                // Auto-fill plan name if empty
+                const nameInput = document.getElementById('uploadPlanName');
+                if (!nameInput.value) {
+                    const base = file.name.replace('.json', '').replace(/[-_]/g, ' ');
+                    nameInput.value = base.charAt(0).toUpperCase() + base.slice(1);
+                }
+
+            } catch (err) {
+                errorEl.textContent = '⚠️ Could not parse JSON: ' + err.message;
+                errorEl.style.display = 'block';
             }
-            newTrainingData.push({
-                week: w + 1,
-                phase: w < Math.floor(totalWeeks * 0.3) ? 'Base' :
-                       w < Math.floor(totalWeeks * 0.6) ? 'Build' :
-                       w < Math.floor(totalWeeks * 0.85) ? 'Peak' : 'Taper',
-                totals: { swim: '0m', bike: '0km', run: '0km' },
-                days: weekDays
-            });
+        };
+        reader.readAsText(file);
+    }
+
+    async function uploadPlan() {
+        const errorEl = document.getElementById('uploadCreatorError');
+        errorEl.style.display = 'none';
+
+        const planName = document.getElementById('uploadPlanName').value.trim();
+        if (!planName) {
+            errorEl.textContent = '⚠️ Please enter a plan name.';
+            errorEl.style.display = 'block';
+            return;
         }
+        if (!parsedPlanData) {
+            errorEl.textContent = '⚠️ Please upload a JSON file first.';
+            errorEl.style.display = 'block';
+            return;
+        }
+        if (userPlans.length >= 3) {
+            errorEl.textContent = '⚠️ Maximum of 3 active plans reached. Archive or delete a plan first.';
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        const btn = document.getElementById('uploadPlanBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Saving...';
 
         try {
-            const planName = `${template} Plan — ${new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
             const { error } = await supabaseClient
                 .from('training_plans')
                 .insert({
                     user_id: currentUser.id,
-                    plan_type: template,
+                    plan_type: selectedPlanType,
                     plan_name: planName,
-                    plan_data: newTrainingData,
-                    metadata: { startDate, endDate, perfGoal, compGoal }
+                    plan_data: parsedPlanData
                 });
 
             if (error) throw error;
 
-            modal.style.display = 'none';
-            // Reset form
-            document.getElementById('planStartDate').value = '';
-            document.getElementById('planEndDate').value = '';
-            document.getElementById('perfGoal').value = '';
-            document.getElementById('compGoal').value = '';
-
+            closeCreatorModal();
             await loadUserPlans();
+
         } catch (err) {
-            console.error('Error creating plan:', err);
-            creatorError.textContent = '⚠️ Failed to create plan: ' + err.message;
-            creatorError.style.display = 'block';
+            console.error('Error uploading plan:', err);
+            errorEl.textContent = '⚠️ Failed to save plan: ' + err.message;
+            errorEl.style.display = 'block';
         } finally {
-            generatePlanBtn.disabled = false;
-            generatePlanBtn.textContent = '🚀 Generate Plan';
+            btn.disabled = false;
+            btn.innerHTML = '🚀 Upload &amp; Save Plan';
         }
-    });
+    }
 
     // Close modal on backdrop click
-    modal?.addEventListener('click', (e) => {
-        if (e.target === modal) modal.style.display = 'none';
+    document.getElementById('planCreatorModal')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('planCreatorModal')) closeCreatorModal();
     });
 
     // Logout function
