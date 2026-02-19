@@ -900,8 +900,8 @@
         .workout-distance[contenteditable="true"]:focus .edit-icon {
             opacity: 0.4;
         }
-        /* Special Day Styling - Race Day (Gold) */
-        .day-row[data-day-id="w16d6"] {
+        /* Special Day Styling - Race Day (Gold) — works for any plan */
+        .day-row.ps-race-day {
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #f4a261 100%) !important;
             color: #1a1a2e !important;
             border: 4px solid #d4af37 !important;
@@ -911,7 +911,7 @@
             overflow: visible;
         }
         
-        .day-row[data-day-id="w16d6"]::before {
+        .day-row.ps-race-day::before {
             content: '🏆';
             position: absolute;
             top: -20px;
@@ -925,23 +925,23 @@
             50% { transform: translateY(-10px); }
         }
         
-        .day-row[data-day-id="w16d6"] .day-name,
-        .day-row[data-day-id="w16d6"] .day-date,
-        .day-row[data-day-id="w16d6"] .workout-name,
-        .day-row[data-day-id="w16d6"] .workout-distance {
+        .day-row.ps-race-day .day-name,
+        .day-row.ps-race-day .day-date,
+        .day-row.ps-race-day .workout-name,
+        .day-row.ps-race-day .workout-distance {
             color: #1a1a2e !important;
             font-weight: 700 !important;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
         
         /* Hide checkboxes for race day */
-        .day-row[data-day-id="w16d6"] .checkbox-label,
-        .day-row[data-day-id="w16d6"] .miss-btn-label {
+        .day-row.ps-race-day .checkbox-label,
+        .day-row.ps-race-day .miss-btn-label {
             display: none !important;
         }
         
-        /* Special Day Styling - Celebration Day (Party Blue) */
-        .day-row[data-day-id="w16d7"] {
+        /* Special Day Styling - Celebration Day (Party Blue) — works for any plan */
+        .day-row.ps-celebration-day {
             background: linear-gradient(135deg, #48dbfb 0%, #0abde3 50%, #00a8ff 100%) !important;
             color: white !important;
             border: 4px solid #0097e6 !important;
@@ -951,7 +951,7 @@
             overflow: visible;
         }
         
-        .day-row[data-day-id="w16d7"]::before {
+        .day-row.ps-celebration-day::before {
             content: '🎉';
             position: absolute;
             top: -20px;
@@ -967,26 +967,22 @@
         }
         
         @keyframes spin {
-            from { 
-                transform: rotate(0deg);
-            }
-            to { 
-                transform: rotate(360deg);
-            }
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
         }
         
-        .day-row[data-day-id="w16d7"] .day-name,
-        .day-row[data-day-id="w16d7"] .day-date,
-        .day-row[data-day-id="w16d7"] .workout-name,
-        .day-row[data-day-id="w16d7"] .workout-distance {
+        .day-row.ps-celebration-day .day-name,
+        .day-row.ps-celebration-day .day-date,
+        .day-row.ps-celebration-day .workout-name,
+        .day-row.ps-celebration-day .workout-distance {
             color: white !important;
             font-weight: 700 !important;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         /* Hide checkboxes for celebration day */
-        .day-row[data-day-id="w16d7"] .checkbox-label,
-        .day-row[data-day-id="w16d7"] .miss-btn-label {
+        .day-row.ps-celebration-day .checkbox-label,
+        .day-row.ps-celebration-day .miss-btn-label {
             display: none !important;
         }
         
@@ -1182,8 +1178,8 @@
             }
             
             /* Mobile adjustments for special days */
-            .day-row[data-day-id="w16d6"]::before,
-            .day-row[data-day-id="w16d7"]::before {
+            .day-row.ps-race-day::before,
+            .day-row.ps-celebration-day::before {
                 font-size: 2rem;
                 top: -15px;
                 right: -15px;
@@ -1686,6 +1682,13 @@ function renderDay(day) {
     const allRest = (day.workouts || []).length > 0 && (day.workouts || []).every(w => w.type === 'rest' || w.type === 'mobility');
     if (allRest) row.classList.add('rest-day');
 
+    // Dynamically detect race day and celebration day (not hardcoded to w16d6/w16d7)
+    const allDescs = (day.workouts || []).map(w => (w.desc || '') + (w.distance || ''));
+    const isRaceDay = allDescs.some(d => d.includes('42.2') || /RACE DAY/i.test(d));
+    const isCelebration = allDescs.some(d => /CELEBRAT/i.test(d) || /you did it/i.test(d));
+    if (isRaceDay) row.classList.add('ps-race-day');
+    if (isCelebration) row.classList.add('ps-celebration-day');
+
     // Day header
     const dayHdr = document.createElement('div');
     dayHdr.className = 'day-header-row';
@@ -2109,7 +2112,10 @@ function updateOverviewStats() {
         wcards[weekNum-1].querySelectorAll('.workout-item').forEach(item => {
             if (item.classList.contains('rest')||item.classList.contains('mobility')) return;
             const dist = item.querySelector('.workout-dist');
-            const km   = parseKm(dist?.textContent);
+            const descEl = item.querySelector('.workout-desc');
+            // Fall back to parsing km from the desc text if distance field is empty
+            let km = parseKm(dist?.textContent);
+            if (!km && descEl?.textContent) km = parseKm(descEl.textContent);
             if (km < 42.2 && km > longRun) longRun = km;
         });
     }
