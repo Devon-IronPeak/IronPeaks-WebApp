@@ -1390,23 +1390,21 @@
             }
         ];
 
-        // Group weeks by phase
-        const phases = {
-            "Post-Marathon Transition": { icon: "🟢", weeks: [] },
-            "Engine Build": { icon: "🔵", weeks: [] },
-            "Peak Build": { icon: "🟣", weeks: [] },
-            "Sharpen": { icon: "🟠", weeks: [] },
-            "Race Week": { icon: "🔴", weeks: [] }
-        };
-
-        trainingData.forEach(week => {
-            if (!phases[week.phase].weeks) phases[week.phase].weeks = [];
-            phases[week.phase].weeks.push(week);
-        });
-
         // Initialize the plan
         function initializePlan() {
             const container = document.getElementById('training-plan');
+            
+            // Rebuild phases fresh from trainingData on every call
+            const phases = {
+                "Post-Marathon Transition": { icon: "🟢", weeks: [] },
+                "Engine Build": { icon: "🔵", weeks: [] },
+                "Peak Build": { icon: "🟣", weeks: [] },
+                "Sharpen": { icon: "🟠", weeks: [] },
+                "Race Week": { icon: "🔴", weeks: [] }
+            };
+            trainingData.forEach(week => {
+                if (phases[week.phase]) phases[week.phase].weeks.push(week);
+            });
             
             Object.entries(phases).forEach(([phaseName, phaseData], phaseIndex) => {
                 if (phaseData.weeks.length === 0) return;
@@ -1820,12 +1818,11 @@
                     .eq('plan_type', 'T100')
                     .order('created_at', { ascending: false })
                     .limit(1)
-                    .single();
+                    .maybeSingle(); // returns null instead of error when no rows found
                 
                 if (dbError) {
                     console.error('Error fetching plan:', dbError.message);
-                    // Use hardcoded data as fallback
-                    console.log('Using hardcoded training data (database error)');
+                    console.log('Falling back to hardcoded training data');
                     initializePlan();
                     return;
                 }
@@ -1844,7 +1841,9 @@
                             });
                         });
                     });
-                    console.log('Loaded training plan from database (state-driven)');
+                    console.log('✅ T100 plan loaded from Supabase, planId:', currentPlanId);
+                } else {
+                    console.warn('⚠️ No T100 plan found in database for this user. Using hardcoded data. Saves will not persist until a plan record exists.');
                 }
                 
                 // Initialize the plan with loaded data (state lives in trainingData)
@@ -1963,16 +1962,16 @@
                 if (workout.missed) workout.completed = false;
             }
             
-            // 3. Re-render to reflect new state
+            // 3. Re-render to reflect new state (initializePlan rebuilds phases internally)
             const container = document.getElementById('training-plan');
             if (container) {
                 container.innerHTML = '';
-                groupPhases();
                 initializePlan();
             }
             
             // 4. Persist to Supabase
-            await savePlanToDatabase();        }
+            await savePlanToDatabase();
+        }
 
         // =====================================================
         // DATABASE SYNC FUNCTIONS
