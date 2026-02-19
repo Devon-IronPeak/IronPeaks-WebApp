@@ -459,6 +459,34 @@
             margin-top: 0.15rem;
         }
 
+        .workout-distance {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-top: 0.2rem;
+            min-height: 1em;
+        }
+
+        .workout-distance:empty::before {
+            content: attr(data-placeholder);
+            color: rgba(148, 163, 184, 0.35);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .workout-description:empty::before {
+            content: attr(data-placeholder);
+            color: rgba(148, 163, 184, 0.35);
+            font-style: italic;
+        }
+
+        .workout-distance[contenteditable="true"] {
+            border: 1px dashed rgba(245, 158, 11, 0.5);
+            border-radius: 4px;
+            padding: 2px 4px;
+            outline: none;
+        }
+
         .workout-time {
             color: var(--accent-cyan);
             font-weight: 600;
@@ -1203,9 +1231,10 @@
             let swimKm = 0, bikeKm = 0, runKm = 0;
             weekData.days?.forEach(day => {
                 day.workouts?.forEach(w => {
-                    if (w.type === 'swim')      swimKm += parseAmount(w.desc);
-                    else if (w.type === 'bike') bikeKm += parseAmountKm(w.desc, 'bike');
-                    else if (w.type === 'run')  runKm  += parseAmountKm(w.desc, 'run');
+                    const amountStr = (w.distance && w.distance.trim()) ? w.distance : w.desc;
+                    if (w.type === 'swim')      swimKm += parseAmount(amountStr);
+                    else if (w.type === 'bike') bikeKm += parseAmountKm(amountStr, 'bike');
+                    else if (w.type === 'run')  runKm  += parseAmountKm(amountStr, 'run');
                 });
             });
 
@@ -1240,6 +1269,69 @@
             card.appendChild(daysGrid);
             
             return card;
+        }
+
+        // ── Build a single workout DOM item ─────────────────────────────────────
+        // Used by createDayCard (existing workouts) AND addWorkout (new workouts)
+        // weekIndex/dayIndex/workoutIdx can be -1 for brand-new unsaved workouts;
+        // in that case we wire the buttons to update trainingData via closures.
+        function buildWorkoutItem(workout, weekNum, dayIndex, workoutIdx, weekIndex) {
+            const item = document.createElement('div');
+            item.className = `workout-item ${workout.type || 'run'}`;
+
+            const timePrefix = workout.time ? `<span class="workout-time">${workout.time}:</span> ` : '';
+            const isChecked  = workout.completed ? 'checked' : '';
+            const isMissedClass = workout.missed ? 'active' : '';
+            const distVal = workout.distance || '';
+            const hasId   = workoutIdx >= 0;
+
+            item.innerHTML = `
+                <span class="workout-icon">${workout.icon || '🏃'}</span>
+                <div class="workout-details">
+                    <div class="workout-type">${workout.type || 'run'}</div>
+                    <div class="workout-description"${hasId ? ` data-workout-id="w${weekNum}d${dayIndex}w${workoutIdx}"` : ''}>${timePrefix}${workout.desc || ''}</div>
+                    <div class="workout-distance">${distVal}</div>
+                </div>
+                <div class="miss-btn-wrapper">
+                    <div class="miss-btn ${isMissedClass}">✗</div>
+                    <span class="miss-label">Miss</span>
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" class="checkbox" ${isChecked}>
+                    <span class="checkbox-label">Done</span>
+                </div>
+            `;
+
+            const missBtn  = item.querySelector('.miss-btn');
+            const checkbox = item.querySelector('.checkbox');
+
+            missBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const nowActive = missBtn.classList.toggle('active');
+                if (nowActive && checkbox.checked) checkbox.checked = false;
+                // Sync to trainingData (if workout exists there)
+                if (weekIndex >= 0 && dayIndex >= 0 && workoutIdx >= 0) {
+                    const w = trainingData[weekIndex]?.days[dayIndex]?.workouts[workoutIdx];
+                    if (w) { w.missed = nowActive; if (nowActive) w.completed = false; }
+                }
+                const dc = item.closest('.day-card');
+                if (dc) updateDayCompletion(dc);
+                savePlanToDatabase();
+            });
+
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked && missBtn.classList.contains('active')) missBtn.classList.remove('active');
+                // Sync to trainingData (if workout exists there)
+                if (weekIndex >= 0 && dayIndex >= 0 && workoutIdx >= 0) {
+                    const w = trainingData[weekIndex]?.days[dayIndex]?.workouts[workoutIdx];
+                    if (w) { w.completed = checkbox.checked; if (checkbox.checked) w.missed = false; }
+                }
+                const dc = item.closest('.day-card');
+                if (dc) updateDayCompletion(dc);
+                savePlanToDatabase();
+            });
+
+            return item;
         }
 
         function createDayCard(dayData, weekNum, dayIndex) {
@@ -1285,29 +1377,7 @@
             const weekIndex = trainingData.findIndex(w => w.week === weekNum);
             
             dayData.workouts.forEach((workout, workoutIdx) => {
-                const workoutItem = document.createElement('div');
-                workoutItem.className = `workout-item ${workout.type}`;
-                
-                const timePrefix = workout.time ? `<span class="workout-time">${workout.time}:</span> ` : '';
-                const isChecked = workout.completed ? 'checked' : '';
-                const isMissedClass = workout.missed ? 'active' : '';
-                
-                workoutItem.innerHTML = `
-                    <span class="workout-icon">${workout.icon}</span>
-                    <div class="workout-details">
-                        <div class="workout-type">${workout.type}</div>
-                        <div class="workout-description" data-workout-id="w${weekNum}d${dayIndex}w${workoutIdx}">${timePrefix}${workout.desc}</div>
-                    </div>
-                    <div class="miss-btn-wrapper">
-                        <div class="miss-btn ${isMissedClass}" onclick="toggleWorkoutState(${weekIndex}, ${dayIndex}, ${workoutIdx}, 'missed')">✗</div>
-                        <span class="miss-label">Miss</span>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" class="checkbox" ${isChecked} onchange="toggleWorkoutState(${weekIndex}, ${dayIndex}, ${workoutIdx}, 'completed')">
-                        <span class="checkbox-label">Done</span>
-                    </div>
-                `;
-                
+                const workoutItem = buildWorkoutItem(workout, weekNum, dayIndex, workoutIdx, weekIndex);
                 workoutsContainer.appendChild(workoutItem);
             });
             
@@ -1447,9 +1517,15 @@
             const currentWeek = Math.floor(diffDays / 7) + 1;
             
             const weekEl = document.getElementById('currentWeek');
-            if (weekEl && currentWeek >= 1 && currentWeek <= 13) {
+            if (!weekEl) return;
+            if (diffDays < 0) {
+                // Plan hasn't started yet — show countdown days
+                const daysUntil = Math.abs(diffDays);
+                weekEl.textContent = 'Pre';
+                weekEl.title = `Plan starts in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`;
+            } else if (currentWeek >= 1 && currentWeek <= 13) {
                 weekEl.textContent = currentWeek;
-            } else if (weekEl) {
+            } else {
                 weekEl.textContent = '--';
             }
         }
@@ -1718,9 +1794,11 @@
 
                 weekData.days?.forEach(day => {
                     day.workouts?.forEach(w => {
-                        if (w.type === 'swim')      weekSwimKm  += parseAmount(w.desc);
-                        else if (w.type === 'bike') weekBikeKm  += parseAmountKm(w.desc, 'bike');
-                        else if (w.type === 'run')  weekRunKm   += parseAmountKm(w.desc, 'run');
+                        // Use dedicated distance field if set, otherwise fall back to desc
+                        const amountStr = (w.distance && w.distance.trim()) ? w.distance : w.desc;
+                        if (w.type === 'swim')      weekSwimKm  += parseAmount(amountStr);
+                        else if (w.type === 'bike') weekBikeKm  += parseAmountKm(amountStr, 'bike');
+                        else if (w.type === 'run')  weekRunKm   += parseAmountKm(amountStr, 'run');
                     });
                 });
 
@@ -1896,14 +1974,20 @@
                     editModeBtn.disabled = true;
                 }
 
-                // Toggle contenteditable on all workout descriptions
+                // Toggle contenteditable on all workout descriptions AND distances
                 document.querySelectorAll('.workout-description').forEach(desc => {
+                    const workoutItem = desc.closest('.workout-item');
+                    const distEl = workoutItem?.querySelector('.workout-distance');
                     if (editMode) {
                         desc.contentEditable = 'true';
                         desc.style.cursor = 'text';
                         desc.style.border = '1px dashed var(--accent-cyan)';
                         desc.style.padding = '4px';
                         desc.style.borderRadius = '4px';
+                        if (distEl) {
+                            distEl.contentEditable = 'true';
+                            distEl.style.cursor = 'text';
+                        }
                         
                         // Add key workout toggle button
                         const keyBtn = document.createElement('button');
@@ -1941,11 +2025,10 @@
                             refreshDayCardClasses(desc.closest('.day-card'));
                         };
                         
-                        const workoutItem = desc.closest('.workout-item');
-                        if (!workoutItem.querySelector('.key-toggle-btn')) {
+                        if (!workoutItem?.querySelector('.key-toggle-btn')) {
                             workoutItem.appendChild(keyBtn);
                         }
-                        if (!workoutItem.querySelector('.brick-toggle-btn')) {
+                        if (!workoutItem?.querySelector('.brick-toggle-btn')) {
                             workoutItem.appendChild(brickBtn);
                         }
                         
@@ -1954,11 +2037,16 @@
                         desc.style.cursor = 'default';
                         desc.style.border = 'none';
                         desc.style.padding = '0';
+                        if (distEl) {
+                            distEl.contentEditable = 'false';
+                            distEl.style.cursor = 'default';
+                            distEl.style.border = 'none';
+                            distEl.style.padding = '0';
+                        }
                         
                         // Remove toggle buttons
-                        const workoutItem = desc.closest('.workout-item');
-                        const keyBtn = workoutItem.querySelector('.key-toggle-btn');
-                        const brickBtn = workoutItem.querySelector('.brick-toggle-btn');
+                        const keyBtn = workoutItem?.querySelector('.key-toggle-btn');
+                        const brickBtn = workoutItem?.querySelector('.brick-toggle-btn');
                         if (keyBtn) keyBtn.remove();
                         if (brickBtn) brickBtn.remove();
                     }
@@ -2013,16 +2101,16 @@
                         const workoutItems = dayCard.querySelectorAll('.workout-item');
                         const newWorkouts = [];
                         workoutItems.forEach((item, wIdx) => {
-                            // Determine type from className
                             let type = 'run';
                             for (const t of ['swim','bike','run','strength','rest','brick']) {
                                 if (item.classList.contains(t)) { type = t; break; }
                             }
                             const descEl   = item.querySelector('.workout-description');
+                            const distEl   = item.querySelector('.workout-distance');
                             const checkbox = item.querySelector('.checkbox');
                             const missBtn  = item.querySelector('.miss-btn');
 
-                            // Preserve existing workout metadata (icon, time) if available
+                            // Preserve existing workout metadata if available
                             const existId = descEl?.dataset.workoutId;
                             const ep = existId?.match(/w(\d+)d(\d+)w(\d+)/);
                             const existing = ep ? weekData.days[dayIdx].workouts[parseInt(ep[3])] : null;
@@ -2031,6 +2119,7 @@
                                 type,
                                 icon: existing?.icon || typeIcons[type] || '🏃',
                                 desc: descEl?.textContent.trim() || '',
+                                distance: distEl?.textContent.trim() || '',
                                 time: existing?.time || '',
                                 completed: checkbox?.checked || false,
                                 missed: missBtn?.classList.contains('active') || false
@@ -2053,6 +2142,14 @@
         function addWorkout(dayCard) {
             const workoutsContainer = dayCard.querySelector('.workouts-container');
             
+            // Find which week/day this card belongs to
+            const dayIdParts = dayCard.dataset.dayId?.match(/w(\d+)d(\d+)/);
+            if (!dayIdParts) return;
+            const weekNum = parseInt(dayIdParts[1]);
+            const dayIdx  = parseInt(dayIdParts[2]);
+            const weekIndex = trainingData.findIndex(w => w.week === weekNum);
+            const dayData   = trainingData[weekIndex]?.days?.[dayIdx];
+
             // Type config
             const types = {
                 swim:     { icon: '🏊', label: 'Swim' },
@@ -2072,9 +2169,7 @@
                     ${Object.entries(types).map(([key, t]) => `
                         <button data-type="${key}" style="padding: 0.4rem 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; cursor: pointer; font-size: 0.9rem; transition: all 0.2s;" 
                             onmouseover="this.style.background='rgba(6,182,212,0.25)';this.style.borderColor='var(--accent-cyan)'"
-                            onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.2)'">
-                            ${t.icon} ${t.label}
-                        </button>
+                            onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.2)'">${t.icon} ${t.label}</button>
                     `).join('')}
                 </div>
                 <button class="cancel-add-btn" style="align-self: flex-start; padding: 0.3rem 0.7rem; background: transparent; border: 1px solid rgba(239,68,68,0.4); border-radius: 6px; color: #ef4444; cursor: pointer; font-size: 0.8rem;">✕ Cancel</button>
@@ -2082,101 +2177,97 @@
 
             const addBtn = workoutsContainer.querySelector('.add-workout-btn');
             workoutsContainer.insertBefore(selectorEl, addBtn);
-
-            // Cancel
             selectorEl.querySelector('.cancel-add-btn').onclick = () => selectorEl.remove();
 
-            // Type chosen
             selectorEl.querySelectorAll('[data-type]').forEach(btn => {
                 btn.onclick = () => {
                     const chosenType = btn.dataset.type;
                     const { icon } = types[chosenType];
                     selectorEl.remove();
 
-                    const newWorkoutItem = document.createElement('div');
-                    newWorkoutItem.className = `workout-item ${chosenType}`;
-                    // Placeholder description with typical unit hint
-                    const distHint = chosenType === 'swim' ? 'e.g. 2km easy' : chosenType === 'bike' ? 'e.g. 40km Z2 ride' : chosenType === 'run' ? 'e.g. 10km easy' : chosenType === 'strength' ? 'e.g. 45min strength' : 'Rest';
-                    newWorkoutItem.innerHTML = `
-                        <span class="workout-icon">${icon}</span>
-                        <div class="workout-details">
-                            <div class="workout-type">${chosenType}</div>
-                            <div class="workout-description" contenteditable="true" style="cursor: text; border: 1px dashed var(--accent-cyan); padding: 4px; border-radius: 4px;">${distHint}</div>
-                        </div>
-                        <div class="miss-btn-wrapper">
-                            <div class="miss-btn">✗</div>
-                            <span class="miss-label">Miss</span>
-                        </div>
-                        <div class="checkbox-wrapper">
-                            <input type="checkbox" class="checkbox">
-                            <span class="checkbox-label">Done</span>
-                        </div>
-                    `;
+                    // 1. Create stub workout object and push to trainingData IMMEDIATELY
+                    //    so the new workout has a real index and handlers work right away
+                    const stubWorkout = {
+                        type: chosenType, icon,
+                        desc: '', distance: '',
+                        completed: false, missed: false, time: ''
+                    };
+                    if (dayData) dayData.workouts.push(stubWorkout);
+                    const newWorkoutIdx = dayData ? dayData.workouts.length - 1 : -1;
 
-                    workoutsContainer.insertBefore(newWorkoutItem, addBtn);
+                    // 2. Build the DOM item via shared helper
+                    const newWorkoutItem = buildWorkoutItem(stubWorkout, weekNum, dayIdx, newWorkoutIdx, weekIndex);
+                    newWorkoutItem.classList.add('edit-new'); // mark as newly added
 
-                    // Wire up miss-btn and checkbox so updateDayCompletion fires immediately
-                    const newMissBtn = newWorkoutItem.querySelector('.miss-btn');
-                    const newCheckbox = newWorkoutItem.querySelector('.checkbox');
-                    newMissBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        newMissBtn.classList.toggle('active');
-                        if (newMissBtn.classList.contains('active') && newCheckbox.checked) newCheckbox.checked = false;
-                        updateDayCompletion(dayCard);
-                    });
-                    newCheckbox.addEventListener('change', () => {
-                        if (newCheckbox.checked && newMissBtn.classList.contains('active')) newMissBtn.classList.remove('active');
-                        updateDayCompletion(dayCard);
-                    });
+                    // 3. Make desc and distance editable (edit mode is active)
+                    const descEl = newWorkoutItem.querySelector('.workout-description');
+                    const distEl = newWorkoutItem.querySelector('.workout-distance');
+                    descEl.contentEditable = 'true';
+                    descEl.style.cssText = 'cursor: text; border: 1px dashed var(--accent-cyan); padding: 4px; border-radius: 4px;';
+                    descEl.textContent = '';
+                    descEl.setAttribute('data-placeholder', chosenType === 'swim' ? 'e.g. 2600m easy' : chosenType === 'bike' ? 'e.g. 3×15min SS' : chosenType === 'run' ? 'e.g. 10km easy' : chosenType === 'strength' ? 'e.g. 45min weights' : 'Rest');
+                    if (distEl) {
+                        distEl.contentEditable = 'true';
+                        distEl.style.cssText = 'cursor: text; border: 1px dashed rgba(245,158,11,0.5); padding: 2px 4px; border-radius: 4px;';
+                        distEl.setAttribute('data-placeholder', 'distance');
+                    }
 
-                    // Add buttons in order: 🗝️ Key, 🧱 Brick, 🗑️ Delete
-                    const newDesc = newWorkoutItem.querySelector('.workout-description');
+                    // Sync description and distance back to stub as user types
+                    descEl.addEventListener('input', () => { stubWorkout.desc = descEl.textContent.trim(); });
+                    if (distEl) distEl.addEventListener('input', () => { stubWorkout.distance = distEl.textContent.trim(); });
 
+                    // 4. Edit-mode buttons: 🗝️ Key, 🧱 Brick, 🗑️ Delete
                     const newKeyBtn = document.createElement('button');
                     newKeyBtn.className = 'key-toggle-btn';
                     newKeyBtn.textContent = '+ 🗝️';
-                    newKeyBtn.style.cssText = 'margin-left: 8px; padding: 2px 8px; background: rgba(14, 165, 233, 0.2); border: 1px solid var(--tri-swim); border-radius: 4px; cursor: pointer; font-size: 0.85rem;';
+                    newKeyBtn.style.cssText = 'margin-left: 8px; padding: 2px 8px; background: rgba(14,165,233,0.2); border: 1px solid var(--tri-swim); border-radius: 4px; cursor: pointer; font-size: 0.85rem;';
                     newKeyBtn.onclick = (e) => {
                         e.preventDefault(); e.stopPropagation();
-                        if (newDesc.textContent.includes('🗝️')) {
-                            newDesc.textContent = newDesc.textContent.replace('🗝️','').trim();
+                        if (descEl.textContent.includes('🗝️')) {
+                            descEl.textContent = descEl.textContent.replace('🗝️','').trim();
                             newKeyBtn.textContent = '+ 🗝️';
                         } else {
-                            newDesc.textContent = '🗝️ ' + newDesc.textContent;
+                            descEl.textContent = '🗝️ ' + descEl.textContent;
                             newKeyBtn.textContent = '🗝️';
                         }
+                        stubWorkout.desc = descEl.textContent.trim();
                         refreshDayCardClasses(dayCard);
                     };
 
                     const newBrickBtn = document.createElement('button');
                     newBrickBtn.className = 'brick-toggle-btn';
                     newBrickBtn.textContent = '+ 🧱';
-                    newBrickBtn.style.cssText = 'margin-left: 4px; padding: 2px 8px; background: rgba(139, 69, 19, 0.2); border: 1px solid #8B4513; border-radius: 4px; cursor: pointer; font-size: 0.85rem;';
+                    newBrickBtn.style.cssText = 'margin-left: 4px; padding: 2px 8px; background: rgba(139,69,19,0.2); border: 1px solid #8B4513; border-radius: 4px; cursor: pointer; font-size: 0.85rem;';
                     newBrickBtn.onclick = (e) => {
                         e.preventDefault(); e.stopPropagation();
-                        if (newDesc.textContent.includes('🧱')) {
-                            newDesc.textContent = newDesc.textContent.replace('🧱','').trim();
+                        if (descEl.textContent.includes('🧱')) {
+                            descEl.textContent = descEl.textContent.replace('🧱','').trim();
                             newBrickBtn.textContent = '+ 🧱';
                         } else {
-                            newDesc.textContent = '🧱 ' + newDesc.textContent;
+                            descEl.textContent = '🧱 ' + descEl.textContent;
                             newBrickBtn.textContent = '🧱';
                         }
+                        stubWorkout.desc = descEl.textContent.trim();
                         refreshDayCardClasses(dayCard);
                     };
 
                     const newDelBtn = document.createElement('button');
                     newDelBtn.className = 'delete-workout-btn';
                     newDelBtn.textContent = '🗑️';
-                    newDelBtn.style.cssText = 'padding: 4px 8px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; font-size: 1rem;';
-                    newDelBtn.onclick = () => { newWorkoutItem.remove(); refreshDayCardClasses(dayCard); };
+                    newDelBtn.style.cssText = 'padding: 4px 8px; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; font-size: 1rem;';
+                    newDelBtn.onclick = () => {
+                        // Remove from trainingData too
+                        if (dayData && newWorkoutIdx >= 0) dayData.workouts.splice(newWorkoutIdx, 1);
+                        newWorkoutItem.remove();
+                        refreshDayCardClasses(dayCard);
+                    };
 
-                    // Append in order: Key, Brick, Delete
                     newWorkoutItem.appendChild(newKeyBtn);
                     newWorkoutItem.appendChild(newBrickBtn);
                     newWorkoutItem.appendChild(newDelBtn);
 
-                    // Focus the description for immediate editing
-                    newWorkoutItem.querySelector('.workout-description').focus();
+                    workoutsContainer.insertBefore(newWorkoutItem, addBtn);
+                    descEl.focus();
                     refreshDayCardClasses(dayCard);
                 };
             });

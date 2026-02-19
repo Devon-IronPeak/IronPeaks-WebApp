@@ -588,20 +588,6 @@
             box-shadow: 0 4px 12px rgba(30, 58, 92, 0.6);
         }
 
-        .day-row.missed::after {
-            content: 'MISSED';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-weight: bold;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 2.5em;
-            pointer-events: none;
-            z-index: 1;
-            letter-spacing: 4px;
-        }
-
         .day-row.completed .day-name,
         .day-row.completed .day-date,
         .day-row.completed .workout-name,
@@ -1342,33 +1328,46 @@
         .day-row .checkbox { width:22px; height:22px; cursor:pointer; }
 
         /* ── COMPLETION STATES ── same hues as before ── */
-        .day-row.completed  { background:linear-gradient(135deg,#10b981,#059669); color:white; box-shadow:0 4px 12px rgba(16,185,129,.4); }
+        .day-row.completed  { background:linear-gradient(135deg,#10b981,#059669); color:white; box-shadow:0 4px 12px rgba(16,185,129,.4); position:relative; overflow:hidden; }
         .day-row.missed     { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; box-shadow:0 4px 12px rgba(239,68,68,.4); }
-        /* partial = T100 style: left gold / right green split */
+        /* partial = diagonal amber→green split, dark and prominent */
         .day-row.partial    {
-            background: linear-gradient(90deg,
-                rgba(245,158,11,0.22) 0%, rgba(245,158,11,0.18) 50%,
-                rgba(16,185,129,0.18) 50%, rgba(16,185,129,0.22) 100%);
-            border-left: 4px solid #f59e0b;
-            border-right: 4px solid #10b981;
+            background: linear-gradient(135deg,
+                rgba(180,90,0,0.85) 0%, rgba(180,90,0,0.80) 45%,
+                rgba(4,120,70,0.80) 55%, rgba(4,120,70,0.85) 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,.5);
+            position: relative;
+            overflow: hidden;
         }
         .day-row.long-run.completed  { background:linear-gradient(135deg,#fbbf24,#f59e0b); }
         .day-row.long-run.missed     { background:linear-gradient(135deg,#5c2e1f,#3d1e14); }
-        .day-row.long-run.partial    { background:linear-gradient(135deg,#c27803,#a35f1e); }
+        .day-row.long-run.partial    { background:linear-gradient(135deg,rgba(180,90,0,.9),rgba(4,120,70,.9)); }
         .day-row.key-workout.completed { background:linear-gradient(135deg,#0ea5e9,#0284c7); }
         .day-row.key-workout.missed    { background:linear-gradient(135deg,#1e3a5c,#14293d); }
-        .day-row.key-workout.partial   { background:linear-gradient(135deg,#0e7490,#0c5f7a); }
+        .day-row.key-workout.partial   { background:linear-gradient(135deg,rgba(2,100,160,.9),rgba(4,120,70,.9)); }
 
         /* white text in completion states */
         .day-row.completed .day-name,.day-row.completed .day-date,.day-row.completed .workout-desc,
         .day-row.completed .workout-dist,.day-row.completed .miss-btn-wrap,.day-row.completed .check-wrap,
         .day-row.missed .day-name,.day-row.missed .day-date,.day-row.missed .workout-desc,
         .day-row.missed .workout-dist,.day-row.missed .miss-btn-wrap,.day-row.missed .check-wrap,
-        /* partial text stays dark (light background) */
+        .day-row.partial .day-name,.day-row.partial .day-date,.day-row.partial .workout-desc,
+        .day-row.partial .workout-dist,.day-row.partial .miss-btn-wrap,.day-row.partial .check-wrap { color: white; }
 
         .day-row.completed .workout-item,
-        .day-row.missed    .workout-item { background:rgba(255,255,255,0.15); border-left-color:rgba(255,255,255,0.4); }
-        .day-row.partial   .workout-item { background:rgba(255,255,255,0.55); }
+        .day-row.missed    .workout-item,
+        .day-row.partial   .workout-item { background:rgba(255,255,255,0.15); border-left-color:rgba(255,255,255,0.4); }
+
+        /* COMPLETED watermark */
+        .day-row.completed { position:relative; overflow:hidden; }
+        .day-row.completed::after {
+            content:'COMPLETED'; position:absolute; top:50%; left:50%;
+            transform:translate(-50%,-50%); font-weight:bold;
+            color:rgba(255,255,255,.22); font-size:2.2em;
+            pointer-events:none; z-index:1; letter-spacing:4px;
+            white-space: nowrap;
+        }
 
         /* MISSED watermark */
         .day-row.missed { position:relative; overflow:hidden; }
@@ -1377,6 +1376,15 @@
             transform:translate(-50%,-50%); font-weight:bold;
             color:rgba(255,255,255,.25); font-size:2.5em;
             pointer-events:none; z-index:1; letter-spacing:4px;
+        }
+
+        /* PARTIAL watermark */
+        .day-row.partial::after {
+            content:'PARTIAL'; position:absolute; top:50%; left:50%;
+            transform:translate(-50%,-50%) rotate(-8deg); font-weight:bold;
+            color:rgba(255,255,255,.28); font-size:2.4em;
+            pointer-events:none; z-index:1; letter-spacing:4px;
+            white-space: nowrap;
         }
 
         .day-row { position:relative; }
