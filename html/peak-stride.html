@@ -1771,7 +1771,29 @@ function syncWorkoutState(dayId, wi) {
         fd.workouts[wi].missed    = mb ? mb.classList.contains('active') : false;
     }
     updateDayCompletion(row);
+    updateWeekKmForDay(dayId);
     savePlanToDatabase();
+}
+
+function updateWeekKmForDay(dayId) {
+    // Find which week this day belongs to and refresh its km badge
+    for (const phase of trainingData.phases) {
+        for (let wi = 0; wi < phase.weeks.length; wi++) {
+            const week = phase.weeks[wi];
+            if (week.days.some(d => d.id === dayId)) {
+                // Find the week card by its total element
+                const phaseIdx = trainingData.phases.indexOf(phase);
+                const uid = 'ph'+phaseIdx+'wk'+wi;
+                const el = document.getElementById('wktotal-'+uid);
+                if (el) {
+                    let totalKm = 0;
+                    week.days.forEach(d => (d.workouts||[]).forEach(w => { totalKm += parseKm(w.distance); }));
+                    el.textContent = totalKm > 0 ? totalKm + ' km' : week.totalKm;
+                }
+                return;
+            }
+        }
+    }
 }
 
 function updateDayCompletionFromData(row, day) {
@@ -2147,11 +2169,56 @@ async function savePlanToDatabase() {
     if (error) console.error('PS save error:',error.message);
 }
 
+// ── Migrate old flat-day format → new workouts[] format ──────────────────────
+function migratePlanData(data) {
+    if (!data?.phases?.length) return data;
+    let changed = false;
+    for (const phase of data.phases) {
+        for (const week of phase.weeks) {
+            for (const day of week.days) {
+                // Old format: day has workoutName/distance/completed/missed directly, no workouts array
+                if (!Array.isArray(day.workouts) && day.workoutName !== undefined) {
+                    const typeMap = {
+                        '🏃': 'run', '🚴': 'bike', '🏊': 'swim', '😴': 'rest',
+                        '🧘': 'mobility', '💪': 'strength'
+                    };
+                    // Guess type from icon in workoutName or cssClasses
+                    let type = 'run';
+                    if (day.workoutName.includes('🚴') || day.workoutName.toLowerCase().includes('bike')) type = 'bike';
+                    else if (day.workoutName.includes('🏊') || day.workoutName.toLowerCase().includes('swim')) type = 'swim';
+                    else if (day.workoutName.includes('😴') || day.workoutName.toLowerCase().includes('rest')) type = 'rest';
+                    else if (day.workoutName.includes('🧘') || day.workoutName.toLowerCase().includes('mobil')) type = 'mobility';
+                    else if (day.workoutName.includes('💪') || day.workoutName.toLowerCase().includes('strength')) type = 'strength';
+                    else if ((day.cssClasses||[]).includes('rest-day')) type = 'rest';
+
+                    const iconMap = { run:'🏃', bike:'🚴', swim:'🏊', rest:'😴', mobility:'🧘', strength:'💪' };
+                    day.workouts = [{
+                        type,
+                        icon: iconMap[type] || '🏃',
+                        desc: day.workoutName || '',
+                        distance: day.distance || '',
+                        completed: !!day.completed,
+                        missed: !!day.missed
+                    }];
+                    // clean up old flat fields
+                    delete day.workoutName;
+                    delete day.distance;
+                    delete day.completed;
+                    delete day.missed;
+                    delete day.partial;
+                    changed = true;
+                }
+            }
+        }
+    }
+    return data;
+}
+
 async function checkAuthAndLoadPlan() {
     // Phase 1: instant from cache
     const cached = loadFromCache();
     if (cached?.phases?.length) {
-        trainingData = cached;
+        trainingData = migratePlanData(cached);
         currentPlanId = localStorage.getItem(CACHE_ID)||null;
         initializePlan();
     }
@@ -2177,7 +2244,7 @@ async function checkAuthAndLoadPlan() {
         currentPlanId = plan.id;
         const dbData  = plan.plan_data;
         if (dbData?.phases?.length) {
-            trainingData = dbData;
+            trainingData = migratePlanData(dbData);
             saveToCache(trainingData, currentPlanId);
             initializePlan();
         } else if (!cached) {

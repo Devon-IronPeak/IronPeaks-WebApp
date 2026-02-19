@@ -1382,21 +1382,19 @@
             // Remove all state classes first
             dayCard.classList.remove('completed', 'missed', 'partial-completion');
             
-            // Determine state
-            if (totalWorkouts === 0) {
-                // No workouts (shouldn't happen, but handle it)
-                return;
-            } else if (missedCount > 0 && completedCount > 0) {
-                // PARTIAL: Some missed, some completed - show split state
+            if (totalWorkouts === 0) return;
+
+            if (completedCount > 0 && missedCount > 0) {
+                // PARTIAL: some done, some missed
                 dayCard.classList.add('partial-completion');
-            } else if (completedCount === totalWorkouts) {
-                // ALL COMPLETED
+            } else if (completedCount === totalWorkouts && missedCount === 0) {
+                // ALL COMPLETED (and none missed)
                 dayCard.classList.add('completed');
             } else if (missedCount > 0 && completedCount === 0) {
                 // ALL MISSED (none completed)
                 dayCard.classList.add('missed');
             }
-            // else: neither completed nor missed - normal state
+            // else: neither completed nor missed — neutral state
             
             // Update weekly compliance
             checkWeekCompliance();
@@ -2116,6 +2114,20 @@
                     `;
 
                     workoutsContainer.insertBefore(newWorkoutItem, addBtn);
+
+                    // Wire up miss-btn and checkbox so updateDayCompletion fires immediately
+                    const newMissBtn = newWorkoutItem.querySelector('.miss-btn');
+                    const newCheckbox = newWorkoutItem.querySelector('.checkbox');
+                    newMissBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        newMissBtn.classList.toggle('active');
+                        if (newMissBtn.classList.contains('active') && newCheckbox.checked) newCheckbox.checked = false;
+                        updateDayCompletion(dayCard);
+                    });
+                    newCheckbox.addEventListener('change', () => {
+                        if (newCheckbox.checked && newMissBtn.classList.contains('active')) newMissBtn.classList.remove('active');
+                        updateDayCompletion(dayCard);
+                    });
 
                     // Add buttons in order: 🗝️ Key, 🧱 Brick, 🗑️ Delete
                     const newDesc = newWorkoutItem.querySelector('.workout-description');
