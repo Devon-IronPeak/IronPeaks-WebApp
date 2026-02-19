@@ -2173,6 +2173,9 @@ function updateSummaryStats() {
             // Fall back to parsing km from desc text when distance field is empty (e.g. "🗝️ 32km Long Run")
             let km = parseKm(dist?.textContent);
             if (!km && descEl?.textContent) km = parseKm(descEl.textContent);
+            // Skip race day itself (42.2km marathon) — longest training run should be a training run
+            const descText = descEl?.textContent || '';
+            if (km === 42.2 || /RACE DAY/i.test(descText)) return;
             if (km > longest) {
                 longest = km;
                 longestDesc = descEl?.textContent.replace(/[✏️🗝️]/g,'').trim() || '';
