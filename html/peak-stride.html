@@ -1711,7 +1711,7 @@ function renderDay(day) {
     updateDayCompletionFromData(row, day);
 
     // key-workout class from workouts
-    const hasKey = (day.workouts||[]).some(w => w.desc && w.desc.includes('🗝️'));
+    const hasKey = (day.workouts||[]).some(w => w.desc && w.desc.includes('🗝'));
     if (hasKey) row.classList.add('key-workout');
 
     // Notes
@@ -1759,7 +1759,7 @@ function renderDay(day) {
 
 function createWorkoutItem(day, workout, wi) {
     const item = document.createElement('div');
-    item.className = 'workout-item ' + workout.type + (workout.desc&&workout.desc.includes('🗝️')?' key-item':'');
+    item.className = 'workout-item ' + workout.type + (workout.desc&&workout.desc.includes('🗝')?' key-item':'');
     item.dataset.workoutIdx = wi;
 
     const missActive = workout.missed ? 'active' : '';
@@ -1880,12 +1880,12 @@ if (editModeBtn) {
                     const desc = item.querySelector('.workout-desc');
                     const btn = document.createElement('button');
                     btn.className = 'key-toggle-btn';
-                    btn.textContent = desc&&desc.textContent.includes('🗝️') ? '🗝️' : '+ 🗝️';
+                    btn.textContent = desc&&desc.textContent.includes('🗝') ? '🗝️' : '+ 🗝️';
                     btn.addEventListener('click', e => {
                         e.stopPropagation();
                         if (!desc) return;
-                        if (desc.textContent.includes('🗝️')) {
-                            desc.textContent = desc.textContent.replace('🗝️','').trim();
+                        if (desc.textContent.includes('🗝')) {
+                            desc.textContent = desc.textContent.replace('🗝️','').replace('🗝','').trim();
                             btn.textContent = '+ 🗝️';
                             item.classList.remove('key-item');
                         } else {
@@ -1895,7 +1895,7 @@ if (editModeBtn) {
                         }
                         const row = item.closest('.day-row');
                         if (row) {
-                            const hasKey = Array.from(row.querySelectorAll('.workout-desc')).some(d=>d.textContent.includes('🗝️'));
+                            const hasKey = Array.from(row.querySelectorAll('.workout-desc')).some(d=>d.textContent.includes('🗝'));
                             row.classList.toggle('key-workout', hasKey);
                             // Refresh the overview so Next Key Workout updates live
                             updateOverviewStats();
@@ -1952,7 +1952,7 @@ if (editModeBtn) {
                     newWorkouts.push({
                         type,
                         icon: typeIcons[type]||'🏃',
-                        desc: desc ? desc.textContent.replace(/[✏️]/g,'').trim() : '',
+                        desc: desc ? desc.textContent.replace('✏️','').replace('✏','').trim() : '',
                         distance: dist ? dist.textContent.replace(/[✏️]/g,'').trim() : '',
                         completed: cb ? cb.checked : false,
                         missed: mb ? mb.classList.contains('active') : false
@@ -1961,7 +1961,7 @@ if (editModeBtn) {
                 fd.workouts = newWorkouts;
 
                 // update key-workout class
-                const hasKey = newWorkouts.some(w=>w.desc&&w.desc.includes('🗝️'));
+                const hasKey = newWorkouts.some(w=>w.desc&&w.desc.includes('🗝'));
                 row.classList.toggle('key-workout', hasKey);
             });
 
@@ -2021,8 +2021,14 @@ function addWorkout(dayRow) {
             keyBtn.addEventListener('click', e=>{
                 e.stopPropagation();
                 const desc=item.querySelector('.workout-desc');
-                if (desc.textContent.includes('🗝️')) { desc.textContent=desc.textContent.replace('🗝️','').trim(); keyBtn.textContent='+ 🗝️'; item.classList.remove('key-item'); }
+                if (desc.textContent.includes('🗝')) { desc.textContent=desc.textContent.replace('🗝️','').replace('🗝','').trim(); keyBtn.textContent='+ 🗝️'; item.classList.remove('key-item'); }
                 else { desc.textContent='🗝️ '+desc.textContent; keyBtn.textContent='🗝️'; item.classList.add('key-item'); }
+                const row = item.closest('.day-row');
+                if (row) {
+                    const hasKey = Array.from(row.querySelectorAll('.workout-desc')).some(d=>d.textContent.includes('🗝'));
+                    row.classList.toggle('key-workout', hasKey);
+                    updateOverviewStats();
+                }
             });
             const delBtn = document.createElement('button');
             delBtn.className='delete-workout-btn'; delBtn.textContent='🗑️';
@@ -2141,7 +2147,7 @@ function updateOverviewStats() {
                 if (!day.date || day.date < todayStr) continue;
                 const isKeyDay = (day.cssClasses || []).includes('key-workout');
                 for (const w of (day.workouts || [])) {
-                    const isKey = isKeyDay || (w.desc && w.desc.includes('🗝️'));
+                    const isKey = isKeyDay || (w.desc && w.desc.includes('🗝'));
                     if (isKey && w.type !== 'rest' && !w.completed) {
                         nkDay = day; nkWorkout = w;
                         break outer;
