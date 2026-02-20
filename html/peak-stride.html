@@ -927,17 +927,38 @@
         
         .day-row.ps-race-day .day-name,
         .day-row.ps-race-day .day-date,
-        .day-row.ps-race-day .workout-name,
-        .day-row.ps-race-day .workout-distance {
+        .day-row.ps-race-day .workout-desc,
+        .day-row.ps-race-day .workout-dist {
             color: #1a1a2e !important;
             font-weight: 700 !important;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
         
         /* Hide checkboxes for race day */
-        .day-row.ps-race-day .checkbox-label,
-        .day-row.ps-race-day .miss-btn-label {
+        .day-row.ps-race-day .check-wrap,
+        .day-row.ps-race-day .miss-btn-wrap {
             display: none !important;
+        }
+        
+        /* Mobile: race day text readable and not crunched */
+        @media (max-width: 600px) {
+            .day-row.ps-race-day {
+                padding: 1rem 1rem 1rem 1.2rem;
+                overflow: visible;
+            }
+            .day-row.ps-race-day .workout-item {
+                flex-wrap: wrap;
+                gap: 0.3rem;
+            }
+            .day-row.ps-race-day .workout-desc {
+                flex-basis: 100%;
+                font-size: 1rem;
+                line-height: 1.4;
+            }
+            .day-row.ps-race-day .workout-dist {
+                font-size: 1rem;
+                font-weight: 800;
+            }
         }
         
         /* Special Day Styling - Celebration Day (Party Blue) — works for any plan */
@@ -971,19 +992,44 @@
             to   { transform: rotate(360deg); }
         }
         
+        
+        /* Celebration day text colours */
         .day-row.ps-celebration-day .day-name,
         .day-row.ps-celebration-day .day-date,
-        .day-row.ps-celebration-day .workout-name,
-        .day-row.ps-celebration-day .workout-distance {
+        .day-row.ps-celebration-day .workout-desc,
+        .day-row.ps-celebration-day .workout-dist {
             color: white !important;
             font-weight: 700 !important;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
+
         /* Hide checkboxes for celebration day */
-        .day-row.ps-celebration-day .checkbox-label,
-        .day-row.ps-celebration-day .miss-btn-label {
+        .day-row.ps-celebration-day .check-wrap,
+        .day-row.ps-celebration-day .miss-btn-wrap {
             display: none !important;
+        }
+        
+        /* Mobile: celebration day text readable and not crunched */
+        @media (max-width: 600px) {
+            .day-row.ps-celebration-day {
+                padding: 1rem 1rem 1rem 1.2rem;
+                overflow: visible;
+            }
+            .day-row.ps-celebration-day .workout-item {
+                flex-wrap: wrap;
+                gap: 0.3rem;
+            }
+            .day-row.ps-celebration-day .workout-desc {
+                flex-basis: 100%;
+                font-size: 1rem;
+                line-height: 1.4;
+                color: white !important;
+            }
+            .day-row.ps-celebration-day .workout-dist {
+                font-size: 1rem;
+                font-weight: 800;
+                color: white !important;
+            }
         }
         
         /* Mobile Responsive Styles */
