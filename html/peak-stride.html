@@ -1228,6 +1228,42 @@
             .miss-btn-wrap span, .check-wrap span {
                 display: none; /* hide "Miss" / "Done" text labels on very small screens */
             }
+
+            /* Edit mode: wrap workout item into 2 rows so desc is readable */
+            .workout-item:has(.workout-desc[contenteditable="true"]) {
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+            .workout-item:has(.workout-desc[contenteditable="true"]) .workout-icon {
+                align-self: center;
+            }
+            .workout-item:has(.workout-desc[contenteditable="true"]) .workout-desc {
+                flex-basis: calc(100% - 30px); /* full width minus icon */
+                font-size: 1rem;
+                padding: 4px 6px;
+                border-radius: 6px;
+                background: rgba(255,255,255,0.9);
+                border: 1px solid #94a3b8;
+                min-height: 2rem;
+                order: 1;
+            }
+            .workout-item:has(.workout-desc[contenteditable="true"]) .workout-dist {
+                order: 2;
+                flex-shrink: 0;
+                min-width: 60px;
+                padding: 3px 6px;
+                background: rgba(255,255,255,0.9);
+                border: 1px solid #94a3b8;
+                border-radius: 6px;
+                font-size: 0.85rem;
+            }
+            .workout-item:has(.workout-desc[contenteditable="true"]) .miss-btn-wrap,
+            .workout-item:has(.workout-desc[contenteditable="true"]) .check-wrap,
+            .workout-item:has(.workout-desc[contenteditable="true"]) .key-toggle-btn,
+            .workout-item:has(.workout-desc[contenteditable="true"]) .delete-workout-btn {
+                order: 3;
+                flex-shrink: 0;
+            }
         }
         /* Today Highlight - Only Border */
         .today-highlight {
