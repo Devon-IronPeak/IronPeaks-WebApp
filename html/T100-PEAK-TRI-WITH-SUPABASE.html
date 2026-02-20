@@ -1079,7 +1079,12 @@
         function loadFromCache() {
             try {
                 const raw = localStorage.getItem(CACHE_KEY);
-                return raw ? JSON.parse(raw) : null;
+                if (!raw) return null;
+                // Only use cache if it matches the currently selected plan
+                const cachedId   = localStorage.getItem(CACHE_ID_KEY);
+                const activePlanId = localStorage.getItem('active-plan-id');
+                if (activePlanId && cachedId !== activePlanId) return null;
+                return JSON.parse(raw);
             } catch(e) { return null; }
         }
 
@@ -1640,45 +1645,57 @@
 
                 currentUser = user;
 
-                // Fetch all T100 plans — prefer one with real workout data
-                const { data: records, error: dbError } = await supabaseClient
-                    .from('training_plans')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .eq('plan_type', 'T100')
-                    .order('updated_at', { ascending: false });
+                // Respect the active plan selected in the dashboard
+                const activePlanId = localStorage.getItem('active-plan-id') || localStorage.getItem(CACHE_ID_KEY);
 
-                if (dbError) {
-                    console.error('DB fetch error:', dbError.message);
-                    updateSyncBadge('error');
-                    if (!cached) showNoPlanMessage('Database error: ' + dbError.message);
-                    return;
+                let planRecord = null;
+
+                // First try to load the specifically selected plan
+                if (activePlanId) {
+                    const { data: selected } = await supabaseClient
+                        .from('training_plans')
+                        .select('*')
+                        .eq('id', activePlanId)
+                        .eq('user_id', user.id)
+                        .eq('plan_type', 'T100')
+                        .single();
+                    if (selected && Array.isArray(selected.plan_data) && selected.plan_data.length > 0) {
+                        planRecord = selected;
+                    }
                 }
 
-                // Pick the first record that has real data (non-empty array)
-                const planRecord = records?.find(r =>
-                    Array.isArray(r.plan_data) && r.plan_data.length > 0
-                ) || null;
+                // Fall back to most recently updated T100 plan if nothing selected
+                if (!planRecord) {
+                    const { data: records, error: dbError } = await supabaseClient
+                        .from('training_plans')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .eq('plan_type', 'T100')
+                        .order('updated_at', { ascending: false });
+
+                    if (dbError) {
+                        console.error('DB fetch error:', dbError.message);
+                        updateSyncBadge('error');
+                        if (!cached) showNoPlanMessage('Database error: ' + dbError.message);
+                        return;
+                    }
+
+                    planRecord = records?.find(r =>
+                        Array.isArray(r.plan_data) && r.plan_data.length > 0
+                    ) || null;
+                }
 
                 if (planRecord) {
                     currentPlanId = planRecord.id;
+                    // Keep active-plan-id in sync
+                    localStorage.setItem('active-plan-id', planRecord.id);
                     const dbData = planRecord.plan_data;
                     normalizeTrainingData(dbData);
                     trainingData = dbData;
                     saveToCache(trainingData, currentPlanId);
                     console.log('✅ Synced from Supabase, planId:', currentPlanId);
                     initializePlan(); // re-render with fresh cloud data
-
-                    // Clean up any duplicate/empty plans silently
-                    const extras = records.filter(r => r.id !== currentPlanId).map(r => r.id);
-                    if (extras.length) {
-                        await supabaseClient
-                            .from('training_plans')
-                            .delete()
-                            .in('id', extras)
-                            .eq('user_id', user.id);
-                        console.log(`🧹 Removed ${extras.length} duplicate/empty plan(s)`);
-                    }
+                    // NOTE: No longer deleting "extras" — multiple T100 plans are valid
 
                 } else {
                     // No usable plan in DB at all
