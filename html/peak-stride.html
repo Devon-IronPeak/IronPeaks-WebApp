@@ -1593,6 +1593,7 @@ function initializePlan() {
     document.getElementById('training-summary').style.display = '';
     highlightToday();
     checkWeekCompliance();
+    updateLongRunHighlights();
     updateOverviewStats();
     updateSummaryStats();
     scheduleMidnightRefresh();
@@ -1911,7 +1912,7 @@ if (editModeBtn) {
                         e.stopPropagation();
                         const r = item.closest('.day-row');
                         item.remove();
-                        if (r) refreshDayRestState(r);
+                        if (r) { refreshDayRestState(r); updateLongRunHighlights(); }
                     });
                     item.appendChild(del);
                 }
@@ -1975,6 +1976,7 @@ if (editModeBtn) {
             document.querySelectorAll('.key-toggle-btn,.delete-workout-btn,.add-workout-btn').forEach(b=>b.remove());
 
             updateWeekTotals();
+            updateLongRunHighlights();
             updateOverviewStats();
             updateSummaryStats();
             await savePlanToDatabase();
@@ -2041,13 +2043,14 @@ function addWorkout(dayRow) {
                 e.stopPropagation();
                 const r = item.closest('.day-row');
                 item.remove();
-                if (r) refreshDayRestState(r);
+                if (r) { refreshDayRestState(r); updateLongRunHighlights(); }
             });
             item.appendChild(keyBtn);
             item.appendChild(delBtn);
 
             wc.insertBefore(item, addBtn);
             refreshDayRestState(dayRow);
+            updateLongRunHighlights();
             item.querySelector('.workout-desc').focus();
         };
     });
@@ -2069,6 +2072,44 @@ function refreshDayRestState(row) {
         const isRest = item.classList.contains('rest') || item.classList.contains('mobility');
         item.querySelector('.miss-btn-wrap').style.display = isRest ? 'none' : '';
         item.querySelector('.check-wrap').style.display    = isRest ? 'none' : '';
+    });
+}
+
+// Auto-assign long-run class to the longest run in each week (excluding race days)
+function updateLongRunHighlights() {
+    document.querySelectorAll('.week-card').forEach(wc => {
+        // Clear all existing auto long-run classes first
+        wc.querySelectorAll('.day-row.long-run').forEach(r => r.classList.remove('long-run'));
+
+        let bestKm = 0;
+        let bestRow = null;
+
+        wc.querySelectorAll('.day-row').forEach(row => {
+            // Never apply to race day
+            if (row.classList.contains('ps-race-day')) return;
+
+            let rowKm = 0;
+            row.querySelectorAll('.workout-item').forEach(item => {
+                // Only running workouts count
+                if (item.classList.contains('bike') || item.classList.contains('swim') ||
+                    item.classList.contains('rest') || item.classList.contains('mobility')) return;
+                const dist = item.querySelector('.workout-dist');
+                const desc = item.querySelector('.workout-desc');
+                let km = parseKm(dist?.textContent);
+                if (!km && desc?.textContent) km = parseKm(desc.textContent);
+                rowKm += km;
+            });
+
+            if (rowKm > bestKm) {
+                bestKm = rowKm;
+                bestRow = row;
+            }
+        });
+
+        // Only highlight if there's a meaningful run (> 0 km)
+        if (bestRow && bestKm > 0) {
+            bestRow.classList.add('long-run');
+        }
     });
 }
 
