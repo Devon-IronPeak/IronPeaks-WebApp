@@ -1909,7 +1909,9 @@ if (editModeBtn) {
                     del.textContent = '🗑️';
                     del.addEventListener('click', e => {
                         e.stopPropagation();
+                        const r = item.closest('.day-row');
                         item.remove();
+                        if (r) refreshDayRestState(r);
                     });
                     item.appendChild(del);
                 }
@@ -1963,6 +1965,8 @@ if (editModeBtn) {
                 // update key-workout class
                 const hasKey = newWorkouts.some(w=>w.desc&&w.desc.includes('🗝'));
                 row.classList.toggle('key-workout', hasKey);
+                // Update rest-day class based on final workout types
+                refreshDayRestState(row);
             });
 
             // Strip edit UI
@@ -2010,7 +2014,8 @@ function addWorkout(dayRow) {
             // Create a stub workout object
             const dayId = dayRow.getAttribute('data-day-id');
             const fd = findDay(dayId);
-            const stubWorkout = { type:t, icon:types[t].icon, desc:'New '+types[t].label+' workout', distance:'', completed:false, missed:false };
+            const defaultDesc = (t === 'rest' || t === 'mobility') ? 'Rest 💤' : 'New '+types[t].label+' workout';
+            const stubWorkout = { type:t, icon:types[t].icon, desc:defaultDesc, distance:'', completed:false, missed:false };
 
             const item = createWorkoutItem({id:dayId, workouts:fd?fd.workouts:[]} , stubWorkout, (fd?fd.workouts.length:0));
             item.querySelector('.workout-desc').contentEditable='true';
@@ -2032,11 +2037,17 @@ function addWorkout(dayRow) {
             });
             const delBtn = document.createElement('button');
             delBtn.className='delete-workout-btn'; delBtn.textContent='🗑️';
-            delBtn.addEventListener('click', e=>{ e.stopPropagation(); item.remove(); });
+            delBtn.addEventListener('click', e=>{
+                e.stopPropagation();
+                const r = item.closest('.day-row');
+                item.remove();
+                if (r) refreshDayRestState(r);
+            });
             item.appendChild(keyBtn);
             item.appendChild(delBtn);
 
             wc.insertBefore(item, addBtn);
+            refreshDayRestState(dayRow);
             item.querySelector('.workout-desc').focus();
         };
     });
@@ -2045,6 +2056,22 @@ function addWorkout(dayRow) {
 // =====================================================
 // WEEK COMPLIANCE
 // =====================================================
+// Refresh a day row's rest-day class and checkbox visibility based on current workout types
+function refreshDayRestState(row) {
+    const items = row.querySelectorAll('.workout-item');
+    if (items.length === 0) return;
+    const allRest = Array.from(items).every(item =>
+        item.classList.contains('rest') || item.classList.contains('mobility')
+    );
+    row.classList.toggle('rest-day', allRest);
+    // Show/hide checkboxes and miss buttons on individual items
+    items.forEach(item => {
+        const isRest = item.classList.contains('rest') || item.classList.contains('mobility');
+        item.querySelector('.miss-btn-wrap').style.display = isRest ? 'none' : '';
+        item.querySelector('.check-wrap').style.display    = isRest ? 'none' : '';
+    });
+}
+
 function checkWeekCompliance() {
     if (!trainingData) return;
     const today = new Date();
