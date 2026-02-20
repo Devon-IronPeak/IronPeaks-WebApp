@@ -2176,12 +2176,30 @@ function updateOverviewStats() {
     calculateWeeksToRace();
     const today   = new Date();
     const todayStr= today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-    const start   = new Date('2026-01-26');
-    const diffDays= Math.floor((today-start)/86400000);
-    const weekNum = Math.max(1, Math.floor(diffDays/7)+1);
+    // Find which week contains today by matching against actual day dates in trainingData
+    const wcards = document.querySelectorAll('.week-card');
+    let weekNum = 1;
+    if (trainingData?.phases) {
+        let found = false;
+        trainingData.phases.forEach((phase, pi) => {
+            phase.weeks?.forEach((week, wi) => {
+                const dates = (week.days || []).map(d => d.date).filter(Boolean);
+                if (dates.length && !found) {
+                    const min = dates[0], max = dates[dates.length - 1];
+                    if (todayStr >= min && todayStr <= max) {
+                        // Count which week card index this is
+                        let idx = 0;
+                        trainingData.phases.slice(0, pi).forEach(p => idx += (p.weeks?.length || 0));
+                        idx += wi;
+                        weekNum = idx + 1;
+                        found = true;
+                    }
+                }
+            });
+        });
+    }
 
     // Current week km
-    const wcards = document.querySelectorAll('.week-card');
     let curKm = 0;
     if (weekNum>=1 && weekNum<=wcards.length) {
         const el = wcards[weekNum-1].querySelector('.week-total');
