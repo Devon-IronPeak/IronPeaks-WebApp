@@ -2309,7 +2309,9 @@ function updateOverviewStats() {
             // Fall back to parsing km from the desc text if distance field is empty
             let km = parseKm(dist?.textContent);
             if (!km && descEl?.textContent) km = parseKm(descEl.textContent);
-            if (km < 42.2 && km > longRun) longRun = km;
+            const rowEl = item.closest('.day-row');
+            if (rowEl && rowEl.classList.contains('ps-race-day')) return;
+            if (km > longRun) longRun = km;
         });
     }
     const ulr = document.getElementById('upcomingLongRun');
@@ -2368,9 +2370,9 @@ function updateSummaryStats() {
             // Fall back to parsing km from desc text when distance field is empty (e.g. "🗝️ 32km Long Run")
             let km = parseKm(dist?.textContent);
             if (!km && descEl?.textContent) km = parseKm(descEl.textContent);
-            // Skip race day itself (42.2km marathon)
-            const descText = descEl?.textContent || '';
-            if (km === 42.2 || /RACE DAY/i.test(descText)) return;
+            // Skip race day by class, not by distance
+            const rowEl = item.closest('.day-row');
+            if (rowEl && rowEl.classList.contains('ps-race-day')) return;
             if (km > longest) {
                 longest = km;
                 longestDesc = descEl?.textContent.replace(/[✏️🗝️]/g,'').trim() || '';
