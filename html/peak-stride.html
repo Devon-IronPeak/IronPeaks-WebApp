@@ -1631,9 +1631,11 @@ function renderWeek(week, pi, wi) {
     const savedWeek = loadCollapse(uid);
     if (savedWeek === '1') card.classList.add('collapsed');
 
-    // calc total km for week header
+    // calc total km for week header — running only (bike/swim tracked separately)
     let totalKm = 0;
-    week.days.forEach(d => d.workouts?.forEach(w => { totalKm += parseKm(w.distance); }));
+    week.days.forEach(d => d.workouts?.forEach(w => {
+        if (w.type !== 'bike' && w.type !== 'swim') totalKm += parseKm(w.distance);
+    }));
     const kmText = totalKm > 0 ? totalKm + ' km' : week.totalKm;
 
     const hdr = document.createElement('div');
@@ -1824,7 +1826,9 @@ function updateWeekKmForDay(dayId) {
                 const el = document.getElementById('wktotal-'+uid);
                 if (el) {
                     let totalKm = 0;
-                    week.days.forEach(d => (d.workouts||[]).forEach(w => { totalKm += parseKm(w.distance); }));
+                    week.days.forEach(d => (d.workouts||[]).forEach(w => {
+                        if (w.type !== 'bike' && w.type !== 'swim') totalKm += parseKm(w.distance);
+                    }));
                     el.textContent = totalKm > 0 ? totalKm + ' km' : week.totalKm;
                 }
                 return;
@@ -1893,6 +1897,8 @@ if (editModeBtn) {
                         if (row) {
                             const hasKey = Array.from(row.querySelectorAll('.workout-desc')).some(d=>d.textContent.includes('🗝️'));
                             row.classList.toggle('key-workout', hasKey);
+                            // Refresh the overview so Next Key Workout updates live
+                            updateOverviewStats();
                         }
                     });
                     item.appendChild(btn);
@@ -2082,7 +2088,12 @@ function updateWeekTotals() {
         const el = wc.querySelector('.week-total');
         if (!el) return;
         let km=0;
-        wc.querySelectorAll('.workout-dist').forEach(d => { km += parseKm(d.textContent); });
+        wc.querySelectorAll('.workout-item').forEach(item => {
+            // Only count running workouts toward weekly running volume
+            if (item.classList.contains('bike') || item.classList.contains('swim')) return;
+            const dist = item.querySelector('.workout-dist');
+            km += parseKm(dist?.textContent);
+        });
         if (km > 0) el.textContent = km+' km';
     });
 }
@@ -2170,10 +2181,12 @@ function updateSummaryStats() {
             if (item.classList.contains('rest')||item.classList.contains('mobility')) return;
             const dist = item.querySelector('.workout-dist');
             const descEl = item.querySelector('.workout-desc');
+            // Only running workouts count for longest training run
+            if (item.classList.contains('bike') || item.classList.contains('swim')) return;
             // Fall back to parsing km from desc text when distance field is empty (e.g. "🗝️ 32km Long Run")
             let km = parseKm(dist?.textContent);
             if (!km && descEl?.textContent) km = parseKm(descEl.textContent);
-            // Skip race day itself (42.2km marathon) — longest training run should be a training run
+            // Skip race day itself (42.2km marathon)
             const descText = descEl?.textContent || '';
             if (km === 42.2 || /RACE DAY/i.test(descText)) return;
             if (km > longest) {
