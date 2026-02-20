@@ -1602,9 +1602,9 @@ function renderPhase(phase, pi) {
     const sec = document.createElement('div');
     sec.className = 'phase-section ' + phase.cssClass;
 
-    // Default OPEN; only collapse if user explicitly collapsed it (saved as '1')
+    // Default COLLAPSED; only open if user explicitly opened it (saved as '0')
     const savedPhase = loadCollapse('ph'+pi);
-    if (savedPhase === '1') sec.classList.add('collapsed');
+    if (savedPhase !== '0') sec.classList.add('collapsed');
 
     const hdr = document.createElement('div');
     hdr.className = 'phase-header';
@@ -1627,9 +1627,9 @@ function renderWeek(week, pi, wi) {
     const card = document.createElement('div');
     card.className = 'week-card';
 
-    // Default OPEN; only collapse if user explicitly collapsed it (saved as '1')
+    // Default COLLAPSED; only open if user explicitly opened it (saved as '0')
     const savedWeek = loadCollapse(uid);
-    if (savedWeek === '1') card.classList.add('collapsed');
+    if (savedWeek !== '0') card.classList.add('collapsed');
 
     // calc total km for week header — running only (bike/swim tracked separately)
     let totalKm = 0;
