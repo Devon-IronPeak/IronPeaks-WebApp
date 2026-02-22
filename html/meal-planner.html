@@ -1078,13 +1078,7 @@ function initSupabase() {
 
 function normalizeState(s) {
     s = s || {};
-    DAYS.forEach(d => {
-        if (!s.meals) s.meals = {};
-        if (!s.meals[d]) s.meals[d] = {};
-        MEAL_TYPES.forEach(t => {
-            if (!s.meals[d][t.key]) s.meals[d][t.key] = [];
-        });
-    });
+    if (!s.meals) s.meals = {};
     if (!s.favs) s.favs = [];
     if (!s.dayGoals) s.dayGoals = {};
     if (!s.maintenance) s.maintenance = 2400;
@@ -1092,6 +1086,14 @@ function normalizeState(s) {
     if (!s.goal) s.goal = 2000;
     if (s.weekOffset === undefined) s.weekOffset = 0;
     return s;
+}
+
+function ensureDayKey(key) {
+    // Make sure a date-keyed slot exists in state.meals
+    if (!state.meals[key]) state.meals[key] = {};
+    MEAL_TYPES.forEach(t => {
+        if (!state.meals[key][t.key]) state.meals[key][t.key] = [];
+    });
 }
 
 function loadState() {
@@ -1262,6 +1264,14 @@ function getWeekDates(offset) {
     });
 }
 
+function dateKey(dateObj) {
+    // Returns "YYYY-MM-DD" for a given Date object — used as meal storage key
+    const y = dateObj.getFullYear();
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
 function changeWeek(delta) {
     state.weekOffset = (state.weekOffset || 0) + delta;
     state.activeDay = 0;
@@ -1291,11 +1301,12 @@ function renderDayPills() {
         const thisDate = new Date(dates[i]);
         thisDate.setHours(0,0,0,0);
         const isToday = thisDate.getTime() === todayTime;
+        const dk = dateKey(dates[i]);
         const pill = document.createElement('div');
         pill.className = 'day-pill' +
             (i === state.activeDay ? ' active' : '') +
             (isToday ? ' today-highlight' : '') +
-            (dayTotal(d) > 0 ? ' has-meals' : '');
+            (dayTotal(dk) > 0 ? ' has-meals' : '');
         pill.innerHTML = `<span class="day-abbr">${d.toUpperCase()}</span><span class="day-num">${dates[i].getDate()}</span><span class="day-dot"></span>`;
         pill.onclick = () => { state.activeDay = i; renderAll(); };
         container.appendChild(pill);
@@ -1322,10 +1333,14 @@ function renderWeeklyChart() {
     chart.innerHTML = '';
 
     // Only show days up to and including today
-    const deltas = DAYS.map((d, i) => {
-        if (i > todayIdx) return null; // future — no data
-        const consumed = dayTotal(d);
-        const baseline = state.deltaMode === 'maintenance' ? state.maintenance : effectiveGoal(d);
+    const chartDates = getWeekDates();
+    const todayMidnight = new Date(); todayMidnight.setHours(0,0,0,0);
+    const deltas = chartDates.map((date, i) => {
+        const d = new Date(date); d.setHours(0,0,0,0);
+        if (d > todayMidnight) return null; // future — no data
+        const dk = dateKey(date);
+        const consumed = dayTotal(dk);
+        const baseline = state.deltaMode === 'maintenance' ? state.maintenance : effectiveGoal(dk);
         return consumed - baseline;
     });
 
@@ -1333,6 +1348,7 @@ function renderWeeklyChart() {
 
     DAYS.forEach((d, i) => {
         const delta = deltas[i];
+        const dk = dateKey(chartDates[i]);
         const col = document.createElement('div');
         col.className = 'summary-day-col';
 
@@ -1352,7 +1368,7 @@ function renderWeeklyChart() {
                     <div class="delta-zero-line"></div>
                     <div class="summary-bar delta-bar ${isOver?'over':'under'} ${i===state.activeDay?'active':''}"
                         style="${isOver ? 'align-self:flex-start;height:'+pct+'px' : 'align-self:flex-end;height:'+pct+'px'}"
-                        title="${dayTotal(d)} consumed / ${isOver?'+':'-'}${Math.abs(delta)} vs ${state.deltaMode}"
+                        title="${dayTotal(dk)} consumed / ${isOver?'+':'-'}${Math.abs(delta)} vs ${state.deltaMode}"
                         onclick="state.activeDay=${i};renderAll()"></div>
                 </div>
                 <div class="summary-cal-label ${isOver?'over':delta<0?'under':''}">${label}</div>`;
@@ -1376,9 +1392,10 @@ function renderWeeklyChart() {
 
 // ── RENDER MEAL SECTIONS ──────────────────────────────────────────────────────
 function renderMealSections() {
-    const dayKey = DAYS[state.activeDay];
     const dates = getWeekDates();
     const d = dates[state.activeDay];
+    const dayKey = dateKey(d);   // "YYYY-MM-DD" — unique per calendar date
+    ensureDayKey(dayKey);
 
     // Day header
     document.getElementById('dayTitle').innerHTML =
@@ -1523,7 +1540,9 @@ function closeAddForm(type) {
 }
 
 function addMeal(type) {
-    const dayKey = DAYS[state.activeDay];
+    const dates = getWeekDates();
+    const dayKey = dateKey(dates[state.activeDay]);
+    ensureDayKey(dayKey);
     const nameEl = document.getElementById(`name-${type}`);
     const calEl  = document.getElementById(`cal-${type}`);
     const name = nameEl.value.trim();
@@ -1656,9 +1675,9 @@ function deleteFav(i) {
     const fav = state.favs[i];
     // Unlink any meals that reference this fav
     if (fav) {
-        DAYS.forEach(d => {
+        Object.keys(state.meals).forEach(dk => {
             MEAL_TYPES.forEach(mt => {
-                (state.meals[d]?.[mt.key] || []).forEach(m => {
+                (state.meals[dk]?.[mt.key] || []).forEach(m => {
                     if (m.favId === fav.id) delete m.favId;
                 });
             });
