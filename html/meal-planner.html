@@ -1006,8 +1006,8 @@ body {
       <div class="gm-label">SET DAILY GOAL</div>
       <div class="gm-hint" style="margin-bottom:0.5rem">Option A — lose/gain by weight target per week:</div>
       <div class="gm-row" style="margin-bottom:0.5rem">
-        <input class="gm-input" id="gm-deficit" type="number" step="0.1" min="-1" max="1.5" placeholder="e.g. 0.5" oninput="updateGoalFromDeficit()">
-        <span style="font-size:0.75rem;color:var(--text-dim)">kg/week</span>
+        <input class="gm-input" id="gm-deficit" type="number" step="0.1" min="-2" max="3" placeholder="e.g. 1" oninput="updateGoalFromDeficit()">
+        <span style="font-size:0.75rem;color:var(--text-dim)">lbs/week</span>
         <span style="font-size:0.7rem;color:var(--text-muted)">(negative = gain)</span>
         <span id="gm-goal-hint" style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--accent2);margin-left:0.5rem"></span>
       </div>
@@ -1699,7 +1699,7 @@ function updateGoalFromDeficit() {
     const maint = parseInt(document.getElementById('gm-maintenance').value) || 0;
     const deficitInput = document.getElementById('gm-deficit').value;
     if (deficitInput !== '' && maint > 0) {
-        const weeklyDeficit = parseFloat(deficitInput) * 7700; // kcal per kg
+        const weeklyDeficit = parseFloat(deficitInput) * 3500; // kcal per lb
         const dailyDeficit  = Math.round(weeklyDeficit / 7);
         const computed = Math.max(1000, maint - dailyDeficit);
         document.getElementById('gm-goal').value = computed;
