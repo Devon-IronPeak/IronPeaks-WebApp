@@ -1021,8 +1021,8 @@ body {
     <hr class="gm-divider">
 
     <div class="gm-section">
-      <div class="gm-label">THIS WEEK'S DAILY OVERRIDES <span style="font-weight:400;opacity:0.6">(leave blank to use base goal)</span></div>
-      <div class="gm-hint" style="margin-bottom:0.5rem">Specific to each date — navigate weeks to set other weeks. e.g. long run day, rest day.</div>
+      <div class="gm-label">PER-DAY OVERRIDES <span style="font-weight:400;opacity:0.6">(leave blank to use base goal)</span></div>
+      <div class="gm-hint" style="margin-bottom:0.5rem">Applies every week — e.g. long run day, rest day.</div>
       <div class="gm-days-grid" id="gmDaysGrid"></div>
     </div>
 
@@ -1054,7 +1054,7 @@ let state = {
     weekOffset: 0,   // 0=current week, +1=next, -1=prev
     goal: 2000,           // base daily goal
     maintenance: 2400,    // TDEE maintenance calories
-    dayGoals: {},         // { "YYYY-MM-DD": 2200, ... } per specific date overrides
+    dayGoals: {},         // { "Mon": 2200, ... } per-weekday overrides
     meals: {},
     favs: [],
     deltaMode: 'goal',    // 'goal' or 'maintenance' — weekly chart toggle
@@ -1180,8 +1180,14 @@ async function initAuth() {
 function genId() { return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
 
 function effectiveGoal(dayKey) {
-    // dayKey is "YYYY-MM-DD" — overrides are stored per specific date
-    return state.dayGoals?.[dayKey] ?? state.goal;
+    // dayKey is "YYYY-MM-DD"; dayGoals are keyed by weekday name ("Mon"..."Sun")
+    let weekdayName = dayKey;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dayKey)) {
+        const parts = dayKey.split('-');
+        const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        weekdayName = DAYS[(d.getDay() + 6) % 7];
+    }
+    return state.dayGoals?.[weekdayName] ?? state.goal;
 }
 
 // ── INGREDIENTS ───────────────────────────────────────────────────────────────
@@ -1408,7 +1414,8 @@ function renderMealSections() {
     const todayDisp = document.getElementById('todayGoalDisplay');
     if (todayDisp) todayDisp.textContent = goal;
     document.getElementById('calConsumed').textContent = total + ' consumed';
-    document.getElementById('calGoalLabel').textContent = '/ ' + goal + ' goal' + (state.dayGoals?.[dayKey] ? ' ✦' : '');
+    const _wdn = DAYS[(new Date(dayKey.split('-')[0], dayKey.split('-')[1]-1, dayKey.split('-')[2]).getDay()+6)%7];
+    document.getElementById('calGoalLabel').textContent = '/ ' + goal + ' goal' + (state.dayGoals?.[_wdn] ? ' ✦' : '');
 
     const pct = Math.min((total/goal)*100, 100);
     const fill = document.getElementById('calProgressFill');
@@ -1697,20 +1704,16 @@ function openGoalModal() {
     document.getElementById('gm-deficit').value = '';
     document.getElementById('gm-goal-hint').textContent = '';
 
-    // Render per-day inputs for the currently viewed week (keyed by YYYY-MM-DD)
+    // Render per-day inputs keyed by weekday name
     const grid = document.getElementById('gmDaysGrid');
     if (grid) {
         grid.innerHTML = '';
-        const weekDates = getWeekDates();
-        DAYS.forEach((d, i) => {
-            const dk = dateKey(weekDates[i]);
-            const dateNum = weekDates[i].getDate();
-            const monthAbbr = weekDates[i].toLocaleDateString('en-CA', { month: 'short' });
+        DAYS.forEach(d => {
             const col = document.createElement('div');
             col.className = 'gm-day-col';
-            col.innerHTML = `<div class="gm-day-label">${d.toUpperCase()}<br><span style="font-size:0.5rem;opacity:0.6">${monthAbbr} ${dateNum}</span></div>
-                <input class="gm-day-input" id="gm-day-${dk}" type="number" min="500" max="10000" step="50"
-                    placeholder="${state.goal}" value="${state.dayGoals?.[dk] || ''}">`;
+            col.innerHTML = `<div class="gm-day-label">${d.toUpperCase()}</div>
+                <input class="gm-day-input" id="gm-day-${d}" type="number" min="500" max="10000" step="50"
+                    placeholder="${state.goal}" value="${state.dayGoals?.[d] || ''}">`;
             grid.appendChild(col);
         });
     }
@@ -1739,15 +1742,13 @@ function saveGoalSettings() {
     if (maint >= 500) state.maintenance = maint;
     if (goal  >= 500) state.goal = goal;
 
-    // Save per-day overrides by specific date
-    const weekDates = getWeekDates();
-    DAYS.forEach((d, i) => {
-        const dk = dateKey(weekDates[i]);
-        const inp = document.getElementById('gm-day-' + dk);
+    // Save per-weekday overrides
+    DAYS.forEach(d => {
+        const inp = document.getElementById('gm-day-' + d);
         if (!inp) return;
         const v = inp.value.trim();
-        if (v === '') { delete state.dayGoals[dk]; }
-        else { const n = parseInt(v); if (n >= 500) state.dayGoals[dk] = n; }
+        if (v === '') { delete state.dayGoals[d]; }
+        else { const n = parseInt(v); if (n >= 500) state.dayGoals[d] = n; }
     });
 
     saveState();
