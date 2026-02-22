@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peak Fuel | Alberta Mountain Meal Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg-dark:       #070d18;
+    --bg-mid:        #0d1626;
+    --bg-card:       #111f38;
+    --bg-card2:      #162540;
+    --border:        #1e3050;
+    --border-light:  #243d66;
+    --text:          #e2eaf8;
+    --text-dim:      #7a93b8;
+    --text-muted:    #3d5a7a;
+    --accent:        #c8971a;         /* Lynx amber */
+    --accent2:       #e8b84b;         /* Gold highlight */
+    --pine:          #1a6b3a;         /* Forest pine */
+    --pine-light:    #25a058;
+    --glacier:       #0e7ec0;         /* Glacier lake blue */
+    --glacier-light: #1aaee0;
+    --stone:         #8a7560;         /* Rocky mountain stone */
+    --snow:          #d4e8f5;         /* Mountain snow */
+    --breakfast:     #e8b84b;
+    --lunch:         #25a058;
+    --dinner:        #1aaee0;
+    --snack:         #c06dda;
+    --danger:        #e84545;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(14,126,192,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(200,151,26,0.08) 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60 L30 10 L60 60Z' fill='rgba(255,255,255,0.008)'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+}
+
+/* ── HEADER ── */
+.navbar {
+    background: rgba(7,13,24,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.lynx-icon {
+    font-size: 1.8rem;
+    filter: drop-shadow(0 0 8px rgba(200,151,26,0.6));
+    animation: breathe 4s ease-in-out infinite;
+}
+@keyframes breathe {
+    0%,100% { filter: drop-shadow(0 0 6px rgba(200,151,26,0.5)); }
+    50%      { filter: drop-shadow(0 0 14px rgba(232,184,75,0.8)); }
+}
+.nav-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.08em;
+}
+.nav-sub {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+.nav-right {
+    display: flex;
+    gap: 0.6rem;
+}
+.nav-btn {
+    background: rgba(14,126,192,0.15);
+    border: 1px solid var(--glacier);
+    color: var(--glacier-light);
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+}
+.nav-btn:hover { background: rgba(14,126,192,0.3); box-shadow: 0 0 12px rgba(14,126,192,0.3); }
+.nav-btn.amber {
+    background: rgba(200,151,26,0.15);
+    border-color: var(--accent);
+    color: var(--accent2);
+}
+.nav-btn.amber:hover { background: rgba(200,151,26,0.3); box-shadow: 0 0 12px rgba(200,151,26,0.3); }
+
+/* ── WEEK STRIP ── */
+.week-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(13,22,38,0.8);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+}
+.week-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    margin-right: 0.5rem;
+}
+.day-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0.4rem 0.7rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    transition: all 0.2s;
+    min-width: 52px;
+}
+.day-pill:hover { border-color: var(--accent); background: rgba(200,151,26,0.08); }
+.day-pill.today-highlight .day-num {
+    background: var(--glacier);
+    color: #fff;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    margin: 0 auto;
+}
+.week-nav-arrow {
+    background: none;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.week-nav-arrow:hover { border-color: var(--accent); color: var(--accent2); }
+.week-nav-today {
+    background: rgba(14,126,192,0.15);
+    border: 1px solid var(--glacier);
+    color: var(--glacier-light);
+    border-radius: 6px;
+    padding: 0.2rem 0.55rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.week-nav-today:hover { background: rgba(14,126,192,0.3); }
+.week-nav-today.hidden { display: none; }
+.day-pill.active {
+    border-color: var(--accent2);
+    background: rgba(200,151,26,0.15);
+    box-shadow: 0 0 12px rgba(200,151,26,0.2);
+}
+.day-pill.active .day-abbr { color: var(--accent2); }
+.day-pill.today-highlight { border-color: var(--glacier); }
+.day-abbr { font-family: 'Orbitron', monospace; font-size: 0.65rem; font-weight: 700; color: var(--text-dim); letter-spacing: 0.05em; }
+.day-num  { font-size: 1rem; font-weight: 700; color: var(--text); }
+.day-dot  { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); display: none; }
+.day-pill.has-meals .day-dot { display: block; }
+
+/* ── MAIN LAYOUT ── */
+.main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.2rem 1rem 4rem;
+}
+
+/* ── DAY HEADER ── */
+.day-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+}
+.day-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--text);
+}
+.day-title span { color: var(--accent2); font-style: italic; }
+.calorie-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent2);
+    background: rgba(200,151,26,0.12);
+    border: 1px solid rgba(200,151,26,0.3);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* ── CALORIE PROGRESS ── */
+.cal-progress-wrap {
+    margin-bottom: 1.2rem;
+}
+.cal-progress-bar {
+    height: 6px;
+    background: var(--bg-card2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.4rem;
+}
+.cal-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s ease;
+    max-width: 100%;
+}
+.cal-progress-fill.over { background: linear-gradient(90deg, #e84545, #ff6b6b); }
+.cal-goal-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
+}
+
+/* ── MEAL SECTIONS ── */
+.meal-section {
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    overflow: hidden;
+}
+.meal-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    user-select: none;
+}
+.meal-section-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.meal-type-icon { font-size: 1.1rem; }
+.meal-type-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+.meal-type-cal {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+}
+.section-add-btn {
+    background: none;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.section-add-btn:hover { border-color: var(--accent); color: var(--accent2); }
+
+/* Category colour coding */
+.breakfast .meal-section-header { border-left: 3px solid var(--breakfast); }
+.lunch     .meal-section-header { border-left: 3px solid var(--lunch); }
+.dinner    .meal-section-header { border-left: 3px solid var(--dinner); }
+.snack     .meal-section-header { border-left: 3px solid var(--snack); }
+
+.breakfast .meal-type-label { color: var(--breakfast); }
+.lunch     .meal-type-label { color: var(--lunch); }
+.dinner    .meal-type-label { color: var(--dinner); }
+.snack     .meal-type-label { color: var(--snack); }
+
+/* ── MEAL ITEMS ── */
+.meal-list { padding: 0 0.75rem 0.5rem; }
+.meal-item {
+    border-radius: 7px;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 0.35rem;
+    border: 1px solid transparent;
+    transition: border-color 0.15s;
+    overflow: hidden;
+}
+.meal-item:hover { border-color: var(--border-light); }
+.meal-item.expanded { border-color: var(--border-light); background: rgba(255,255,255,0.05); }
+.meal-item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    cursor: pointer;
+    user-select: none;
+}
+.meal-item-chevron {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+.meal-item.expanded .meal-item-chevron { transform: rotate(90deg); color: var(--accent); }
+.meal-item.no-ings .meal-item-chevron { visibility: hidden; }
+.meal-item-name {
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.meal-item-cal {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent2);
+    min-width: 55px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.meal-item-actions {
+    display: flex;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+.meal-item-ingredients {
+    display: none;
+    padding: 0 0.6rem 0.6rem 1.6rem;
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+}
+.meal-item.expanded .meal-item-ingredients { display: block; }
+.ing-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.78rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.ing-row:last-child { border-bottom: none; }
+.ing-row-name { flex: 1; color: var(--text-dim); }
+.ing-row-cal { font-family: 'Orbitron', monospace; font-size: 0.68rem; color: var(--pine-light); }
+.ing-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    padding: 0.35rem 0 0.2rem;
+}
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    opacity: 0.4;
+    transition: opacity 0.15s;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+.icon-btn:hover { opacity: 1; background: rgba(255,255,255,0.07); }
+.icon-btn.fav.active { opacity: 1; filter: drop-shadow(0 0 4px gold); }
+
+/* ── ADD MEAL FORM ── */
+.add-meal-form {
+    background: rgba(7,13,24,0.6);
+    border-top: 1px solid var(--border);
+    padding: 0.75rem;
+    display: none;
+}
+.add-meal-form.open { display: block; }
+.form-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+.form-input {
+    flex: 1;
+    min-width: 120px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border-light);
+    color: var(--text);
+    border-radius: 7px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input.cal-input { max-width: 100px; min-width: 80px; }
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.btn {
+    padding: 0.45rem 1rem;
+    border-radius: 7px;
+    font-size: 0.8rem;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+.btn-save {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #070d18;
+}
+.btn-save:hover { box-shadow: 0 0 14px rgba(200,151,26,0.5); transform: translateY(-1px); }
+.btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+}
+.btn-cancel:hover { border-color: var(--danger); color: var(--danger); }
+.btn-ing {
+    background: transparent;
+    border: 1px solid var(--pine);
+    color: var(--pine-light);
+    font-size: 0.72rem;
+    padding: 0.42rem 0.7rem;
+}
+.btn-ing:hover { background: rgba(37,160,88,0.15); }
+.btn-ing.active { background: rgba(37,160,88,0.2); border-color: var(--pine-light); }
+.ing-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.5rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 5px;
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+}
+.ing-item-name { flex: 1; color: var(--text); }
+.ing-item-cal { font-family: 'Orbitron', monospace; font-size: 0.7rem; color: var(--pine-light); }
+.ing-item-del { background: none; border: none; cursor: pointer; opacity: 0.4; font-size: 0.8rem; }
+.ing-item-del:hover { opacity: 1; }
+.btn-fav-pick {
+    background: transparent;
+    border: 1px solid rgba(255,215,0,0.3);
+    color: #ffd700;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.7rem;
+}
+.btn-fav-pick:hover { background: rgba(255,215,0,0.1); }
+
+/* ── FAVORITES PANEL ── */
+.fav-panel {
+    display: none;
+    margin-top: 0.5rem;
+    background: var(--bg-dark);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 8px;
+    padding: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.fav-panel.open { display: block; }
+.fav-panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    color: #ffd700;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+    opacity: 0.7;
+}
+.fav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+}
+.fav-item:hover { background: rgba(255,215,0,0.07); border-color: rgba(255,215,0,0.2); }
+.fav-item-name { flex: 1; font-size: 0.83rem; font-weight: 600; }
+.fav-item-cal { font-family: 'Orbitron', monospace; font-size: 0.72rem; color: var(--accent2); }
+.fav-item-use {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(200,151,26,0.2);
+    border: none;
+    color: var(--accent2);
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    transition: all 0.15s;
+}
+.fav-item-use:hover { background: rgba(200,151,26,0.4); }
+.fav-empty {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 0.5rem;
+    font-style: italic;
+}
+
+/* ── WEEKLY SUMMARY ── */
+.weekly-summary {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.2rem;
+}
+.summary-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+}
+.summary-day-col { text-align: center; }
+.summary-day-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.3rem;
+}
+.summary-bar-wrap {
+    height: 50px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+.summary-bar {
+    width: 16px;
+    border-radius: 3px 3px 0 0;
+    background: linear-gradient(0deg, var(--accent), var(--accent2));
+    min-height: 2px;
+    transition: height 0.4s ease;
+    cursor: pointer;
+    opacity: 0.7;
+}
+.summary-bar:hover { opacity: 1; }
+.summary-bar.active { opacity: 1; box-shadow: 0 0 8px rgba(200,151,26,0.4); }
+.summary-cal-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.5rem;
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+}
+
+/* ── GOAL SETTER ── */
+.goal-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    flex-wrap: wrap;
+}
+.goal-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+.goal-input {
+    background: var(--bg-card2);
+    border: 1px solid var(--border-light);
+    color: var(--accent2);
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    width: 80px;
+    outline: none;
+    text-align: center;
+}
+.goal-input:focus { border-color: var(--accent); }
+.goal-unit {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+}
+
+/* ── MOUNTAIN DECORATION ── */
+.mountain-bg {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.04;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    padding: 1.5rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.modal-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.modal-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.fav-list-modal { max-height: 300px; overflow-y: auto; }
+
+/* ── TOAST ── */
+.toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--bg-card2);
+    border: 1px solid var(--accent);
+    color: var(--accent2);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    padding: 0.6rem 1.1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 300;
+    display: none;
+    animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+/* ── DELTA CHART ── */
+.delta-toggle-btn {
+    background: rgba(14,126,192,0.15);
+    border: 1px solid var(--glacier);
+    color: var(--glacier-light);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.delta-toggle-btn:hover { background: rgba(14,126,192,0.3); }
+.summary-bar-wrap.delta-wrap {
+    position: relative;
+    height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.delta-zero-line {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--border-light);
+    transform: translateY(-50%);
+}
+.summary-bar.delta-bar {
+    width: 16px;
+    border-radius: 3px;
+    min-height: 2px;
+    transition: height 0.4s ease;
+    cursor: pointer;
+}
+.summary-bar.delta-bar.over { background: linear-gradient(180deg, #e84545, #ff6b6b); }
+.summary-bar.delta-bar.under { background: linear-gradient(0deg, var(--pine), var(--pine-light)); }
+.summary-bar.delta-bar.active { box-shadow: 0 0 8px rgba(200,151,26,0.5); }
+.summary-bar.future { width: 16px; height: 4px; background: var(--border); border-radius: 2px; }
+.summary-cal-label.over { color: #e84545; }
+.summary-cal-label.under { color: var(--pine-light); }
+
+/* ── GOAL MODAL ── */
+.gm-section {
+    margin-bottom: 1rem;
+}
+.gm-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+}
+.gm-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+.gm-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.gm-input {
+    background: var(--bg-card2);
+    border: 1px solid var(--border-light);
+    color: var(--text);
+    border-radius: 7px;
+    padding: 0.45rem 0.7rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100px;
+}
+.gm-input:focus { border-color: var(--accent); }
+.gm-input.wide { width: 130px; }
+.gm-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0.75rem 0;
+}
+.gm-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+.gm-day-col { text-align: center; }
+.gm-day-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.25rem;
+}
+.gm-day-input {
+    width: 100%;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    color: var(--accent2);
+    border-radius: 5px;
+    padding: 0.3rem 0.2rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    text-align: center;
+    outline: none;
+}
+.gm-day-input:focus { border-color: var(--accent); }
+.gm-day-input::placeholder { color: var(--text-muted); font-size: 0.6rem; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+    .summary-grid { grid-template-columns: repeat(7,1fr); gap: 0.2rem; }
+    .summary-bar { width: 12px; }
+    .day-pill { min-width: 42px; padding: 0.35rem 0.4rem; }
+    .day-num { font-size: 0.9rem; }
+    .day-title { font-size: 1.4rem; }
+    .nav-title { font-size: 0.9rem; }
+    .week-label { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Mountain silhouette -->
+<svg class="mountain-bg" viewBox="0 0 1440 200" preserveAspectRatio="none">
+  <path d="M0,200 L0,120 L120,60 L200,100 L320,20 L440,80 L560,10 L680,70 L760,30 L880,90 L1000,40 L1120,80 L1240,25 L1360,75 L1440,50 L1440,200 Z" fill="white"/>
+</svg>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="lynx-icon">
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Mountain -->
+        <polygon points="4,34 19,8 34,34" fill="rgba(14,126,192,0.35)" stroke="rgba(26,174,224,0.6)" stroke-width="1.2" stroke-linejoin="round"/>
+        <polygon points="4,34 12,20 20,28 19,8 34,34" fill="rgba(7,13,24,0.5)"/>
+        <!-- Snow cap -->
+        <polygon points="15,13 19,8 23,13 19,11" fill="rgba(212,232,245,0.85)"/>
+        <!-- Lynx body climbing mountain -->
+        <g transform="translate(16,15) rotate(-28)">
+          <!-- Body -->
+          <ellipse cx="0" cy="0" rx="4.5" ry="2.8" fill="#c8971a"/>
+          <ellipse cx="0" cy="0" rx="3.8" ry="2" fill="#e8b84b"/>
+          <!-- Head -->
+          <ellipse cx="4.2" cy="-2" rx="2.6" ry="2.2" fill="#c8971a"/>
+          <ellipse cx="4.2" cy="-2" rx="1.9" ry="1.5" fill="#e8b84b"/>
+          <!-- Ear tufts -->
+          <polygon points="3.0,-3.8 2.4,-5.5 4.0,-4.2" fill="#c8971a"/>
+          <polygon points="5.4,-3.8 5.0,-5.5 6.6,-4.2" fill="#c8971a"/>
+          <!-- Ear tuft tips (black) -->
+          <line x1="2.7" y1="-3.9" x2="3.1" y2="-5.3" stroke="#1a1a1a" stroke-width="0.7" stroke-linecap="round"/>
+          <line x1="5.2" y1="-3.9" x2="5.8" y2="-5.3" stroke="#1a1a1a" stroke-width="0.7" stroke-linecap="round"/>
+          <!-- Eye -->
+          <circle cx="5.2" cy="-2.4" r="0.55" fill="#070d18"/>
+          <circle cx="5.4" cy="-2.6" r="0.2" fill="white"/>
+          <!-- Nose -->
+          <ellipse cx="6.4" cy="-1.6" rx="0.4" ry="0.3" fill="#8a4a2a"/>
+          <!-- Front legs reaching up -->
+          <line x1="2.5" y1="-1" x2="0" y2="-4.5" stroke="#c8971a" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="3.5" y1="-0.5" x2="1.5" y2="-4.2" stroke="#c8971a" stroke-width="1.4" stroke-linecap="round"/>
+          <!-- Paws at top -->
+          <circle cx="0" cy="-4.8" r="0.9" fill="#c8971a"/>
+          <circle cx="1.5" cy="-4.5" r="0.8" fill="#c8971a"/>
+          <!-- Back legs pushing -->
+          <line x1="-2" y1="1" x2="-4" y2="3.5" stroke="#c8971a" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="-1" y1="1.5" x2="-2.5" y2="4" stroke="#c8971a" stroke-width="1.4" stroke-linecap="round"/>
+          <!-- Tail -->
+          <path d="M-4,0 Q-7,-1 -6,-3" stroke="#c8971a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          <!-- Bobcat spot markings -->
+          <ellipse cx="-1" cy="-0.5" rx="0.8" ry="0.5" fill="rgba(140,90,20,0.5)"/>
+          <ellipse cx="1" cy="0.8" rx="0.7" ry="0.4" fill="rgba(140,90,20,0.5)"/>
+        </g>
+      </svg>
+    </span>
+    <div>
+      <div class="nav-title">PEAK FUEL</div>
+      <div class="nav-sub">MEAL PLANNING AND TRACKING</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span id="nav-user-email" style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--text-dim);letter-spacing:0.05em;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    <button class="nav-btn amber" onclick="openFavModal()">⭐ FAVOURITES</button>
+    <button class="nav-btn" onclick="openGoalModal()">⚙️ GOAL</button>
+    <button class="nav-btn" onclick="window.location.href='dashboard.html'" style="background:rgba(37,160,88,0.15);border-color:var(--pine-light);color:var(--pine-light);">← DASHBOARD</button>
+    <button class="nav-btn" id="nav-logout-btn" onclick="handleLogout()" style="background:rgba(232,69,69,0.15);border-color:#e84545;color:#e84545;">LOGOUT</button>
+  </div>
+</nav>
+
+<!-- WEEK STRIP -->
+<div class="week-nav">
+  <button class="week-nav-arrow" onclick="changeWeek(-1)" title="Previous week">&#8249;</button>
+  <span class="week-label" id="weekLabel">WEEK OF</span>
+  <div id="dayPills"></div>
+  <button class="week-nav-arrow" onclick="changeWeek(1)" title="Next week">&#8250;</button>
+  <button class="week-nav-today" id="todayBtn" onclick="goToToday()">TODAY</button>
+</div>
+
+<!-- MAIN -->
+<div class="main" style="position:relative;z-index:1;">
+
+  <!-- Weekly bar chart -->
+  <div class="weekly-summary">
+    <div class="summary-title" style="justify-content:space-between">
+      <span>🏔️ WEEKLY OVERVIEW</span>
+      <button id="deltaToggle" class="delta-toggle-btn" onclick="state.deltaMode=state.deltaMode==='goal'?'maintenance':'goal';saveState();renderWeeklyChart()">vs Goal</button>
+    </div>
+    <div class="summary-grid" id="weeklyChart"></div>
+    <div id="weeklyDeltaTotal" style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--text-dim);text-align:right;margin-top:0.4rem;letter-spacing:0.06em"></div>
+  </div>
+
+  <!-- Daily calorie goal progress -->
+  <div class="goal-row">
+    <span class="goal-label">🔥 TODAY'S TARGET</span>
+    <span id="todayGoalDisplay" style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;color:var(--accent2)"></span>
+    <span class="goal-unit">kcal</span>
+    <div style="margin-left:auto;font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--text-dim)" id="remainingLabel"></div>
+  </div>
+
+  <!-- Day header -->
+  <div class="day-header">
+    <div class="day-title" id="dayTitle">Monday <span id="dayDateSpan"></span></div>
+    <div class="calorie-badge" id="dayCalBadge">0 kcal</div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="cal-progress-wrap">
+    <div class="cal-progress-bar">
+      <div class="cal-progress-fill" id="calProgressFill" style="width:0%"></div>
+    </div>
+    <div class="cal-goal-row">
+      <span id="calConsumed">0 consumed</span>
+      <span id="calGoalLabel">/ 2000 goal</span>
+    </div>
+  </div>
+
+  <!-- Meal sections -->
+  <div id="mealSections"></div>
+
+</div>
+
+<!-- FAVOURITES MODAL -->
+<div class="modal-overlay" id="favModal">
+  <div class="modal">
+    <div class="modal-title">
+      ⭐ FAVOURITE MEALS
+      <button class="modal-close" onclick="closeFavModal()">✕</button>
+    </div>
+    <div class="fav-list-modal" id="favListModal"></div>
+  </div>
+</div>
+
+<!-- GOAL MODAL -->
+<div class="modal-overlay" id="goalModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">
+      ⚙️ GOAL SETTINGS
+      <button class="modal-close" onclick="closeGoalModal()">✕</button>
+    </div>
+
+    <div class="gm-section">
+      <div class="gm-label">DAILY MAINTENANCE CALORIES (TDEE)</div>
+      <div class="gm-row">
+        <input class="gm-input wide" id="gm-maintenance" type="number" min="1000" max="8000" step="50" placeholder="2400">
+        <span style="font-size:0.75rem;color:var(--text-dim)">kcal/day</span>
+      </div>
+      <div class="gm-hint">Your total daily energy expenditure at current activity level.</div>
+    </div>
+
+    <hr class="gm-divider">
+
+    <div class="gm-section">
+      <div class="gm-label">SET DAILY GOAL</div>
+      <div class="gm-hint" style="margin-bottom:0.5rem">Option A — lose/gain by weight target per week:</div>
+      <div class="gm-row" style="margin-bottom:0.5rem">
+        <input class="gm-input" id="gm-deficit" type="number" step="0.1" min="-1" max="1.5" placeholder="e.g. 0.5" oninput="updateGoalFromDeficit()">
+        <span style="font-size:0.75rem;color:var(--text-dim)">kg/week</span>
+        <span style="font-size:0.7rem;color:var(--text-muted)">(negative = gain)</span>
+        <span id="gm-goal-hint" style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--accent2);margin-left:0.5rem"></span>
+      </div>
+      <div class="gm-hint" style="margin-bottom:0.5rem">Option B — set manually:</div>
+      <div class="gm-row">
+        <input class="gm-input wide" id="gm-goal" type="number" min="500" max="10000" step="50">
+        <span style="font-size:0.75rem;color:var(--text-dim)">kcal/day base goal</span>
+      </div>
+    </div>
+
+    <hr class="gm-divider">
+
+    <div class="gm-section">
+      <div class="gm-label">PER-DAY OVERRIDES <span style="font-weight:400;opacity:0.6">(leave blank to use base goal)</span></div>
+      <div class="gm-hint" style="margin-bottom:0.5rem">Higher/lower days e.g. long run day, rest day.</div>
+      <div class="gm-days-grid" id="gmDaysGrid"></div>
+    </div>
+
+    <div style="display:flex;gap:0.6rem;margin-top:0.75rem">
+      <button class="btn btn-save" style="flex:1" onclick="saveGoalSettings()">SAVE SETTINGS</button>
+      <button class="btn btn-cancel" onclick="closeGoalModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const MEAL_TYPES = [
+    { key:'breakfast', label:'BREAKFAST', icon:'🌄', color:'var(--breakfast)' },
+    { key:'lunch',     label:'LUNCH',     icon:'🦅', color:'var(--lunch)' },
+    { key:'dinner',    label:'DINNER',    icon:'🌲', color:'var(--dinner)' },
+    { key:'snack',     label:'SNACK',     icon:'🐾', color:'var(--snack)' },
+];
+
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAY_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+let state = {
+    activeDay: 0,   // 0=Mon … 6=Sun
+    weekOffset: 0,   // 0=current week, +1=next, -1=prev
+    goal: 2000,           // base daily goal
+    maintenance: 2400,    // TDEE maintenance calories
+    dayGoals: {},         // { "Mon": 2200, ... } per-day overrides
+    meals: {},
+    favs: [],
+    deltaMode: 'goal',    // 'goal' or 'maintenance' — weekly chart toggle
+};
+
+// ── SUPABASE AUTH + CLOUD SYNC ────────────────────────────────────────────────
+const SUPABASE_URL = 'https://yecqupxvbazsgzqgmzmc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllY3F1cHh2YmF6c2d6cWdtem1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MzU4NDcsImV4cCI6MjA4NjAxMTg0N30._8MxQKOgs-IeezPUTumvHPaFDj1n4R-TYOFv-eXuBZk';
+
+let supabaseClient = null;
+let currentUser = null;
+let saveDebounceTimer = null;
+
+function initSupabase() {
+    try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch(e) {
+        console.warn('Supabase init failed, using localStorage fallback:', e);
+    }
+}
+
+function normalizeState(s) {
+    s = s || {};
+    DAYS.forEach(d => {
+        if (!s.meals) s.meals = {};
+        if (!s.meals[d]) s.meals[d] = {};
+        MEAL_TYPES.forEach(t => {
+            if (!s.meals[d][t.key]) s.meals[d][t.key] = [];
+        });
+    });
+    if (!s.favs) s.favs = [];
+    if (!s.dayGoals) s.dayGoals = {};
+    if (!s.maintenance) s.maintenance = 2400;
+    if (!s.deltaMode) s.deltaMode = 'goal';
+    if (!s.goal) s.goal = 2000;
+    if (s.weekOffset === undefined) s.weekOffset = 0;
+    return s;
+}
+
+function loadState() {
+    // Load from localStorage as immediate cache; cloud sync happens async after auth
+    try {
+        const cached = localStorage.getItem('peakfuel-v1');
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            state = { ...state, ...parsed };
+        }
+    } catch(e) {}
+    state = normalizeState(state);
+}
+
+let _saveInProgress = false;
+function saveState() {
+    // Always write to localStorage immediately for snappy UX
+    localStorage.setItem('peakfuel-v1', JSON.stringify(state));
+    // Debounce cloud save by 1.2s
+    clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = setTimeout(() => cloudSave(), 1200);
+}
+
+async function cloudSave() {
+    if (!supabaseClient || !currentUser) return;
+    try {
+        await supabaseClient.from('meal_planner_data').upsert({
+            user_id: currentUser.id,
+            data: state,
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+    } catch(e) {
+        console.warn('Cloud save failed:', e);
+    }
+}
+
+async function cloudLoad() {
+    if (!supabaseClient || !currentUser) return;
+    try {
+        const { data, error } = await supabaseClient
+            .from('meal_planner_data')
+            .select('data')
+            .eq('user_id', currentUser.id)
+            .single();
+        if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
+        if (data?.data) {
+            state = { ...state, ...data.data };
+            state = normalizeState(state);
+            // Also update localStorage cache
+            localStorage.setItem('peakfuel-v1', JSON.stringify(state));
+            renderAll();
+        }
+    } catch(e) {
+        console.warn('Cloud load failed, using local data:', e);
+    }
+}
+
+async function handleLogout() {
+    if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+    }
+    window.location.href = 'dashboard.html';
+}
+
+async function initAuth() {
+    if (!supabaseClient) return;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+        currentUser = session.user;
+        const emailEl = document.getElementById('nav-user-email');
+        if (emailEl) emailEl.textContent = currentUser.email;
+        // Load cloud data (overrides localStorage if newer)
+        await cloudLoad();
+    } else {
+        // Not logged in — show a soft warning but still allow local use
+        const emailEl = document.getElementById('nav-user-email');
+        if (emailEl) {
+            emailEl.textContent = 'Not signed in';
+            emailEl.style.color = 'var(--danger)';
+        }
+    }
+}
+
+function genId() { return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
+
+function effectiveGoal(dayKey) {
+    return state.dayGoals?.[dayKey] ?? state.goal;
+}
+
+// ── INGREDIENTS ───────────────────────────────────────────────────────────────
+const ingredientStore = {}; // { type: [{name,cal,id}] }
+
+function toggleIngredients(type) {
+    const sec = document.getElementById(`ingsec-${type}`);
+    const btn = document.querySelector(`#form-${type} .btn-ing`);
+    const isOpen = sec.style.display === 'none';
+    sec.style.display = isOpen ? 'block' : 'none';
+    btn?.classList.toggle('active', isOpen);
+    if (isOpen) {
+        if (!ingredientStore[type]) ingredientStore[type] = [];
+        renderIngredients(type);
+        setTimeout(() => document.getElementById(`ingname-${type}`)?.focus(), 50);
+    }
+}
+
+function addIngredient(type) {
+    const nameEl = document.getElementById(`ingname-${type}`);
+    const calEl  = document.getElementById(`ingcal-${type}`);
+    const name = nameEl.value.trim();
+    const cal  = calEl.value !== '' ? parseInt(calEl.value) : null; // calories optional
+    if (!name) { nameEl.focus(); return; }
+    if (!ingredientStore[type]) ingredientStore[type] = [];
+    ingredientStore[type].push({ id: genId(), name, cal });
+    nameEl.value = '';
+    calEl.value  = '';
+    nameEl.focus();
+    renderIngredients(type);
+    // Auto-update cal total only from ingredients that have calories
+    const total = ingredientStore[type].reduce((s, i) => s + (i.cal||0), 0);
+    if (total > 0) document.getElementById(`cal-${type}`).value = total;
+}
+
+function deleteIngredient(type, id) {
+    if (!ingredientStore[type]) return;
+    ingredientStore[type] = ingredientStore[type].filter(i => i.id !== id);
+    const total = ingredientStore[type].reduce((s, i) => s + (i.cal||0), 0);
+    document.getElementById(`cal-${type}`).value = total || '';
+    renderIngredients(type);
+}
+
+function renderIngredients(type) {
+    const list = document.getElementById(`inglist-${type}`);
+    const totalEl = document.getElementById(`ingtotal-${type}`);
+    if (!list) return;
+    const ings = ingredientStore[type] || [];
+    list.innerHTML = '';
+    ings.forEach(ing => {
+        const row = document.createElement('div');
+        row.className = 'ing-item';
+        const calDisplay = ing.cal != null ? ing.cal + ' kcal' : '–';
+        row.innerHTML = `<span class="ing-item-name">${ing.name}</span><span class="ing-item-cal">${calDisplay}</span><button class="ing-item-del" onclick="deleteIngredient('${type}','${ing.id}')">✕</button>`;
+        list.appendChild(row);
+    });
+    const total = ings.reduce((s, i) => s + (i.cal||0), 0);
+    if (totalEl) totalEl.textContent = total > 0 ? `Total: ${total} kcal — auto-filled above` : 'Add calories to auto-fill';
+}
+
+// ── DAY TOTALS ────────────────────────────────────────────────────────────────
+function dayTotal(dayKey) {
+    let t = 0;
+    MEAL_TYPES.forEach(mt => {
+        (state.meals[dayKey]?.[mt.key] || []).forEach(m => t += (parseInt(m.cal)||0));
+    });
+    return t;
+}
+
+// ── RENDER DAY PILLS ──────────────────────────────────────────────────────────
+function getWeekDates(offset) {
+    const off = (offset !== undefined ? offset : (state.weekOffset || 0));
+    const today = new Date();
+    const dow = today.getDay(); // 0=Sun
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - ((dow + 6) % 7) + off * 7);
+    return DAYS.map((_, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        return d;
+    });
+}
+
+function changeWeek(delta) {
+    state.weekOffset = (state.weekOffset || 0) + delta;
+    state.activeDay = 0;
+    saveState();
+    renderAll();
+}
+
+function goToToday() {
+    state.weekOffset = 0;
+    const todayIdx = (new Date().getDay() + 6) % 7;
+    state.activeDay = todayIdx;
+    saveState();
+    renderAll();
+}
+
+function renderDayPills() {
+    const offset = state.weekOffset || 0;
+    const dates = getWeekDates(offset);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const todayTime = today.getTime();
+    const container = document.getElementById('dayPills');
+    container.style.display = 'flex';
+    container.style.gap = '0.4rem';
+    container.innerHTML = '';
+    DAYS.forEach((d, i) => {
+        const thisDate = new Date(dates[i]);
+        thisDate.setHours(0,0,0,0);
+        const isToday = thisDate.getTime() === todayTime;
+        const pill = document.createElement('div');
+        pill.className = 'day-pill' +
+            (i === state.activeDay ? ' active' : '') +
+            (isToday ? ' today-highlight' : '') +
+            (dayTotal(d) > 0 ? ' has-meals' : '');
+        pill.innerHTML = `<span class="day-abbr">${d.toUpperCase()}</span><span class="day-num">${dates[i].getDate()}</span><span class="day-dot"></span>`;
+        pill.onclick = () => { state.activeDay = i; renderAll(); };
+        container.appendChild(pill);
+    });
+
+    // Update week label
+    const weekLabelEl = document.getElementById('weekLabel');
+    if (weekLabelEl) {
+        const monday = dates[0];
+        const sunday = dates[6];
+        const fmt = d => d.toLocaleDateString('en-CA', {month:'short', day:'numeric'});
+        weekLabelEl.textContent = fmt(monday) + ' – ' + fmt(sunday);
+    }
+
+    // Show/hide today button
+    const todayBtn = document.getElementById('todayBtn');
+    if (todayBtn) todayBtn.classList.toggle('hidden', offset === 0);
+}
+
+// ── RENDER WEEKLY CHART ───────────────────────────────────────────────────────
+function renderWeeklyChart() {
+    const todayIdx = (new Date().getDay() + 6) % 7;
+    const chart = document.getElementById('weeklyChart');
+    chart.innerHTML = '';
+
+    // Only show days up to and including today
+    const deltas = DAYS.map((d, i) => {
+        if (i > todayIdx) return null; // future — no data
+        const consumed = dayTotal(d);
+        const baseline = state.deltaMode === 'maintenance' ? state.maintenance : effectiveGoal(d);
+        return consumed - baseline;
+    });
+
+    const maxAbs = Math.max(1, ...deltas.filter(x=>x!==null).map(Math.abs));
+
+    DAYS.forEach((d, i) => {
+        const delta = deltas[i];
+        const col = document.createElement('div');
+        col.className = 'summary-day-col';
+
+        if (delta === null) {
+            // Future day — dim placeholder
+            col.innerHTML = `
+                <div class="summary-day-label">${d.toUpperCase()}</div>
+                <div class="summary-bar-wrap"><div class="summary-bar future"></div></div>
+                <div class="summary-cal-label"></div>`;
+        } else {
+            const pct = Math.min((Math.abs(delta) / maxAbs) * 45, 45); // max 45px half
+            const isOver = delta > 0;
+            const label = delta === 0 ? '±0' : (isOver ? '+'+delta : ''+delta);
+            col.innerHTML = `
+                <div class="summary-day-label">${d.toUpperCase()}</div>
+                <div class="summary-bar-wrap delta-wrap">
+                    <div class="delta-zero-line"></div>
+                    <div class="summary-bar delta-bar ${isOver?'over':'under'} ${i===state.activeDay?'active':''}"
+                        style="${isOver ? 'align-self:flex-start;height:'+pct+'px' : 'align-self:flex-end;height:'+pct+'px'}"
+                        title="${dayTotal(d)} consumed / ${isOver?'+':'-'}${Math.abs(delta)} vs ${state.deltaMode}"
+                        onclick="state.activeDay=${i};renderAll()"></div>
+                </div>
+                <div class="summary-cal-label ${isOver?'over':delta<0?'under':''}">${label}</div>`;
+        }
+        chart.appendChild(col);
+    });
+
+    // Update toggle button state
+    const tg = document.getElementById('deltaToggle');
+    if (tg) tg.textContent = state.deltaMode === 'maintenance' ? 'vs Maintenance' : 'vs Goal';
+
+    // Weekly running delta total
+    const weekTotal = deltas.filter(x => x !== null).reduce((s, x) => s + x, 0);
+    const weekTotEl = document.getElementById('weeklyDeltaTotal');
+    if (weekTotEl && deltas.some(x => x !== null)) {
+        const sign = weekTotal >= 0 ? '+' : '';
+        weekTotEl.textContent = `Week running total: ${sign}${weekTotal} kcal vs ${state.deltaMode}`;
+        weekTotEl.style.color = weekTotal > 0 ? '#e84545' : weekTotal < 0 ? 'var(--pine-light)' : 'var(--text-dim)';
+    }
+}
+
+// ── RENDER MEAL SECTIONS ──────────────────────────────────────────────────────
+function renderMealSections() {
+    const dayKey = DAYS[state.activeDay];
+    const dates = getWeekDates();
+    const d = dates[state.activeDay];
+
+    // Day header
+    document.getElementById('dayTitle').innerHTML =
+        `${DAY_FULL[state.activeDay]} <span>${d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}</span>`;
+
+    const total = dayTotal(dayKey);
+    const goal  = effectiveGoal(dayKey);
+    document.getElementById('dayCalBadge').textContent = total + ' kcal';
+    const todayDisp = document.getElementById('todayGoalDisplay');
+    if (todayDisp) todayDisp.textContent = goal;
+    document.getElementById('calConsumed').textContent = total + ' consumed';
+    document.getElementById('calGoalLabel').textContent = '/ ' + goal + ' goal' + (state.dayGoals?.[dayKey] ? ' ✦' : '');
+
+    const pct = Math.min((total/goal)*100, 100);
+    const fill = document.getElementById('calProgressFill');
+    fill.style.width = pct + '%';
+    fill.className = 'cal-progress-fill' + (total > goal ? ' over' : '');
+
+    const remaining = goal - total;
+    document.getElementById('remainingLabel').textContent =
+        remaining >= 0 ? remaining + ' kcal remaining' : Math.abs(remaining) + ' kcal over';
+
+    const container = document.getElementById('mealSections');
+    container.innerHTML = '';
+
+    MEAL_TYPES.forEach(mt => {
+        const meals = state.meals[dayKey]?.[mt.key] || [];
+        const typeTotal = meals.reduce((s,m) => s+(parseInt(m.cal)||0), 0);
+
+        const sec = document.createElement('div');
+        sec.className = `meal-section ${mt.key}`;
+        sec.id = `section-${mt.key}`;
+
+        sec.innerHTML = `
+            <div class="meal-section-header">
+                <div class="meal-section-left">
+                    <span class="meal-type-icon">${mt.icon}</span>
+                    <span class="meal-type-label">${mt.label}</span>
+                    ${typeTotal > 0 ? `<span class="meal-type-cal">${typeTotal} kcal</span>` : ''}
+                </div>
+                <button class="section-add-btn" onclick="toggleAddForm('${mt.key}',event)">＋ Add</button>
+            </div>
+            <div class="meal-list" id="list-${mt.key}"></div>
+            <div class="add-meal-form" id="form-${mt.key}">
+                <div class="form-row">
+                    <input class="form-input" id="name-${mt.key}" type="text" placeholder="Meal name…" autocomplete="off">
+                    <input class="form-input cal-input" id="cal-${mt.key}" type="number" min="0" max="5000" placeholder="kcal">
+                </div>
+                <div class="ingredients-section" id="ingsec-${mt.key}" style="display:none;margin-bottom:0.5rem">
+                    <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:0.4rem;">INGREDIENTS (each line: name, calories)</div>
+                    <div class="ing-list" id="inglist-${mt.key}"></div>
+                    <div style="display:flex;gap:0.4rem;margin-top:0.35rem">
+                        <input class="form-input" id="ingname-${mt.key}" type="text" placeholder="Ingredient name…" style="flex:1" autocomplete="off">
+                        <input class="form-input cal-input" id="ingcal-${mt.key}" type="number" min="0" placeholder="kcal" style="max-width:80px">
+                        <button class="btn btn-save" style="padding:0.4rem 0.7rem;font-size:0.7rem" onclick="addIngredient('${mt.key}')">＋</button>
+                    </div>
+                    <div style="font-size:0.72rem;color:var(--text-dim);margin-top:0.3rem;font-style:italic" id="ingtotal-${mt.key}">Total: 0 kcal — will auto-fill above</div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-save" onclick="addMeal('${mt.key}')">ADD</button>
+                    <button class="btn btn-ing" onclick="toggleIngredients('${mt.key}')">🥗 Ingredients</button>
+                    <button class="btn-fav-pick btn" onclick="toggleFavPanel('${mt.key}')">⭐ From Favs</button>
+                    <button class="btn btn-cancel" onclick="closeAddForm('${mt.key}')">CANCEL</button>
+                </div>
+                <div class="fav-panel" id="favpanel-${mt.key}"></div>
+            </div>`;
+
+        container.appendChild(sec);
+
+        // Render meal items
+        const list = sec.querySelector(`#list-${mt.key}`);
+        if (meals.length === 0) {
+            list.innerHTML = `<div style="font-size:0.78rem;color:var(--text-muted);padding:0.4rem 0.6rem;font-style:italic;">No meals logged yet</div>`;
+        } else {
+            meals.forEach((meal, idx) => {
+                const isFav = !!(meal.favId && state.favs.some(f => f.id === meal.favId));
+                const hasIngs = meal.ingredients && meal.ingredients.length > 0;
+                const item = document.createElement('div');
+                item.className = 'meal-item' + (hasIngs ? '' : ' no-ings');
+
+                // Ingredient rows HTML
+                const ingRowsHTML = hasIngs
+                    ? `<div class="ing-label">INGREDIENTS</div>` +
+                      meal.ingredients.map(ing =>
+                          `<div class="ing-row"><span class="ing-row-name">${ing.name}</span><span class="ing-row-cal">${ing.cal} kcal</span></div>`
+                      ).join('')
+                    : '';
+
+                item.innerHTML = `
+                    <div class="meal-item-header">
+                        <span class="meal-item-chevron">▶</span>
+                        <span class="meal-item-name" title="${meal.name}">${meal.name}</span>
+                        <span class="meal-item-cal">${meal.cal} kcal</span>
+                        <div class="meal-item-actions">
+                            <button class="icon-btn fav ${isFav?'active':''}" title="${isFav?'Remove from favourites':'Save to favourites'}"
+                                onclick="event.stopPropagation();toggleFav('${dayKey}','${mt.key}',${idx})">⭐</button>
+                            <button class="icon-btn" title="Delete"
+                                onclick="event.stopPropagation();deleteMeal('${dayKey}','${mt.key}',${idx})">🗑️</button>
+                        </div>
+                    </div>
+                    ${hasIngs ? `<div class="meal-item-ingredients">${ingRowsHTML}</div>` : ''}`;
+
+                // Toggle expand on header click (only if has ingredients)
+                if (hasIngs) {
+                    item.querySelector('.meal-item-header').addEventListener('click', () => {
+                        item.classList.toggle('expanded');
+                    });
+                }
+
+                list.appendChild(item);
+            });
+        }
+
+        // Enter key on inputs
+        sec.querySelector(`#name-${mt.key}`).addEventListener('keydown', e => { if(e.key==='Enter') sec.querySelector(`#cal-${mt.key}`).focus(); });
+        sec.querySelector(`#cal-${mt.key}`).addEventListener('keydown', e => { if(e.key==='Enter') addMeal(mt.key); });
+        sec.querySelector(`#ingname-${mt.key}`)?.addEventListener('keydown', e => { if(e.key==='Enter') sec.querySelector(`#ingcal-${mt.key}`)?.focus(); });
+        sec.querySelector(`#ingcal-${mt.key}`)?.addEventListener('keydown', e => { if(e.key==='Enter') addIngredient(mt.key); });
+    });
+}
+
+// ── ADD / DELETE MEAL ─────────────────────────────────────────────────────────
+function toggleAddForm(type, e) {
+    e.stopPropagation();
+    const form = document.getElementById(`form-${type}`);
+    const isOpen = form.classList.toggle('open');
+    if (isOpen) setTimeout(() => document.getElementById(`name-${type}`)?.focus(), 50);
+    else closeFavPanel(type);
+}
+function closeAddForm(type) {
+    const form = document.getElementById(`form-${type}`);
+    form.classList.remove('open');
+    closeFavPanel(type);
+    // Reset ingredient section
+    const sec = document.getElementById(`ingsec-${type}`);
+    if (sec) sec.style.display = 'none';
+    if (ingredientStore[type]) ingredientStore[type] = [];
+    const ingList = document.getElementById(`inglist-${type}`);
+    if (ingList) ingList.innerHTML = '';
+    const btn = form?.querySelector('.btn-ing');
+    btn?.classList.remove('active');
+}
+
+function addMeal(type) {
+    const dayKey = DAYS[state.activeDay];
+    const nameEl = document.getElementById(`name-${type}`);
+    const calEl  = document.getElementById(`cal-${type}`);
+    const name = nameEl.value.trim();
+    const cal  = parseInt(calEl.value);
+    if (!name) { nameEl.focus(); toast('Enter a meal name 🐾'); return; }
+    if (!cal || cal < 0) { calEl.focus(); toast('Enter valid calories 🔥'); return; }
+    // Build ingredient note if any ingredients were added
+    const ings = ingredientStore[type] || [];
+    state.meals[dayKey][type].push({ id:genId(), name, cal, ingredients: ings.length ? [...ings] : undefined });
+    nameEl.value = '';
+    calEl.value  = '';
+    // Clear ingredients
+    ingredientStore[type] = [];
+    const sec = document.getElementById(`ingsec-${type}`);
+    if (sec) sec.style.display = 'none';
+    const ingList = document.getElementById(`inglist-${type}`);
+    if (ingList) ingList.innerHTML = '';
+    const ingBtn = document.querySelector(`#form-${type} .btn-ing`);
+    ingBtn?.classList.remove('active');
+    saveState();
+    renderAll();
+    toast('Meal logged! 🏔️');
+}
+
+function deleteMeal(dayKey, type, idx) {
+    state.meals[dayKey][type].splice(idx, 1);
+    saveState();
+    renderAll();
+}
+
+// ── FAVOURITES ────────────────────────────────────────────────────────────────
+function toggleFav(dayKey, type, idx) {
+    const meal = state.meals[dayKey][type][idx];
+    if (meal.favId && state.favs.some(f => f.id === meal.favId)) {
+        // Already a fav — remove it
+        const favIdx = state.favs.findIndex(f => f.id === meal.favId);
+        if (favIdx >= 0) state.favs.splice(favIdx, 1);
+        delete meal.favId;
+        toast('Removed from favourites');
+    } else {
+        // Save as new fav and link via favId
+        const newFav = { id:genId(), name:meal.name, cal:meal.cal, ingredients: meal.ingredients || [] };
+        state.favs.push(newFav);
+        meal.favId = newFav.id;
+        toast('⭐ Saved to favourites!');
+    }
+    saveState();
+    renderAll();
+}
+
+function toggleFavPanel(type) {
+    const panel = document.getElementById(`favpanel-${type}`);
+    const isOpen = panel.classList.toggle('open');
+    if (!isOpen) return;
+    renderFavPanel(type);
+}
+function closeFavPanel(type) {
+    document.getElementById(`favpanel-${type}`)?.classList.remove('open');
+}
+
+function renderFavPanel(type) {
+    const panel = document.getElementById(`favpanel-${type}`);
+    if (!panel) return;
+    panel.innerHTML = `<div class="fav-panel-title">⭐ YOUR FAVOURITES — click to add</div>`;
+    if (state.favs.length === 0) {
+        panel.innerHTML += `<div class="fav-empty">No favourites yet — star a meal to save it!</div>`;
+        return;
+    }
+    state.favs.forEach(fav => {
+        const row = document.createElement('div');
+        row.className = 'fav-item';
+        row.innerHTML = `
+            <span class="fav-item-name">${fav.name}</span>
+            <span class="fav-item-cal">${fav.cal} kcal</span>
+            <button class="fav-item-use" onclick="useFav('${type}','${fav.id}',false)">ADD</button>
+            <button class="fav-item-use" style="background:rgba(14,126,192,0.2);color:var(--glacier-light)" onclick="useFav('${type}','${fav.id}',true)">EDIT+ADD</button>`;
+        panel.appendChild(row);
+    });
+}
+
+function useFav(type, favId, editMode) {
+    const fav = state.favs.find(f => f.id === favId);
+    if (!fav) return;
+    const nameEl = document.getElementById(`name-${type}`);
+    const calEl  = document.getElementById(`cal-${type}`);
+    nameEl.value = fav.name;
+    calEl.value  = fav.cal;
+
+    // Restore ingredients into store so they get saved with the meal
+    if (fav.ingredients && fav.ingredients.length > 0) {
+        ingredientStore[type] = fav.ingredients.map(ing => ({ ...ing, id: genId() }));
+        // Show ingredient section so user can see/edit them
+        const sec = document.getElementById(`ingsec-${type}`);
+        const btn = document.querySelector(`#form-${type} .btn-ing`);
+        if (sec) { sec.style.display = 'block'; btn?.classList.add('active'); }
+        renderIngredients(type);
+    }
+
+    closeFavPanel(type);
+    if (editMode) {
+        nameEl.focus();
+        nameEl.select();
+    } else {
+        addMeal(type);
+    }
+}
+
+// ── FAVS MODAL ────────────────────────────────────────────────────────────────
+function openFavModal() {
+    const list = document.getElementById('favListModal');
+    list.innerHTML = '';
+    if (state.favs.length === 0) {
+        list.innerHTML = `<div class="fav-empty" style="padding:1rem">No favourites yet. Star a meal to save it here!</div>`;
+    } else {
+        state.favs.forEach((fav, i) => {
+            const row = document.createElement('div');
+            row.className = 'fav-item';
+            row.style.justifyContent = 'space-between';
+            row.innerHTML = `
+                <span class="fav-item-name">${fav.name}</span>
+                <span class="fav-item-cal">${fav.cal} kcal</span>
+                <button class="icon-btn" style="opacity:0.6" onclick="deleteFav(${i})">🗑️</button>`;
+            list.appendChild(row);
+        });
+    }
+    document.getElementById('favModal').classList.add('open');
+}
+function closeFavModal() { document.getElementById('favModal').classList.remove('open'); }
+function deleteFav(i) {
+    const fav = state.favs[i];
+    // Unlink any meals that reference this fav
+    if (fav) {
+        DAYS.forEach(d => {
+            MEAL_TYPES.forEach(mt => {
+                (state.meals[d]?.[mt.key] || []).forEach(m => {
+                    if (m.favId === fav.id) delete m.favId;
+                });
+            });
+        });
+    }
+    state.favs.splice(i, 1);
+    saveState();
+    openFavModal();
+    renderAll();
+}
+
+// ── GOAL MODAL ───────────────────────────────────────────────────────────────
+function openGoalModal() {
+    document.getElementById('gm-maintenance').value = state.maintenance || 2400;
+    document.getElementById('gm-goal').value = state.goal || 2000;
+    document.getElementById('gm-deficit').value = '';
+    document.getElementById('gm-goal-hint').textContent = '';
+
+    // Render per-day inputs
+    const grid = document.getElementById('gmDaysGrid');
+    if (grid) {
+        grid.innerHTML = '';
+        DAYS.forEach(d => {
+            const col = document.createElement('div');
+            col.className = 'gm-day-col';
+            col.innerHTML = `<div class="gm-day-label">${d.toUpperCase()}</div>
+                <input class="gm-day-input" id="gm-day-${d}" type="number" min="500" max="10000" step="50"
+                    placeholder="${state.goal}" value="${state.dayGoals?.[d] || ''}">`;
+            grid.appendChild(col);
+        });
+    }
+
+    document.getElementById('goalModal').classList.add('open');
+}
+function closeGoalModal() { document.getElementById('goalModal').classList.remove('open'); }
+
+function updateGoalFromDeficit() {
+    const maint = parseInt(document.getElementById('gm-maintenance').value) || 0;
+    const deficitInput = document.getElementById('gm-deficit').value;
+    if (deficitInput !== '' && maint > 0) {
+        const weeklyDeficit = parseFloat(deficitInput) * 7700; // kcal per kg
+        const dailyDeficit  = Math.round(weeklyDeficit / 7);
+        const computed = Math.max(1000, maint - dailyDeficit);
+        document.getElementById('gm-goal').value = computed;
+        document.getElementById('gm-goal-hint').textContent = computed + ' kcal/day';
+    } else {
+        document.getElementById('gm-goal-hint').textContent = '';
+    }
+}
+
+function saveGoalSettings() {
+    const maint = parseInt(document.getElementById('gm-maintenance').value);
+    const goal  = parseInt(document.getElementById('gm-goal').value);
+    if (maint >= 500) state.maintenance = maint;
+    if (goal  >= 500) state.goal = goal;
+
+    // Save per-day overrides
+    DAYS.forEach(d => {
+        const inp = document.getElementById('gm-day-' + d);
+        if (!inp) return;
+        const v = inp.value.trim();
+        if (v === '') { delete state.dayGoals[d]; }
+        else { const n = parseInt(v); if (n >= 500) state.dayGoals[d] = n; }
+    });
+
+    saveState();
+    closeGoalModal();
+    renderAll();
+    toast('✅ Goal settings saved!');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.style.display = 'none'; }, 2200);
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────────────────
+function renderAll() {
+    renderDayPills();
+    renderWeeklyChart();
+    renderMealSections();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadState();
+
+// Auto-select today (only if on current week)
+if ((state.weekOffset || 0) === 0) {
+    const todayIdx = (new Date().getDay() + 6) % 7;
+    state.activeDay = todayIdx;
+}
+
+renderAll();
+
+// Init Supabase and load cloud data
+initSupabase();
+initAuth();
+</script>
+</body>
+</html>
