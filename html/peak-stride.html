@@ -1383,6 +1383,7 @@
         .workout-item.swim     { border-left-color: var(--success); }
         .workout-item.rest,
         .workout-item.mobility { border-left-color: rgba(101, 174, 120, 0.6); background: rgba(134,197,152,0.12); }
+        .workout-item.strength { border-left-color: #a855f7; background: rgba(168,85,247,0.07); }
         .workout-item.key-item { border-left-color: #0284c7; background: rgba(14,165,233,0.08); }
 
         /* Rest day row — soft sage green, no miss/done controls */
@@ -1517,6 +1518,32 @@
         }
         .workout-type-selector button:hover { background:rgba(74,144,226,.2); border-color:var(--mountain-blue); }
         .cancel-add-btn { align-self:flex-start; padding:0.25rem 0.65rem; background:transparent; border:1px solid rgba(239,68,68,.4); border-radius:5px; color:#ef4444; cursor:pointer; font-size:0.8rem; }
+
+        /* ── DRAG & DROP ── */
+        .workout-item.draggable { cursor: grab; }
+        .workout-item.draggable:active { cursor: grabbing; }
+        .workout-item.drag-over-top {
+            border-top: 3px solid var(--mountain-blue) !important;
+            margin-top: -2px;
+        }
+        .workout-item.drag-over-bottom {
+            border-bottom: 3px solid var(--mountain-blue) !important;
+            margin-bottom: -2px;
+        }
+        .workout-item.dragging {
+            opacity: 0.4;
+            background: rgba(74,144,226,0.15) !important;
+        }
+        .drag-handle {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            cursor: grab;
+            padding: 0 2px;
+            flex-shrink: 0;
+            user-select: none;
+            display: none;
+        }
+        .edit-mode-active .drag-handle { display: block; }
 
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1857,6 +1884,7 @@ function createWorkoutItem(day, workout, wi) {
     const checked    = workout.completed ? 'checked' : '';
 
     item.innerHTML = `
+        <span class="drag-handle" title="Drag to reorder">⠿</span>
         <span class="workout-icon">${workout.icon||'🏃'}</span>
         <div class="workout-desc" data-id="${day.id}" data-wi="${wi}">${workout.desc||''}</div>
         <div class="workout-dist" data-id="${day.id}" data-wi="${wi}">${workout.distance||''}</div>
@@ -1903,6 +1931,74 @@ function syncWorkoutState(dayId, wi) {
     updateDayCompletion(row);
     updateWeekKmForDay(dayId);
     savePlanToDatabase();
+}
+
+// ── DRAG & DROP REORDER ─────────────────────────────────────────────────────
+function enableDragReorder(container) {
+    let dragSrc = null;
+
+    function getDragAfterElement(container, y) {
+        const items = [...container.querySelectorAll('.workout-item:not(.dragging):not(.add-workout-btn):not(.workout-type-selector)')];
+        return items.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset, element: child };
+            }
+            return closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    container.addEventListener('dragstart', e => {
+        const item = e.target.closest('.workout-item');
+        if (!item || !item.classList.contains('draggable')) return;
+        dragSrc = item;
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', ''); // required for Firefox
+    });
+
+    container.addEventListener('dragend', e => {
+        const item = e.target.closest('.workout-item');
+        if (item) item.classList.remove('dragging', 'drag-over-top', 'drag-over-bottom');
+        container.querySelectorAll('.workout-item').forEach(i => i.classList.remove('drag-over-top','drag-over-bottom'));
+        dragSrc = null;
+    });
+
+    container.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        container.querySelectorAll('.workout-item').forEach(i => i.classList.remove('drag-over-top','drag-over-bottom'));
+        const afterEl = getDragAfterElement(container, e.clientY);
+        if (afterEl) {
+            afterEl.classList.add('drag-over-top');
+        } else {
+            // after last item
+            const items = [...container.querySelectorAll('.workout-item:not(.dragging):not(.workout-type-selector)')];
+            if (items.length > 0) items[items.length-1].classList.add('drag-over-bottom');
+        }
+    });
+
+    container.addEventListener('dragleave', e => {
+        if (!container.contains(e.relatedTarget)) {
+            container.querySelectorAll('.workout-item').forEach(i => i.classList.remove('drag-over-top','drag-over-bottom'));
+        }
+    });
+
+    container.addEventListener('drop', e => {
+        e.preventDefault();
+        if (!dragSrc) return;
+        container.querySelectorAll('.workout-item').forEach(i => i.classList.remove('drag-over-top','drag-over-bottom'));
+        const afterEl = getDragAfterElement(container, e.clientY);
+        const addBtn = container.querySelector('.add-workout-btn');
+        if (afterEl) {
+            container.insertBefore(dragSrc, afterEl);
+        } else {
+            // append before the add button if it exists, otherwise at end
+            if (addBtn) container.insertBefore(dragSrc, addBtn);
+            else container.appendChild(dragSrc);
+        }
+    });
 }
 
 function updateWeekKmForDay(dayId) {
@@ -1965,6 +2061,16 @@ if (editModeBtn) {
                 el.style.cursor = 'text';
             });
 
+            // Enable drag-and-drop on all workout containers
+            document.getElementById('training-plan').classList.add('edit-mode-active');
+            document.querySelectorAll('.workouts-container').forEach(wc => {
+                enableDragReorder(wc);
+            });
+            document.querySelectorAll('.workout-item').forEach(item => {
+                item.classList.add('draggable');
+                item.setAttribute('draggable', 'true');
+            });
+
             // Add key toggle + delete buttons to every workout item
             document.querySelectorAll('.workout-item').forEach(item => {
                 if (!item.querySelector('.key-toggle-btn')) {
@@ -2025,7 +2131,7 @@ if (editModeBtn) {
             this.textContent = '⏳ Saving…';
             this.disabled = true;
 
-            const typeIcons = {run:'🏃',bike:'🚴',swim:'🏊',rest:'😴',mobility:'🧘'};
+            const typeIcons = {run:'🏃',bike:'🚴',swim:'🏊',rest:'😴',mobility:'🧘',strength:'💪'};
 
             document.querySelectorAll('.day-row[data-day-id]').forEach(row => {
                 const dayId = row.getAttribute('data-day-id');
@@ -2035,7 +2141,7 @@ if (editModeBtn) {
                 const newWorkouts = [];
                 items.forEach(item => {
                     let type = 'run';
-                    for (const t of ['run','bike','swim','rest','mobility']) {
+                    for (const t of ['run','bike','swim','rest','mobility','strength']) {
                         if (item.classList.contains(t)) { type=t; break; }
                     }
                     const desc = item.querySelector('.workout-desc');
@@ -2061,6 +2167,8 @@ if (editModeBtn) {
             });
 
             // Strip edit UI
+            document.getElementById('training-plan').classList.remove('edit-mode-active');
+            document.querySelectorAll('.workout-item').forEach(item => { item.classList.remove('draggable'); item.removeAttribute('draggable'); });
             allDescs.forEach(el=>{ el.contentEditable='false'; el.style.cursor='default'; });
             allDists.forEach(el=>{ el.contentEditable='false'; el.style.cursor='default'; });
             document.querySelectorAll('.key-toggle-btn,.delete-workout-btn,.add-workout-btn').forEach(b=>b.remove());
@@ -2084,6 +2192,7 @@ function addWorkout(dayRow) {
         bike:     { icon:'🚴', label:'Bike' },
         swim:     { icon:'🏊', label:'Swim' },
         rest:     { icon:'😴', label:'Rest/Mobility' },
+        strength: { icon:'💪', label:'Strength' },
     };
 
     const sel = document.createElement('div');
@@ -2138,6 +2247,8 @@ function addWorkout(dayRow) {
             item.appendChild(keyBtn);
             item.appendChild(delBtn);
 
+            item.classList.add('draggable');
+            item.setAttribute('draggable', 'true');
             wc.insertBefore(item, addBtn);
             refreshDayRestState(dayRow);
             updateLongRunHighlights();
