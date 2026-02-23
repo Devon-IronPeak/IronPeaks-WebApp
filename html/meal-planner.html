@@ -851,6 +851,72 @@ body {
     .nav-title { font-size: 0.9rem; }
     .week-label { display: none; }
 }
+/* ── MACRO INPUTS ── */
+.macro-row {
+    display: flex; gap: 0.4rem; margin-top: 0.4rem; align-items: center;
+}
+.macro-row label {
+    font-family: 'Orbitron', monospace; font-size: 0.6rem;
+    color: var(--text-dim); letter-spacing: 0.08em; white-space: nowrap;
+}
+.macro-input {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border-light);
+    border-radius: 5px; color: var(--text); font-size: 0.8rem;
+    padding: 0.3rem 0.4rem; width: 58px; text-align: center;
+}
+.macro-input:focus { outline: none; border-color: var(--accent); }
+.macro-input::placeholder { color: var(--text-muted); font-size: 0.7rem; }
+.macro-hint { font-size: 0.65rem; color: var(--text-muted); margin-top:0.2rem; font-style:italic; }
+/* ── MEAL MACRO BADGE ── */
+.meal-macros {
+    display: flex; gap: 0.4rem; margin-top: 0.25rem; flex-wrap: wrap;
+}
+.macro-badge {
+    font-size: 0.62rem; font-family:'Orbitron',monospace; letter-spacing:0.05em;
+    padding: 0.1rem 0.4rem; border-radius: 3px; font-weight:700;
+}
+.macro-badge.p { background: rgba(78,205,196,0.18); color: #4ecdc4; border: 1px solid rgba(78,205,196,0.3); }
+.macro-badge.c { background: rgba(232,184,75,0.18); color: var(--accent2); border: 1px solid rgba(232,184,75,0.3); }
+.macro-badge.f { background: rgba(239,68,68,0.18); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+/* ── PIE CHART SECTION ── */
+.macro-chart-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.2rem 1rem 1rem;
+    margin-top: 1.4rem;
+}
+.macro-chart-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.72rem; font-weight: 700;
+    color: var(--text-dim); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+.macro-chart-body {
+    display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+}
+.pie-wrap { position: relative; flex-shrink: 0; }
+.pie-svg { display: block; }
+.pie-center-text {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none;
+}
+.pie-center-kcal {
+    font-family: 'Orbitron', monospace; font-size: 0.9rem;
+    font-weight: 900; color: var(--text);
+    display: block; line-height: 1.1;
+}
+.pie-center-label { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; }
+.macro-legend { flex: 1; min-width: 130px; display: flex; flex-direction: column; gap: 0.55rem; }
+.legend-row { display: flex; align-items: center; gap: 0.5rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-name { font-family: 'Orbitron', monospace; font-size: 0.62rem; color: var(--text-dim); letter-spacing: 0.06em; flex: 1; }
+.legend-grams { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+.legend-kcal  { font-size: 0.67rem; color: var(--text-muted); margin-left: 3px; }
+.legend-pct { font-family: 'Orbitron', monospace; font-size: 0.62rem; font-weight: 700; min-width: 32px; text-align: right; }
+.macro-no-data { text-align: center; padding: 1.2rem 0; color: var(--text-muted); font-size: 0.8rem; font-style: italic; }
 </style>
 </head>
 <body>
@@ -969,6 +1035,12 @@ body {
 
   <!-- Meal sections -->
   <div id="mealSections"></div>
+
+  <!-- Macro Pie Chart -->
+  <div class="macro-chart-section" id="macroChartSection">
+    <div class="macro-chart-title">🥗 DAILY MACROS</div>
+    <div id="macroChartBody"></div>
+  </div>
 
 </div>
 
@@ -1216,6 +1288,12 @@ function addIngredient(type) {
     ingredientStore[type].push({ id: genId(), name, cal });
     nameEl.value = '';
     calEl.value  = '';
+    const _pe = document.getElementById(`prot-${type}`);
+    const _ce = document.getElementById(`carb-${type}`);
+    const _fe = document.getElementById(`fat-${type}`);
+    if (_pe) _pe.value = '';
+    if (_ce) _ce.value = '';
+    if (_fe) _fe.value = '';
     nameEl.focus();
     renderIngredients(type);
     // Auto-update cal total only from ingredients that have calories
@@ -1452,6 +1530,15 @@ function renderMealSections() {
                     <input class="form-input" id="name-${mt.key}" type="text" placeholder="Meal name…" autocomplete="off">
                     <input class="form-input cal-input" id="cal-${mt.key}" type="number" min="0" max="5000" placeholder="kcal">
                 </div>
+                <div class="macro-row">
+                    <label>MACROS (g) — optional</label>
+                </div>
+                <div class="macro-row">
+                    <label>🥩P</label><input class="macro-input" id="prot-${mt.key}" type="number" min="0" max="500" step="0.1" placeholder="protein">
+                    <label>🍞C</label><input class="macro-input" id="carb-${mt.key}" type="number" min="0" max="500" step="0.1" placeholder="carbs">
+                    <label>🧈F</label><input class="macro-input" id="fat-${mt.key}"  type="number" min="0" max="500" step="0.1" placeholder="fat">
+                </div>
+                <div class="macro-hint">Leave blank to skip — pie chart uses only meals with macros entered</div>
                 <div class="ingredients-section" id="ingsec-${mt.key}" style="display:none;margin-bottom:0.5rem">
                     <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:0.4rem;">INGREDIENTS (each line: name, calories)</div>
                     <div class="ing-list" id="inglist-${mt.key}"></div>
@@ -1492,6 +1579,12 @@ function renderMealSections() {
                       ).join('')
                     : '';
 
+                const hasMacros = meal.protein != null || meal.carbs != null || meal.fat != null;
+                const macroBadgesHTML = hasMacros ? `<div class="meal-macros">
+                    ${meal.protein != null ? `<span class="macro-badge p">P ${meal.protein}g</span>` : ''}
+                    ${meal.carbs   != null ? `<span class="macro-badge c">C ${meal.carbs}g</span>` : ''}
+                    ${meal.fat     != null ? `<span class="macro-badge f">F ${meal.fat}g</span>` : ''}
+                </div>` : '';
                 item.innerHTML = `
                     <div class="meal-item-header">
                         <span class="meal-item-chevron">▶</span>
@@ -1504,6 +1597,7 @@ function renderMealSections() {
                                 onclick="event.stopPropagation();deleteMeal('${dayKey}','${mt.key}',${idx})">🗑️</button>
                         </div>
                     </div>
+                    ${macroBadgesHTML}
                     ${hasIngs ? `<div class="meal-item-ingredients">${ingRowsHTML}</div>` : ''}`;
 
                 // Toggle expand on header click (only if has ingredients)
@@ -1559,7 +1653,17 @@ function addMeal(type) {
     if (!cal || cal < 0) { calEl.focus(); toast('Enter valid calories 🔥'); return; }
     // Build ingredient note if any ingredients were added
     const ings = ingredientStore[type] || [];
-    state.meals[dayKey][type].push({ id:genId(), name, cal, ingredients: ings.length ? [...ings] : undefined });
+    const protEl = document.getElementById(`prot-${type}`);
+    const carbEl = document.getElementById(`carb-${type}`);
+    const fatEl  = document.getElementById(`fat-${type}`);
+    const prot = protEl && protEl.value !== '' ? parseFloat(protEl.value) : null;
+    const carb = carbEl && carbEl.value !== '' ? parseFloat(carbEl.value) : null;
+    const fat  = fatEl  && fatEl.value  !== '' ? parseFloat(fatEl.value)  : null;
+    const mealObj = { id:genId(), name, cal, ingredients: ings.length ? [...ings] : undefined };
+    if (prot !== null) mealObj.protein = prot;
+    if (carb !== null) mealObj.carbs   = carb;
+    if (fat  !== null) mealObj.fat     = fat;
+    state.meals[dayKey][type].push(mealObj);
     nameEl.value = '';
     calEl.value  = '';
     // Clear ingredients
@@ -1768,10 +1872,110 @@ function toast(msg) {
 }
 
 // ── MAIN RENDER ───────────────────────────────────────────────────────────────
+// ── MACRO HELPERS & PIE CHART ────────────────────────────────────────────────
+function dayMacros(dayKey) {
+    let protein = 0, carbs = 0, fat = 0, hasMacros = false;
+    MEAL_TYPES.forEach(mt => {
+        (state.meals[dayKey]?.[mt.key] || []).forEach(m => {
+            if (m.protein != null) { protein += m.protein; hasMacros = true; }
+            if (m.carbs   != null) { carbs   += m.carbs;   hasMacros = true; }
+            if (m.fat     != null) { fat     += m.fat;     hasMacros = true; }
+        });
+    });
+    return { protein, carbs, fat, hasMacros };
+}
+
+function renderMacroPie() {
+    const dates  = getWeekDates();
+    const dayKey = dateKey(dates[state.activeDay]);
+    const body   = document.getElementById('macroChartBody');
+    if (!body) return;
+
+    const { protein, carbs, fat, hasMacros } = dayMacros(dayKey);
+
+    if (!hasMacros) {
+        body.innerHTML = `<div class="macro-no-data">No macro data for today — add protein, carbs or fat when logging a meal to see your breakdown here.</div>`;
+        return;
+    }
+
+    const pKcal = protein * 4;
+    const cKcal = carbs   * 4;
+    const fKcal = fat     * 9;
+    const totalKcal = pKcal + cKcal + fKcal;
+
+    const pPct = totalKcal > 0 ? Math.round(pKcal / totalKcal * 100) : 0;
+    const cPct = totalKcal > 0 ? Math.round(cKcal / totalKcal * 100) : 0;
+    const fPct = totalKcal > 0 ? 100 - pPct - cPct : 0;
+
+    const COL_P = '#4ecdc4', COL_C = '#e8b84b', COL_F = '#f87171';
+    const R = 62, CX = 80, CY = 80, size = 160, STROKE = 24;
+
+    function arc(startDeg, pct, color) {
+        if (pct <= 0) return '';
+        const sweep = pct >= 100 ? 359.99 : 360 * pct / 100;
+        const toXY = deg => {
+            const r = (deg - 90) * Math.PI / 180;
+            return [CX + R * Math.cos(r), CY + R * Math.sin(r)];
+        };
+        const [sx, sy] = toXY(startDeg);
+        const [ex, ey] = toXY(startDeg + sweep);
+        const large = sweep > 180 ? 1 : 0;
+        return `<path d="M${CX},${CY} L${sx},${sy} A${R},${R} 0 ${large},1 ${ex},${ey} Z" fill="${color}" opacity="0.9"/>`;
+    }
+
+    let cursor = 0;
+    const paths = arc(cursor, pPct, COL_P)
+        + arc(cursor += 360 * pPct / 100, cPct, COL_C)
+        + arc(cursor += 360 * cPct / 100, fPct, COL_F);
+
+    body.innerHTML = `
+    <div class="macro-chart-body">
+        <div class="pie-wrap">
+            <svg class="pie-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                ${paths}
+                <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--bg-card)" stroke-width="2"/>
+                <circle cx="${CX}" cy="${CY}" r="${R - STROKE}" fill="var(--bg-card)"/>
+            </svg>
+            <div class="pie-center-text">
+                <span class="pie-center-kcal">${Math.round(totalKcal)}</span>
+                <span class="pie-center-label">macro kcal</span>
+            </div>
+        </div>
+        <div class="macro-legend">
+            <div class="legend-row">
+                <div class="legend-dot" style="background:${COL_P}"></div>
+                <span class="legend-name">PROTEIN</span>
+                <span class="legend-grams">${protein.toFixed(1)}g</span>
+                <span class="legend-kcal">${Math.round(pKcal)} kcal</span>
+                <span class="legend-pct" style="color:${COL_P}">${pPct}%</span>
+            </div>
+            <div class="legend-row">
+                <div class="legend-dot" style="background:${COL_C}"></div>
+                <span class="legend-name">CARBS</span>
+                <span class="legend-grams">${carbs.toFixed(1)}g</span>
+                <span class="legend-kcal">${Math.round(cKcal)} kcal</span>
+                <span class="legend-pct" style="color:${COL_C}">${cPct}%</span>
+            </div>
+            <div class="legend-row">
+                <div class="legend-dot" style="background:${COL_F}"></div>
+                <span class="legend-name">FAT</span>
+                <span class="legend-grams">${fat.toFixed(1)}g</span>
+                <span class="legend-kcal">${Math.round(fKcal)} kcal</span>
+                <span class="legend-pct" style="color:${COL_F}">${fPct}%</span>
+            </div>
+            <div style="margin-top:0.35rem;padding-top:0.4rem;border-top:1px solid var(--border);font-size:0.65rem;color:var(--text-muted);line-height:1.5">
+                ${Math.round(totalKcal)} of ${dayTotal(dayKey)} kcal macro-tracked<br>
+                <span style="font-style:italic">Only meals with macros entered are counted</span>
+            </div>
+        </div>
+    </div>`;
+}
+
 function renderAll() {
     renderDayPills();
     renderWeeklyChart();
     renderMealSections();
+    renderMacroPie();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
