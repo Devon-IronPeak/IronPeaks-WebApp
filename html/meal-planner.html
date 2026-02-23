@@ -1697,6 +1697,9 @@ function toggleFav(dayKey, type, idx) {
     } else {
         // Save as new fav and link via favId
         const newFav = { id:genId(), name:meal.name, cal:meal.cal, ingredients: meal.ingredients || [] };
+        if (meal.protein != null) newFav.protein = meal.protein;
+        if (meal.carbs   != null) newFav.carbs   = meal.carbs;
+        if (meal.fat     != null) newFav.fat      = meal.fat;
         state.favs.push(newFav);
         meal.favId = newFav.id;
         toast('⭐ Saved to favourites!');
@@ -1742,6 +1745,14 @@ function useFav(type, favId, editMode) {
     const calEl  = document.getElementById(`cal-${type}`);
     nameEl.value = fav.name;
     calEl.value  = fav.cal;
+
+    // Restore macros into form fields
+    const protEl = document.getElementById(`prot-${type}`);
+    const carbEl = document.getElementById(`carb-${type}`);
+    const fatEl  = document.getElementById(`fat-${type}`);
+    if (protEl) protEl.value = fav.protein != null ? fav.protein : '';
+    if (carbEl) carbEl.value = fav.carbs   != null ? fav.carbs   : '';
+    if (fatEl)  fatEl.value  = fav.fat     != null ? fav.fat     : '';
 
     // Restore ingredients into store so they get saved with the meal
     if (fav.ingredients && fav.ingredients.length > 0) {
